@@ -1,0 +1,129 @@
+{
+  "kind": "collectionType",
+  "collectionName": "up_users",
+  "info": {
+    "name": "user",
+    "description": "",
+    "singularName": "user",
+    "pluralName": "users",
+    "displayName": "User"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "username": {
+      "type": "string",
+      "minLength": 3,
+      "unique": true,
+      "configurable": false,
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "minLength": 6,
+      "configurable": false,
+      "required": true
+    },
+    "provider": {
+      "type": "string",
+      "configurable": false
+    },
+    "password": {
+      "type": "password",
+      "minLength": 6,
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "resetPasswordToken": {
+      "type": "string",
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "confirmationToken": {
+      "type": "string",
+      "configurable": false,
+      "private": true,
+      "searchable": false
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "blocked": {
+      "type": "boolean",
+      "default": false,
+      "configurable": false
+    },
+    "role": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.role",
+      "inversedBy": "users",
+      "configurable": false
+    },
+    "posts": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::post.post",
+      "mappedBy": "user"
+    },
+    "followers": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "followed_by"
+    },
+    "followed_by": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "followers"
+    },
+    "todos": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::todo.todo",
+      "mappedBy": "user"
+    },
+    "goals": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::goal.goal",
+      "mappedBy": "user"
+    },
+    "diaries": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::diary.diary",
+      "mappedBy": "user"
+    },
+    "block_users": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "blocked_by"
+    },
+    "blocked_by": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "block_users"
+    },
+    "receive_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notice.notice",
+      "mappedBy": "receiver"
+    },
+    "send_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notice.notice",
+      "mappedBy": "sender"
+    }
+  }
+}

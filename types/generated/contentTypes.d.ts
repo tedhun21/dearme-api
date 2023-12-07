@@ -482,6 +482,50 @@ export interface PluginUploadFolder extends Schema.CollectionType {
   };
 }
 
+export interface PluginI18NLocale extends Schema.CollectionType {
+  collectionName: 'i18n_locale';
+  info: {
+    singularName: 'locale';
+    pluralName: 'locales';
+    collectionName: 'locales';
+    displayName: 'Locale';
+    description: '';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  pluginOptions: {
+    'content-manager': {
+      visible: false;
+    };
+    'content-type-builder': {
+      visible: false;
+    };
+  };
+  attributes: {
+    name: Attribute.String &
+      Attribute.SetMinMax<{
+        min: 1;
+        max: 50;
+      }>;
+    code: Attribute.String & Attribute.Unique;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'plugin::i18n.locale',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'plugin::i18n.locale',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface PluginUsersPermissionsPermission
   extends Schema.CollectionType {
   collectionName: 'up_permissions';
@@ -587,7 +631,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     username: Attribute.String &
@@ -616,6 +659,56 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    posts: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::post.post'
+    >;
+    followers: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    followed_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    todos: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::todo.todo'
+    >;
+    goals: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::goal.goal'
+    >;
+    diaries: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
+      'api::diary.diary'
+    >;
+    block_users: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    blocked_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    receive_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::notice.notice'
+    >;
+    send_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::notice.notice'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -633,46 +726,252 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
-export interface PluginI18NLocale extends Schema.CollectionType {
-  collectionName: 'i18n_locale';
+export interface ApiCommentComment extends Schema.CollectionType {
+  collectionName: 'comments';
   info: {
-    singularName: 'locale';
-    pluralName: 'locales';
-    collectionName: 'locales';
-    displayName: 'Locale';
-    description: '';
+    singularName: 'comment';
+    pluralName: 'comments';
+    displayName: 'comment';
   };
   options: {
-    draftAndPublish: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: false;
-    };
-    'content-type-builder': {
-      visible: false;
-    };
+    draftAndPublish: true;
   };
   attributes: {
-    name: Attribute.String &
-      Attribute.SetMinMax<{
-        min: 1;
-        max: 50;
-      }>;
-    code: Attribute.String & Attribute.Unique;
+    body: Attribute.Text;
+    post: Attribute.Relation<
+      'api::comment.comment',
+      'manyToOne',
+      'api::post.post'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'plugin::i18n.locale',
+      'api::comment.comment',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'plugin::i18n.locale',
+      'api::comment.comment',
       'oneToOne',
       'admin::user'
     > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiDiaryDiary extends Schema.CollectionType {
+  collectionName: 'diaries';
+  info: {
+    singularName: 'diary';
+    pluralName: 'diaries';
+    displayName: 'diary';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    body: Attribute.Blocks & Attribute.Required;
+    mood: Attribute.Enumeration<['happy', 'good', 'soso', 'bad', 'sad']> &
+      Attribute.Required;
+    feelings: Attribute.Text;
+    photos: Attribute.Media;
+    companions: Attribute.String;
+    startSleep: Attribute.Time;
+    endSleep: Attribute.Time;
+    weather: Attribute.String;
+    remember: Attribute.Boolean;
+    user: Attribute.Relation<
+      'api::diary.diary',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::diary.diary',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::diary.diary',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiGoalGoal extends Schema.CollectionType {
+  collectionName: 'goals';
+  info: {
+    singularName: 'goal';
+    pluralName: 'goals';
+    displayName: 'goal';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    startDate: Attribute.Date;
+    endDate: Attribute.Date;
+    title: Attribute.String;
+    body: Attribute.Text;
+    user: Attribute.Relation<
+      'api::goal.goal',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::goal.goal', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::goal.goal', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiNoticeNotice extends Schema.CollectionType {
+  collectionName: 'notices';
+  info: {
+    singularName: 'notice';
+    pluralName: 'notices';
+    displayName: 'notice';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    body: Attribute.String;
+    receiver: Attribute.Relation<
+      'api::notice.notice',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    sender: Attribute.Relation<
+      'api::notice.notice',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    event: Attribute.Enumeration<['todo', 'like']>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::notice.notice',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::notice.notice',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiPostPost extends Schema.CollectionType {
+  collectionName: 'posts';
+  info: {
+    singularName: 'post';
+    pluralName: 'posts';
+    displayName: 'post';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    body: Attribute.Text;
+    comments: Attribute.Relation<
+      'api::post.post',
+      'oneToMany',
+      'api::comment.comment'
+    >;
+    privateComment: Attribute.Boolean;
+    image: Attribute.Media;
+    user: Attribute.Relation<
+      'api::post.post',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiQouteQoute extends Schema.CollectionType {
+  collectionName: 'qoutes';
+  info: {
+    singularName: 'qoute';
+    pluralName: 'qoutes';
+    displayName: 'quote';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    author: Attribute.String;
+    body: Attribute.Blocks;
+    image: Attribute.Media;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::qoute.qoute',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::qoute.qoute',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiTodoTodo extends Schema.CollectionType {
+  collectionName: 'todos';
+  info: {
+    singularName: 'todo';
+    pluralName: 'todos';
+    displayName: 'todo';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    body: Attribute.String;
+    user: Attribute.Relation<
+      'api::todo.todo',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    date: Attribute.Date;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::todo.todo', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::todo.todo', 'oneToOne', 'admin::user'> &
       Attribute.Private;
   };
 }
@@ -689,10 +988,17 @@ declare module '@strapi/types' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
+      'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
-      'plugin::i18n.locale': PluginI18NLocale;
+      'api::comment.comment': ApiCommentComment;
+      'api::diary.diary': ApiDiaryDiary;
+      'api::goal.goal': ApiGoalGoal;
+      'api::notice.notice': ApiNoticeNotice;
+      'api::post.post': ApiPostPost;
+      'api::qoute.qoute': ApiQouteQoute;
+      'api::todo.todo': ApiTodoTodo;
     }
   }
 }

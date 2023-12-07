@@ -1,0 +1,67 @@
+{
+  "kind": "collectionType",
+  "collectionName": "diaries",
+  "info": {
+    "singularName": "diary",
+    "pluralName": "diaries",
+    "displayName": "diary"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "blocks",
+      "required": true
+    },
+    "mood": {
+      "type": "enumeration",
+      "enum": [
+        "happy",
+        "good",
+        "soso",
+        "bad",
+        "sad"
+      ],
+      "required": true
+    },
+    "feelings": {
+      "type": "text"
+    },
+    "photos": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "companions": {
+      "type": "string"
+    },
+    "startSleep": {
+      "type": "time"
+    },
+    "endSleep": {
+      "type": "time"
+    },
+    "weather": {
+      "type": "string"
+    },
+    "remember": {
+      "type": "boolean"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "diaries"
+    }
+  }
+}
