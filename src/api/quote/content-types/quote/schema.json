@@ -1,11 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "qoutes",
+  "collectionName": "quotes",
   "info": {
-    "singularName": "qoute",
-    "pluralName": "qoutes",
-    "displayName": "quote",
-    "description": ""
+    "singularName": "quote",
+    "pluralName": "quotes",
+    "displayName": "quote"
   },
   "options": {
     "draftAndPublish": true
@@ -19,15 +18,14 @@
       "type": "blocks"
     },
     "image": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ]
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

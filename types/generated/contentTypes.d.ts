@@ -664,12 +664,12 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::post.post'
     >;
-    followers: Attribute.Relation<
+    friends_request_to: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToMany',
       'plugin::users-permissions.user'
     >;
-    followed_by: Attribute.Relation<
+    friends_request_from: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToMany',
       'plugin::users-permissions.user'
@@ -689,6 +689,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::diary.diary'
     >;
+    receive_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::notice.notice'
+    >;
+    send_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::notice.notice'
+    >;
     block_users: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToMany',
@@ -699,15 +709,10 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToMany',
       'plugin::users-permissions.user'
     >;
-    receive_by: Attribute.Relation<
+    friends: Attribute.Relation<
       'plugin::users-permissions.user',
-      'oneToOne',
-      'api::notice.notice'
-    >;
-    send_by: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToOne',
-      'api::notice.notice'
+      'oneToMany',
+      'api::friendship.friendship'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -799,6 +804,41 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       Attribute.Private;
     updatedBy: Attribute.Relation<
       'api::diary.diary',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiFriendshipFriendship extends Schema.CollectionType {
+  collectionName: 'friendships';
+  info: {
+    singularName: 'friendship';
+    pluralName: 'friendships';
+    displayName: 'friendship';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    user: Attribute.Relation<
+      'api::friendship.friendship',
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::friendship.friendship',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::friendship.friendship',
       'oneToOne',
       'admin::user'
     > &
@@ -914,13 +954,12 @@ export interface ApiPostPost extends Schema.CollectionType {
   };
 }
 
-export interface ApiQouteQoute extends Schema.CollectionType {
-  collectionName: 'qoutes';
+export interface ApiQuoteQuote extends Schema.CollectionType {
+  collectionName: 'quotes';
   info: {
-    singularName: 'qoute';
-    pluralName: 'qoutes';
+    singularName: 'quote';
+    pluralName: 'quotes';
     displayName: 'quote';
-    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -933,13 +972,13 @@ export interface ApiQouteQoute extends Schema.CollectionType {
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
-      'api::qoute.qoute',
+      'api::quote.quote',
       'oneToOne',
       'admin::user'
     > &
       Attribute.Private;
     updatedBy: Attribute.Relation<
-      'api::qoute.qoute',
+      'api::quote.quote',
       'oneToOne',
       'admin::user'
     > &
@@ -994,10 +1033,11 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::comment.comment': ApiCommentComment;
       'api::diary.diary': ApiDiaryDiary;
+      'api::friendship.friendship': ApiFriendshipFriendship;
       'api::goal.goal': ApiGoalGoal;
       'api::notice.notice': ApiNoticeNotice;
       'api::post.post': ApiPostPost;
-      'api::qoute.qoute': ApiQouteQoute;
+      'api::quote.quote': ApiQuoteQuote;
       'api::todo.todo': ApiTodoTodo;
     }
   }

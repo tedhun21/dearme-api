@@ -71,17 +71,17 @@
       "target": "api::post.post",
       "mappedBy": "user"
     },
-    "followers": {
+    "friends_request_to": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "followed_by"
+      "mappedBy": "friends_request_from"
     },
-    "followed_by": {
+    "friends_request_from": {
       "type": "relation",
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "followers"
+      "inversedBy": "friends_request_to"
     },
     "todos": {
       "type": "relation",
@@ -101,6 +101,18 @@
       "target": "api::diary.diary",
       "mappedBy": "user"
     },
+    "receive_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notice.notice",
+      "mappedBy": "receiver"
+    },
+    "send_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notice.notice",
+      "mappedBy": "sender"
+    },
     "block_users": {
       "type": "relation",
       "relation": "manyToMany",
@@ -113,17 +125,11 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "block_users"
     },
-    "receive_by": {
+    "friends": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::notice.notice",
-      "mappedBy": "receiver"
-    },
-    "send_by": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::notice.notice",
-      "mappedBy": "sender"
+      "relation": "oneToMany",
+      "target": "api::friendship.friendship",
+      "mappedBy": "user"
     }
   }
 }

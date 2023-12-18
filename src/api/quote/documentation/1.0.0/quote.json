@@ -1,5 +1,5 @@
 {
-  "/qoutes": {
+  "/quotes": {
     "get": {
       "responses": {
         "200": {
@@ -7,7 +7,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QouteListResponse"
+                "$ref": "#/components/schemas/QuoteListResponse"
               }
             }
           }
@@ -64,7 +64,7 @@
         }
       },
       "tags": [
-        "Qoute"
+        "Quote"
       ],
       "parameters": [
         {
@@ -169,7 +169,7 @@
           }
         }
       ],
-      "operationId": "get/qoutes"
+      "operationId": "get/quotes"
     },
     "post": {
       "responses": {
@@ -178,7 +178,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QouteResponse"
+                "$ref": "#/components/schemas/QuoteResponse"
               }
             }
           }
@@ -235,23 +235,23 @@
         }
       },
       "tags": [
-        "Qoute"
+        "Quote"
       ],
       "parameters": [],
-      "operationId": "post/qoutes",
+      "operationId": "post/quotes",
       "requestBody": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/QouteRequest"
+              "$ref": "#/components/schemas/QuoteRequest"
             }
           }
         }
       }
     }
   },
-  "/qoutes/{id}": {
+  "/quotes/{id}": {
     "get": {
       "responses": {
         "200": {
@@ -259,7 +259,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QouteResponse"
+                "$ref": "#/components/schemas/QuoteResponse"
               }
             }
           }
@@ -316,7 +316,7 @@
         }
       },
       "tags": [
-        "Qoute"
+        "Quote"
       ],
       "parameters": [
         {
@@ -330,7 +330,7 @@
           }
         }
       ],
-      "operationId": "get/qoutes/{id}"
+      "operationId": "get/quotes/{id}"
     },
     "put": {
       "responses": {
@@ -339,7 +339,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/QouteResponse"
+                "$ref": "#/components/schemas/QuoteResponse"
               }
             }
           }
@@ -396,7 +396,7 @@
         }
       },
       "tags": [
-        "Qoute"
+        "Quote"
       ],
       "parameters": [
         {
@@ -410,13 +410,13 @@
           }
         }
       ],
-      "operationId": "put/qoutes/{id}",
+      "operationId": "put/quotes/{id}",
       "requestBody": {
         "required": true,
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "#/components/schemas/QouteRequest"
+              "$ref": "#/components/schemas/QuoteRequest"
             }
           }
         }
@@ -487,7 +487,7 @@
         }
       },
       "tags": [
-        "Qoute"
+        "Quote"
       ],
       "parameters": [
         {
@@ -501,7 +501,7 @@
           }
         }
       ],
-      "operationId": "delete/qoutes/{id}"
+      "operationId": "delete/quotes/{id}"
     }
   }
 }
