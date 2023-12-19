@@ -130,6 +130,31 @@
       "relation": "oneToMany",
       "target": "api::friendship.friendship",
       "mappedBy": "user"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "nickname": {
+      "type": "string",
+      "required": true
+    },
+    "address": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "private": {
+      "type": "boolean"
     }
   }
 }

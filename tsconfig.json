@@ -4,12 +4,7 @@
     "outDir": "dist",
     "rootDir": "."
   },
-  "include": [
-    "./",
-    "./**/*.ts",
-    "./**/*.js",
-    "src/**/*.json"
-  ],
+  "include": ["./", "./**/*.ts", "./**/*.js", "src/**/*.json"],
   "exclude": [
     "node_modules/",
     "build/",
@@ -18,6 +13,7 @@
     ".tmp/",
     "src/admin/",
     "**/*.test.*",
-    "src/plugins/**"
+    "src/plugins/**",
+    "types/generated/**"
   ]
 }

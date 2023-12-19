@@ -714,6 +714,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::friendship.friendship'
     >;
+    photo: Attribute.Media;
+    nickname: Attribute.String & Attribute.Required;
+    address: Attribute.String;
+    phone: Attribute.String & Attribute.Required;
+    private: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
