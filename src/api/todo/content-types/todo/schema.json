@@ -23,6 +23,9 @@
     },
     "date": {
       "type": "date"
+    },
+    "private": {
+      "type": "boolean"
     }
   }
 }
