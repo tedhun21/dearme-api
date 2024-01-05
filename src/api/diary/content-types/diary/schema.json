@@ -4,7 +4,8 @@
   "info": {
     "singularName": "diary",
     "pluralName": "diaries",
-    "displayName": "diary"
+    "displayName": "diary",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -33,14 +34,15 @@
       "type": "text"
     },
     "photos": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": true
+      ]
     },
     "companions": {
       "type": "string"
@@ -62,6 +64,9 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "diaries"
+    },
+    "date": {
+      "type": "date"
     }
   }
 }

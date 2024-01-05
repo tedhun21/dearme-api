@@ -879,6 +879,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     singularName: 'diary';
     pluralName: 'diaries';
     displayName: 'diary';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -900,6 +901,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    date: Attribute.Date;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1112,7 +1114,8 @@ export interface ApiTodoTodo extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     date: Attribute.Date;
-    private: Attribute.Boolean;
+    done: Attribute.Boolean & Attribute.DefaultTo<false>;
+    public: Attribute.Enumeration<['all', 'friend', 'private']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

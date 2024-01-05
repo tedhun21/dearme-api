@@ -24,8 +24,17 @@
     "date": {
       "type": "date"
     },
-    "private": {
-      "type": "boolean"
+    "done": {
+      "type": "boolean",
+      "default": false
+    },
+    "public": {
+      "type": "enumeration",
+      "enum": [
+        "all",
+        "friend",
+        "private"
+      ]
     }
   }
 }

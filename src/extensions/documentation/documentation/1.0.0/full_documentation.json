@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-03T08:48:21.349Z"
+    "x-generation-date": "2024-01-05T08:15:01.660Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -784,8 +784,16 @@
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
-                                                              "private": {
+                                                              "done": {
                                                                 "type": "boolean"
+                                                              },
+                                                              "public": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "all",
+                                                                  "friend",
+                                                                  "private"
+                                                                ]
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -1377,6 +1385,10 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "date": {
+                                                                "type": "string",
+                                                                "format": "date"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -2323,6 +2335,10 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
               }
             }
           }
@@ -3662,8 +3678,16 @@
                                       "type": "string",
                                       "format": "date"
                                     },
-                                    "private": {
+                                    "done": {
                                       "type": "boolean"
+                                    },
+                                    "public": {
+                                      "type": "string",
+                                      "enum": [
+                                        "all",
+                                        "friend",
+                                        "private"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -4024,6 +4048,10 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -4545,6 +4573,10 @@
                 }
               }
             }
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
           },
           "createdAt": {
             "type": "string",
@@ -5792,8 +5824,16 @@
                                       "type": "string",
                                       "format": "date"
                                     },
-                                    "private": {
+                                    "done": {
                                       "type": "boolean"
+                                    },
+                                    "public": {
+                                      "type": "string",
+                                      "enum": [
+                                        "all",
+                                        "friend",
+                                        "private"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -6154,6 +6194,10 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -7950,8 +7994,16 @@
                                       "type": "string",
                                       "format": "date"
                                     },
-                                    "private": {
+                                    "done": {
                                       "type": "boolean"
+                                    },
+                                    "public": {
+                                      "type": "string",
+                                      "enum": [
+                                        "all",
+                                        "friend",
+                                        "private"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -8312,6 +8364,10 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -10104,8 +10160,16 @@
                                       "type": "string",
                                       "format": "date"
                                     },
-                                    "private": {
+                                    "done": {
                                       "type": "boolean"
+                                    },
+                                    "public": {
+                                      "type": "string",
+                                      "enum": [
+                                        "all",
+                                        "friend",
+                                        "private"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -10466,6 +10530,10 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -12179,8 +12247,16 @@
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
-                                                              "private": {
+                                                              "done": {
                                                                 "type": "boolean"
+                                                              },
+                                                              "public": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "all",
+                                                                  "friend",
+                                                                  "private"
+                                                                ]
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -12541,6 +12617,10 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "date": {
+                                                                "type": "string",
+                                                                "format": "date"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -14214,8 +14294,16 @@
                 "type": "string",
                 "format": "date"
               },
-              "private": {
+              "done": {
                 "type": "boolean"
+              },
+              "public": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "friend",
+                  "private"
+                ]
               }
             }
           }
@@ -15376,8 +15464,16 @@
                                       "type": "string",
                                       "format": "date"
                                     },
-                                    "private": {
+                                    "done": {
                                       "type": "boolean"
+                                    },
+                                    "public": {
+                                      "type": "string",
+                                      "enum": [
+                                        "all",
+                                        "friend",
+                                        "private"
+                                      ]
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -15738,6 +15834,10 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -16264,8 +16364,16 @@
             "type": "string",
             "format": "date"
           },
-          "private": {
+          "done": {
             "type": "boolean"
+          },
+          "public": {
+            "type": "string",
+            "enum": [
+              "all",
+              "friend",
+              "private"
+            ]
           },
           "createdAt": {
             "type": "string",

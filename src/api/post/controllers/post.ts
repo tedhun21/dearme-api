@@ -3,49 +3,83 @@
  */
 
 import { factories } from "@strapi/strapi";
+import post from "../routes/post";
 
 export default factories.createCoreController(
   "api::post.post",
   ({ strapi }) => ({
     // Create: post 생성
-    // TODO: 로그인한 사용자만 추가 (user permissions: public -> authenticated)
     async create(ctx) {
-      const { goal, body, isPublic, commentSettings } = JSON.parse(
-        ctx.request.body.data
-      );
-      const files = ctx.request.files;
+      if (!ctx.state.user) {
+        ctx.send("로그인 필요");
+      } else {
+        try {
+          const { goal, body, isPublic, commentSettings } = JSON.parse(
+            ctx.request.body.data
+          );
+          const files = ctx.request.files;
+          const user = ctx.state.user.id;
 
-      console.log(ctx.request.body.data);
+          let data = {
+            data: {
+              user: user,
+              goal,
+              body,
+              public: isPublic,
+              commentSettings,
+            },
+            files: files && files.file ? { photo: files.file } : {},
+          };
 
-      let data = {
-        data: { goal, body, public: isPublic, commentSettings },
-        files: files && files.photo ? { photo: files.file } : {},
-      };
-
-      console.log(data);
-
-      try {
-        const newPost = await strapi.entityService.create(
-          "api::post.post",
-          data
-        );
-        ctx.send({ message: "Uploaded your post successfully", post: newPost });
-      } catch (e) {
-        return ctx.badRequest(
-          "Failed to upload your post, error: " + e.message
-        );
+          const newPost = await strapi.entityService.create(
+            "api::post.post",
+            data
+          );
+          ctx.send({
+            message: "Uploaded your post successfully",
+            post: newPost,
+          });
+        } catch (e) {
+          return ctx.badRequest(
+            "Failed to upload your post, error: " + e.message
+          );
+        }
       }
     },
 
-    // Read: 전체 / 친구 공개 게시물 조회 (query ?isPublic=true)
-    // TODO: response 정리
+    // Read: 전체 / 친구 공개 게시물 조회 (query: ?isPublic=false)
     async find(ctx) {
-      const isPublic = ctx.query.isPublic === "true";
+      const isPublic = ctx.query.isPublic;
+      console.log("ispublic:", isPublic);
+      let condition: any;
+
+      // 게시물: private (친구 공개)
+      if (isPublic === "false") {
+        if (ctx.state.user) {
+          const userId = ctx.state.user.id;
+          // 친구 리스트
+          // TODO: 친구 relation?
+          const friendsList = await strapi.entityService.findOne(
+            "plugin::users-permissions.user",
+            userId,
+            { populate: { friend: true } }
+          );
+          console.log(friendsList);
+
+          condition = {
+            // $and: [{ public: false, user: { $in: friendList } }],
+          };
+        } else {
+          return ctx.send("No access");
+        }
+      } else {
+        console.log("public:true");
+        condition = { public: true };
+      }
+
       const posts = await strapi.entityService.findMany("api::post.post", {
         // 필터링 & 정렬 : public 설정 & 최신순
-        filters: {
-          public: isPublic,
-        },
+        filters: condition,
         sort: { createdAt: "desc" },
         populate: {
           // 게시물 사진
@@ -60,7 +94,7 @@ export default factories.createCoreController(
           // 댓글 > 유저 프로필 사진 & ID, 댓글, 시간
           comments: {
             populate: {
-              users: {
+              user: {
                 fields: ["nickname"],
                 populate: {
                   photo: true,
@@ -71,87 +105,141 @@ export default factories.createCoreController(
         },
       });
 
-      // const customedPosts = Array.isArray(posts)
-      //   ? posts.map((post) => ({
-      //       nickname: post.user.nickname,
-      //       photo: post.user.photo
-      //         ? post.user.photo.formats.thumbnail.url
-      //         : null,
-      //     }))
-      //   : [];
+      console.log(posts);
+
+      const postsData = Array.isArray(posts)
+        ? posts.map((post) => ({
+            id: post.id,
+            userPhoto: (post.user as any).photo
+              ? (post.user as any).photo.formats.thumbnail.url
+              : null,
+            nickname: (post.user as any).nickname,
+            goal: post.goal,
+            photo: post.photo
+              ? (post.photo as any).formats.thumbnail.url
+              : null,
+            body: post.body,
+            createdAt: post.createdAt,
+            comments: Array.isArray(post.comments)
+              ? post.comments.map((comment) => ({
+                  id: comment.id,
+                  user: comment.user.nickname,
+                  userPhoto: comment.user.photo
+                    ? comment.user.photo.formats.thumbnail.url
+                    : null,
+                  body: comment.body,
+                  createdAt: comment.createdAt,
+                }))
+              : [],
+          }))
+        : [];
 
       // console.log(posts[0].user.nickname);
       try {
-        ctx.send({ posts: posts });
+        ctx.send({ posts: postsData });
       } catch (e) {
         console.log(e);
       }
     },
 
     // Update: 게시물 수정
-    // TODO: if(로그인한 사용자 === 작성자) -> 수정 가능
-    // async update(ctx) {
-    //   const postId = ctx.params.id;
-    //   const { goal, body, isPublic, commentSettings } = JSON.parse(
-    //     ctx.request.body.data
-    //   );
-    //   const files = ctx.request.files;
+    // FIX: 404 에러
+    async update(ctx) {
+      if (!ctx.state.user) {
+        ctx.send("No access");
+      }
+      try {
+        const postId = ctx.params.id;
+        const user = ctx.state.user.id;
 
-    //   let data = {
-    //     data: { goal, body, public: isPublic, commentSettings },
-    //     files: files && files.photo ? { photo: files.file } : {},
-    //   };
+        const existingPost = await strapi.entityService.findOne(
+          "api::post.post",
+          postId
+        );
 
-    //   try {
-    //     const updatedPost = await strapi.entityService.update(
-    //       "api::post.post",
-    //       postId,
-    //       { data }
-    //     );
-    //     ctx.send("Updated your post Successfully");
-    //   } catch (e) {
-    //     console.log(e);
-    //   }
-    // },
+        // console.log(user);
+        // console.log(postId);
+        // console.log(existingPost);
+
+        if (!existingPost) {
+          return ctx.notFound("Post not found");
+        }
+
+        if (user !== (existingPost.user as any).id) {
+          return ctx.unauthorized("You can only edit your own posts");
+        }
+
+        // if (유저 === 작성자)
+        const { goal, body, isPublic, commentSettings } = JSON.parse(
+          ctx.request.body.data
+        );
+        const files = ctx.request.files;
+
+        console.log(existingPost.comments);
+        let data = {
+          data: {
+            goal,
+            body,
+            public: isPublic,
+            commentSettings,
+            comments: existingPost.comments,
+          },
+          files: files && files.file ? { photo: files.file } : {},
+        };
+        const updatedPost = await strapi.entityService.update(
+          "api::post.post",
+          postId,
+          data as any
+        );
+        ctx.send({
+          message: "Updated your post Successfully",
+          post: updatedPost,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
 
     // Delete:게시물 삭제
     // TODO: if(로그인한 사용자 === 작성자) -> 삭제 가능
     async delete(ctx) {
       if (!ctx.state.user) {
-        ctx.send("로그인 후 이용해주세요.");
-      } else {
-        const userId = ctx.state.user.id;
-        const postId = ctx.params.id;
+        ctx.send("No access");
+      }
+      const postId = ctx.params.id;
+      const user = ctx.state.user.id;
 
-        const post = await strapi.entityService.findOne(
-          "api::post.post",
-          postId,
-          {
-            populate: {
-              user: {
-                fields: ["id"],
-              },
+      const post = await strapi.entityService.findOne(
+        "api::post.post",
+        postId,
+        {
+          populate: {
+            user: {
+              fields: ["id"],
             },
-          }
-        );
+          },
+        }
+      );
 
-        // console.log(userId);
-        console.log(post);
-        console.log(post.user);
-        // if (userId === post.user.id) {
-        //   try {
-        //     const deletedPost = await strapi.entityService.delete(
-        //       "api::post.post",
-        //       postId
-        //     );
-        //     ctx.send({
-        //       message: "Dleted your post successfully",
-        //       id: deletedPost.id,
-        //     });
-        //   } catch (e) {
-        //     console.log(e);
-        //   }
-        // }
+      // console.log(user);
+      // console.log(post);
+      // console.log(post.user);
+
+      if (user === (post.user as any).id) {
+        try {
+          const deletedPost = await strapi.entityService.delete(
+            "api::post.post",
+            postId
+          );
+          ctx.send({
+            message: "Dleted your post successfully",
+            id: deletedPost.id,
+          });
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        ctx.send("You can only delete your own posts.");
       }
     },
   })
