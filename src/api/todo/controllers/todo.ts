@@ -51,12 +51,14 @@ export default factories.createCoreController(
 
       const modifiedTodos = todos.results.map((todo) => ({
         id: todo.id,
-        body: todo.body,
         date: todo.date,
+        body: todo.body,
+        done: todo.done,
+        public: todo.public,
         user: todo.user,
       }));
 
-      ctx.send({ result: modifiedTodos, pagination: todos.pagination });
+      return ctx.send({ result: modifiedTodos, pagination: todos.pagination });
     },
 
     // todo 생성 (jwt 필요)
@@ -72,7 +74,7 @@ export default factories.createCoreController(
             },
           });
 
-          ctx.send("Create Todo Success");
+          return ctx.send("Create Todo Success");
         } catch (e) {
           console.log(e);
         }
@@ -82,7 +84,7 @@ export default factories.createCoreController(
     // todo 수정 (jwt 필요)
     async update(ctx) {
       if (!ctx.state.user) {
-        ctx.badRequest("권한이 없습니다");
+        return ctx.badRequest("권한이 없습니다");
       }
       try {
         const { id: todoId } = ctx.params;
@@ -105,7 +107,7 @@ export default factories.createCoreController(
           { data: { ...ctx.request.body } }
         );
 
-        ctx.send("Update Todo Success");
+        return ctx.send("Update Todo Success");
       } catch (e) {
         console.log(e);
       }
@@ -114,7 +116,7 @@ export default factories.createCoreController(
     // todo 삭제 (jwt 필요)
     async delete(ctx) {
       if (!ctx.state.user) {
-        ctx.badRequest("권한이 없습니다");
+        return ctx.badRequest("권한이 없습니다");
       }
 
       try {
@@ -134,7 +136,7 @@ export default factories.createCoreController(
           todoId
         );
 
-        ctx.send("Delete Todo Success");
+        return ctx.send("Delete Todo Success");
       } catch (e) {
         console.log(e);
       }

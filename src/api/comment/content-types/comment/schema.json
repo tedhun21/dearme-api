@@ -4,7 +4,7 @@
   "info": {
     "singularName": "comment",
     "pluralName": "comments",
-    "displayName": "comment",
+    "displayName": "Comment",
     "description": ""
   },
   "options": {
@@ -26,6 +26,12 @@
       "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
       "inversedBy": "comments"
+    },
+    "friendship": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::friendship.friendship",
+      "mappedBy": "friend_confirm"
     }
   }
 }

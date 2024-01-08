@@ -7,7 +7,7 @@ import { factories } from "@strapi/strapi";
 export default factories.createCoreController(
   "api::comment.comment",
   ({ strapi }) => ({
-    // Create: comment 생성 (client에서 postId 보내기)
+    // CREATE comment 생성 (client에서 postId 보내기)
     // TODO: commentSettings (public, friends, off)
     async create(ctx) {
       if (!ctx.state.user) {
@@ -42,7 +42,7 @@ export default factories.createCoreController(
       }
     },
 
-    // Read: 댓글 조회 (query: ?postId=123)
+    // READ 댓글 조회 (query: ?postId=123)
     async find(ctx) {
       const { postId } = ctx.query;
       if (!postId) {
@@ -58,7 +58,7 @@ export default factories.createCoreController(
       ctx.send({ comments });
     },
 
-    // Update: 댓글 수정
+    // UPDATE 댓글 수정
     async update(ctx) {
       if (!ctx.state.user) {
         ctx.send("No access");
@@ -114,7 +114,7 @@ export default factories.createCoreController(
       }
     },
 
-    // Delete: 댓글 삭제
+    // DELETE 댓글 삭제
     async delete(ctx) {
       if (!ctx.state.user) {
         ctx.send("No access");

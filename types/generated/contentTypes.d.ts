@@ -755,16 +755,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::post.post'
     >;
-    friends_request_to: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
-    friends_request_from: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
     todos: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -790,21 +780,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToOne',
       'api::notice.notice'
     >;
-    block_users: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
-    blocked_by: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
-    friends: Attribute.Relation<
-      'plugin::users-permissions.user',
-      'oneToMany',
-      'api::friendship.friendship'
-    >;
     photo: Attribute.Media;
     nickname: Attribute.String & Attribute.Required;
     address: Attribute.String;
@@ -814,6 +789,16 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'plugin::users-permissions.user',
       'oneToMany',
       'api::comment.comment'
+    >;
+    friendship: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::friendship.friendship'
+    >;
+    block: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToOne',
+      'api::friendship.friendship'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -837,7 +822,7 @@ export interface ApiCommentComment extends Schema.CollectionType {
   info: {
     singularName: 'comment';
     pluralName: 'comments';
-    displayName: 'comment';
+    displayName: 'Comment';
     description: '';
   };
   options: {
@@ -854,6 +839,11 @@ export interface ApiCommentComment extends Schema.CollectionType {
       'api::comment.comment',
       'manyToOne',
       'plugin::users-permissions.user'
+    >;
+    friendship: Attribute.Relation<
+      'api::comment.comment',
+      'oneToOne',
+      'api::friendship.friendship'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -878,7 +868,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   info: {
     singularName: 'diary';
     pluralName: 'diaries';
-    displayName: 'diary';
+    displayName: 'Diary';
     description: '';
   };
   options: {
@@ -925,16 +915,32 @@ export interface ApiFriendshipFriendship extends Schema.CollectionType {
   info: {
     singularName: 'friendship';
     pluralName: 'friendships';
-    displayName: 'friendship';
+    displayName: 'Friendship';
     description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
-    user: Attribute.Relation<
+    friend_confirm: Attribute.Relation<
       'api::friendship.friendship',
-      'manyToOne',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    friend_request: Attribute.Relation<
+      'api::friendship.friendship',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    status: Attribute.Enumeration<['pending', 'friend', 'block']>;
+    blocked_by: Attribute.Relation<
+      'api::friendship.friendship',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    block: Attribute.Relation<
+      'api::friendship.friendship',
+      'oneToOne',
       'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
@@ -960,7 +966,8 @@ export interface ApiGoalGoal extends Schema.CollectionType {
   info: {
     singularName: 'goal';
     pluralName: 'goals';
-    displayName: 'goal';
+    displayName: 'Goal';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -990,7 +997,7 @@ export interface ApiNoticeNotice extends Schema.CollectionType {
   info: {
     singularName: 'notice';
     pluralName: 'notices';
-    displayName: 'notice';
+    displayName: 'Notice';
     description: '';
   };
   options: {
@@ -1032,7 +1039,7 @@ export interface ApiPostPost extends Schema.CollectionType {
   info: {
     singularName: 'post';
     pluralName: 'posts';
-    displayName: 'post';
+    displayName: 'Post';
     description: '';
   };
   options: {
@@ -1068,7 +1075,8 @@ export interface ApiQuoteQuote extends Schema.CollectionType {
   info: {
     singularName: 'quote';
     pluralName: 'quotes';
-    displayName: 'quote';
+    displayName: 'Quote';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -1100,7 +1108,7 @@ export interface ApiTodoTodo extends Schema.CollectionType {
   info: {
     singularName: 'todo';
     pluralName: 'todos';
-    displayName: 'todo';
+    displayName: 'Todo';
     description: '';
   };
   options: {

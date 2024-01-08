@@ -4,7 +4,7 @@
   "info": {
     "singularName": "friendship",
     "pluralName": "friendships",
-    "displayName": "friendship",
+    "displayName": "Friendship",
     "description": ""
   },
   "options": {
@@ -12,11 +12,37 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "user": {
+    "friend_confirm": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "friends"
+      "inversedBy": "friendship"
+    },
+    "friend_request": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "friendship"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "friend",
+        "block"
+      ]
+    },
+    "blocked_by": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "block"
+    },
+    "block": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "block"
     }
   }
 }

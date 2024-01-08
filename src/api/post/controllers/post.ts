@@ -8,7 +8,7 @@ import post from "../routes/post";
 export default factories.createCoreController(
   "api::post.post",
   ({ strapi }) => ({
-    // Create: post 생성
+    // CREATE: post 생성
     async create(ctx) {
       if (!ctx.state.user) {
         ctx.send("로그인 필요");
@@ -47,7 +47,7 @@ export default factories.createCoreController(
       }
     },
 
-    // Read: 전체 / 친구 공개 게시물 조회 (query: ?isPublic=false)
+    // READ: 전체 / 친구 공개 게시물 조회 (query: ?isPublic=false)
     async find(ctx) {
       const isPublic = ctx.query.isPublic;
       console.log("ispublic:", isPublic);
@@ -134,7 +134,6 @@ export default factories.createCoreController(
           }))
         : [];
 
-      // console.log(posts[0].user.nickname);
       try {
         ctx.send({ posts: postsData });
       } catch (e) {
@@ -142,66 +141,63 @@ export default factories.createCoreController(
       }
     },
 
-    // Update: 게시물 수정
-    // FIX: 404 에러
+    // UPDATE: 게시물 수정
     async update(ctx) {
       if (!ctx.state.user) {
         ctx.send("No access");
       }
       try {
         const postId = ctx.params.id;
-        const user = ctx.state.user.id;
+        const userId = ctx.state.user.id;
 
         const existingPost = await strapi.entityService.findOne(
           "api::post.post",
-          postId
+          postId,
+          { populate: { user: true, comments: true } }
         );
 
-        // console.log(user);
-        // console.log(postId);
-        // console.log(existingPost);
-
+        console.log(existingPost);
         if (!existingPost) {
           return ctx.notFound("Post not found");
         }
 
-        if (user !== (existingPost.user as any).id) {
+        if (userId === (existingPost.user as any).id) {
+          const { goal, body, isPublic, commentSettings } = JSON.parse(
+            ctx.request.body.data
+          );
+          const files = ctx.request.files;
+
+          let data = {
+            data: {
+              body,
+              comments: existingPost.comments,
+              user: userId,
+              goal,
+              public: isPublic,
+              commentSettings,
+            },
+            files: files && files.file ? { photo: files.file } : {},
+          };
+
+          const updatedPost = await strapi.entityService.update(
+            "api::post.post",
+            postId,
+            data as any
+          );
+
+          ctx.send({
+            message: "Updated your post Successfully",
+            post: updatedPost,
+          });
+        } else {
           return ctx.unauthorized("You can only edit your own posts");
         }
-
-        // if (유저 === 작성자)
-        const { goal, body, isPublic, commentSettings } = JSON.parse(
-          ctx.request.body.data
-        );
-        const files = ctx.request.files;
-
-        console.log(existingPost.comments);
-        let data = {
-          data: {
-            goal,
-            body,
-            public: isPublic,
-            commentSettings,
-            comments: existingPost.comments,
-          },
-          files: files && files.file ? { photo: files.file } : {},
-        };
-        const updatedPost = await strapi.entityService.update(
-          "api::post.post",
-          postId,
-          data as any
-        );
-        ctx.send({
-          message: "Updated your post Successfully",
-          post: updatedPost,
-        });
       } catch (e) {
         console.log(e);
       }
     },
 
-    // Delete:게시물 삭제
-    // TODO: if(로그인한 사용자 === 작성자) -> 삭제 가능
+    // DELETE:게시물 삭제
     async delete(ctx) {
       if (!ctx.state.user) {
         ctx.send("No access");
@@ -220,10 +216,6 @@ export default factories.createCoreController(
           },
         }
       );
-
-      // console.log(user);
-      // console.log(post);
-      // console.log(post.user);
 
       if (user === (post.user as any).id) {
         try {

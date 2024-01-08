@@ -4,7 +4,8 @@
   "info": {
     "singularName": "goal",
     "pluralName": "goals",
-    "displayName": "goal"
+    "displayName": "Goal",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true

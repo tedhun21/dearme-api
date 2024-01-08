@@ -71,18 +71,6 @@
       "target": "api::post.post",
       "mappedBy": "user"
     },
-    "friends_request_to": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "friends_request_from"
-    },
-    "friends_request_from": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "friends_request_to"
-    },
     "todos": {
       "type": "relation",
       "relation": "oneToMany",
@@ -112,24 +100,6 @@
       "relation": "oneToOne",
       "target": "api::notice.notice",
       "mappedBy": "sender"
-    },
-    "block_users": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "blocked_by"
-    },
-    "blocked_by": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "block_users"
-    },
-    "friends": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::friendship.friendship",
-      "mappedBy": "user"
     },
     "photo": {
       "type": "media",
@@ -161,6 +131,18 @@
       "relation": "oneToMany",
       "target": "api::comment.comment",
       "mappedBy": "user"
+    },
+    "friendship": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::friendship.friendship",
+      "mappedBy": "friend_request"
+    },
+    "block": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::friendship.friendship",
+      "mappedBy": "block"
     }
   }
 }
