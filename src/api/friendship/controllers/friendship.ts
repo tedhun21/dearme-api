@@ -16,10 +16,10 @@ export default factories.createCoreController(
       const { friendId } = ctx.query;
 
       if (!ctx.state.user) {
-        throw new UnauthorizedError("권한이 없습니다.");
+        throw new UnauthorizedError("Permission denied.");
       }
       if (!ctx.query) {
-        return ctx.badRequest("friendId가 필요합니다.");
+        return ctx.badRequest("friendId is required.");
       }
       try {
         const friendship = await strapi.entityService.findMany(
@@ -82,10 +82,10 @@ export default factories.createCoreController(
     // 친분 있으면 못 만들게
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.UnauthorizedError("권한이 없습니다.");
+        throw new UnauthorizedError("Permission denied.");
       }
       if (!ctx.query) {
-        return ctx.badRequest("friendId가 필요합니다.");
+        return ctx.badRequest("friendId is required.");
       }
       try {
         const { id: userId, nickname: userNickname } = ctx.state.user;
@@ -121,7 +121,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length !== 0) {
-          return ctx.badRequest("이미 follow 하고 있습니다.");
+          return ctx.badRequest("Already following this user.");
         }
 
         const newFriendship = await strapi.entityService.create(
@@ -148,14 +148,14 @@ export default factories.createCoreController(
           );
 
           if (notice.length !== 0) {
-            return ctx.badRequest("이미 follow 요청을 보냈습니다.");
+            return ctx.badRequest("Already sent a follow request.");
           }
 
           const newNotice = await strapi.entityService.create(
             "api::notice.notice",
             {
               data: {
-                body: `${userNickname}님이 친구 요청을 보냈습니다.`,
+                body: `${userNickname} sent a friend request.`,
                 receiver: +friendId,
                 sender: userId,
                 event: "FRIEND",
@@ -163,7 +163,7 @@ export default factories.createCoreController(
             }
           );
 
-          ctx.send("친구 요청을 보냈습니다.");
+          return ctx.send("Follow request sent.");
         }
       } catch (e) {
         console.log(e);
@@ -179,10 +179,10 @@ export default factories.createCoreController(
       const { friendId, status } = ctx.query;
 
       if (!ctx.state.user) {
-        throw new UnauthorizedError("권한이 없습니다.");
+        throw new UnauthorizedError("Permission denied.");
       }
       if (!ctx.query) {
-        return ctx.badRequest("friendId, status가 필요합니다.");
+        return ctx.badRequest("friendId, status are required.");
       }
       try {
         // 친분 유무
@@ -215,7 +215,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.badRequest("친분이 없는 상태입니다.");
+          return ctx.badRequest("No friendship exists.");
         }
 
         // // pending -> friend
@@ -346,7 +346,7 @@ export default factories.createCoreController(
             friendship[0].id
           );
           return ctx.send(
-            `${userId}와 ${+friendId}의 친구 관계가 삭제 되었습니다.`
+            `${userId} and ${+friendId}'s friendship has been deleted.`
           );
         }
       } catch (e) {
