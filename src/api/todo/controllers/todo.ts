@@ -9,10 +9,12 @@ export default factories.createCoreController(
   ({ strapi }: { strapi: Strapi }) => ({
     // todo 전체 조회 (query date & jwt)
     async find(ctx) {
+      const { id: userId } = ctx.state.user;
+      const { date: queryDate } = ctx.query;
       let todos;
 
       // query (date & jwt)
-      if (ctx.request.query.date && ctx.state.user) {
+      if (queryDate && userId) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
@@ -23,7 +25,7 @@ export default factories.createCoreController(
         });
 
         // query date
-      } else if (ctx.request.query.date) {
+      } else if (queryDate) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
@@ -32,7 +34,7 @@ export default factories.createCoreController(
           },
         });
         // query jwt
-      } else if (ctx.state.user) {
+      } else if (userId) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },

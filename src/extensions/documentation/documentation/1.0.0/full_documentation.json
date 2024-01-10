@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-10T04:44:01.006Z"
+    "x-generation-date": "2024-01-10T16:34:22.800Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -934,16 +934,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "mood": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                  "happy",
-                                                                  "good",
-                                                                  "soso",
-                                                                  "bad",
-                                                                  "sad"
-                                                                ]
-                                                              },
                                                               "feelings": {
                                                                 "type": "string"
                                                               },
@@ -1353,10 +1343,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "date": {
-                                                                "type": "string",
-                                                                "format": "date"
-                                                              },
                                                               "companions": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -1367,7 +1353,23 @@
                                                                   "ALONE"
                                                                 ]
                                                               },
-                                                              "body": {},
+                                                              "body": {
+                                                                "type": "string"
+                                                              },
+                                                              "date": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                              },
+                                                              "mood": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "HAPPY",
+                                                                  "GOOD",
+                                                                  "SOSO",
+                                                                  "BAD",
+                                                                  "SAD"
+                                                                ]
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -2408,23 +2410,10 @@
         ],
         "properties": {
           "data": {
-            "required": [
-              "mood"
-            ],
             "type": "object",
             "properties": {
               "title": {
                 "type": "string"
-              },
-              "mood": {
-                "type": "string",
-                "enum": [
-                  "happy",
-                  "good",
-                  "soso",
-                  "bad",
-                  "sad"
-                ]
               },
               "feelings": {
                 "type": "string"
@@ -2470,10 +2459,6 @@
                 ],
                 "example": "string or id"
               },
-              "date": {
-                "type": "string",
-                "format": "date"
-              },
               "companions": {
                 "type": "string",
                 "enum": [
@@ -2484,7 +2469,23 @@
                   "ALONE"
                 ]
               },
-              "body": {}
+              "body": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string",
+                "format": "date"
+              },
+              "mood": {
+                "type": "string",
+                "enum": [
+                  "HAPPY",
+                  "GOOD",
+                  "SOSO",
+                  "BAD",
+                  "SAD"
+                ]
+              }
             }
           }
         }
@@ -2537,22 +2538,9 @@
       },
       "Diary": {
         "type": "object",
-        "required": [
-          "mood"
-        ],
         "properties": {
           "title": {
             "type": "string"
-          },
-          "mood": {
-            "type": "string",
-            "enum": [
-              "happy",
-              "good",
-              "soso",
-              "bad",
-              "sad"
-            ]
           },
           "feelings": {
             "type": "string"
@@ -4124,16 +4112,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "mood": {
-                                      "type": "string",
-                                      "enum": [
-                                        "happy",
-                                        "good",
-                                        "soso",
-                                        "bad",
-                                        "sad"
-                                      ]
-                                    },
                                     "feelings": {
                                       "type": "string"
                                     },
@@ -4312,10 +4290,6 @@
                                         }
                                       }
                                     },
-                                    "date": {
-                                      "type": "string",
-                                      "format": "date"
-                                    },
                                     "companions": {
                                       "type": "string",
                                       "enum": [
@@ -4326,7 +4300,23 @@
                                         "ALONE"
                                       ]
                                     },
-                                    "body": {},
+                                    "body": {
+                                      "type": "string"
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
+                                    },
+                                    "mood": {
+                                      "type": "string",
+                                      "enum": [
+                                        "HAPPY",
+                                        "GOOD",
+                                        "SOSO",
+                                        "BAD",
+                                        "SAD"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -4825,10 +4815,6 @@
               }
             }
           },
-          "date": {
-            "type": "string",
-            "format": "date"
-          },
           "companions": {
             "type": "string",
             "enum": [
@@ -4839,7 +4825,23 @@
               "ALONE"
             ]
           },
-          "body": {},
+          "body": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "mood": {
+            "type": "string",
+            "enum": [
+              "HAPPY",
+              "GOOD",
+              "SOSO",
+              "BAD",
+              "SAD"
+            ]
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -6440,16 +6442,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "mood": {
-                                      "type": "string",
-                                      "enum": [
-                                        "happy",
-                                        "good",
-                                        "soso",
-                                        "bad",
-                                        "sad"
-                                      ]
-                                    },
                                     "feelings": {
                                       "type": "string"
                                     },
@@ -6628,10 +6620,6 @@
                                         }
                                       }
                                     },
-                                    "date": {
-                                      "type": "string",
-                                      "format": "date"
-                                    },
                                     "companions": {
                                       "type": "string",
                                       "enum": [
@@ -6642,7 +6630,23 @@
                                         "ALONE"
                                       ]
                                     },
-                                    "body": {},
+                                    "body": {
+                                      "type": "string"
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
+                                    },
+                                    "mood": {
+                                      "type": "string",
+                                      "enum": [
+                                        "HAPPY",
+                                        "GOOD",
+                                        "SOSO",
+                                        "BAD",
+                                        "SAD"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -8787,16 +8791,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "mood": {
-                                      "type": "string",
-                                      "enum": [
-                                        "happy",
-                                        "good",
-                                        "soso",
-                                        "bad",
-                                        "sad"
-                                      ]
-                                    },
                                     "feelings": {
                                       "type": "string"
                                     },
@@ -8975,10 +8969,6 @@
                                         }
                                       }
                                     },
-                                    "date": {
-                                      "type": "string",
-                                      "format": "date"
-                                    },
                                     "companions": {
                                       "type": "string",
                                       "enum": [
@@ -8989,7 +8979,23 @@
                                         "ALONE"
                                       ]
                                     },
-                                    "body": {},
+                                    "body": {
+                                      "type": "string"
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
+                                    },
+                                    "mood": {
+                                      "type": "string",
+                                      "enum": [
+                                        "HAPPY",
+                                        "GOOD",
+                                        "SOSO",
+                                        "BAD",
+                                        "SAD"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -11065,16 +11071,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "mood": {
-                                      "type": "string",
-                                      "enum": [
-                                        "happy",
-                                        "good",
-                                        "soso",
-                                        "bad",
-                                        "sad"
-                                      ]
-                                    },
                                     "feelings": {
                                       "type": "string"
                                     },
@@ -11253,10 +11249,6 @@
                                         }
                                       }
                                     },
-                                    "date": {
-                                      "type": "string",
-                                      "format": "date"
-                                    },
                                     "companions": {
                                       "type": "string",
                                       "enum": [
@@ -11267,7 +11259,23 @@
                                         "ALONE"
                                       ]
                                     },
-                                    "body": {},
+                                    "body": {
+                                      "type": "string"
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
+                                    },
+                                    "mood": {
+                                      "type": "string",
+                                      "enum": [
+                                        "HAPPY",
+                                        "GOOD",
+                                        "SOSO",
+                                        "BAD",
+                                        "SAD"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -13111,16 +13119,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "mood": {
-                                                                "type": "string",
-                                                                "enum": [
-                                                                  "happy",
-                                                                  "good",
-                                                                  "soso",
-                                                                  "bad",
-                                                                  "sad"
-                                                                ]
-                                                              },
                                                               "feelings": {
                                                                 "type": "string"
                                                               },
@@ -13299,10 +13297,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "date": {
-                                                                "type": "string",
-                                                                "format": "date"
-                                                              },
                                                               "companions": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -13313,7 +13307,23 @@
                                                                   "ALONE"
                                                                 ]
                                                               },
-                                                              "body": {},
+                                                              "body": {
+                                                                "type": "string"
+                                                              },
+                                                              "date": {
+                                                                "type": "string",
+                                                                "format": "date"
+                                                              },
+                                                              "mood": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "HAPPY",
+                                                                  "GOOD",
+                                                                  "SOSO",
+                                                                  "BAD",
+                                                                  "SAD"
+                                                                ]
+                                                              },
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -16626,16 +16636,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "mood": {
-                                      "type": "string",
-                                      "enum": [
-                                        "happy",
-                                        "good",
-                                        "soso",
-                                        "bad",
-                                        "sad"
-                                      ]
-                                    },
                                     "feelings": {
                                       "type": "string"
                                     },
@@ -16814,10 +16814,6 @@
                                         }
                                       }
                                     },
-                                    "date": {
-                                      "type": "string",
-                                      "format": "date"
-                                    },
                                     "companions": {
                                       "type": "string",
                                       "enum": [
@@ -16828,7 +16824,23 @@
                                         "ALONE"
                                       ]
                                     },
-                                    "body": {},
+                                    "body": {
+                                      "type": "string"
+                                    },
+                                    "date": {
+                                      "type": "string",
+                                      "format": "date"
+                                    },
+                                    "mood": {
+                                      "type": "string",
+                                      "enum": [
+                                        "HAPPY",
+                                        "GOOD",
+                                        "SOSO",
+                                        "BAD",
+                                        "SAD"
+                                      ]
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -18125,7 +18137,7 @@
         "operationId": "delete/comments/{id}"
       }
     },
-    "/{dateOrMonth}/diary": {
+    "/diaries": {
       "get": {
         "responses": {
           "200": {
@@ -18293,22 +18305,10 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "dateOrMonth",
-            "in": "path",
-            "description": "",
-            "deprecated": false,
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
           }
         ],
-        "operationId": "get/{dateOrMonth}/diary"
-      }
-    },
-    "/diary": {
+        "operationId": "get/diaries"
+      },
       "post": {
         "responses": {
           "200": {
@@ -18376,7 +18376,7 @@
           "Diary"
         ],
         "parameters": [],
-        "operationId": "post/diary",
+        "operationId": "post/diaries",
         "requestBody": {
           "required": true,
           "content": {
@@ -18387,9 +18387,7 @@
             }
           }
         }
-      }
-    },
-    "/{date}/diary": {
+      },
       "put": {
         "responses": {
           "200": {
@@ -18456,19 +18454,8 @@
         "tags": [
           "Diary"
         ],
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "description": "",
-            "deprecated": false,
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "operationId": "put/{date}/diary",
+        "parameters": [],
+        "operationId": "put/diaries",
         "requestBody": {
           "required": true,
           "content": {
@@ -18547,19 +18534,8 @@
         "tags": [
           "Diary"
         ],
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "description": "",
-            "deprecated": false,
-            "required": true,
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "operationId": "delete/{date}/diary"
+        "parameters": [],
+        "operationId": "delete/diaries"
       }
     },
     "/friendships": {

@@ -15,17 +15,6 @@
     "title": {
       "type": "string"
     },
-    "mood": {
-      "type": "enumeration",
-      "enum": [
-        "happy",
-        "good",
-        "soso",
-        "bad",
-        "sad"
-      ],
-      "required": true
-    },
     "feelings": {
       "type": "text"
     },
@@ -58,9 +47,6 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "diaries"
     },
-    "date": {
-      "type": "date"
-    },
     "companions": {
       "type": "enumeration",
       "enum": [
@@ -72,7 +58,20 @@
       ]
     },
     "body": {
-      "type": "blocks"
+      "type": "text"
+    },
+    "date": {
+      "type": "date"
+    },
+    "mood": {
+      "type": "enumeration",
+      "enum": [
+        "HAPPY",
+        "GOOD",
+        "SOSO",
+        "BAD",
+        "SAD"
+      ]
     }
   }
 }

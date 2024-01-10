@@ -891,8 +891,6 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String;
-    mood: Attribute.Enumeration<['happy', 'good', 'soso', 'bad', 'sad']> &
-      Attribute.Required;
     feelings: Attribute.Text;
     photos: Attribute.Media;
     startSleep: Attribute.Time;
@@ -904,11 +902,12 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    date: Attribute.Date;
     companions: Attribute.Enumeration<
       ['FAMILY', 'FRIEND', 'LOVER', 'ACQUAINTANCE', 'ALONE']
     >;
-    body: Attribute.Blocks;
+    body: Attribute.Text;
+    date: Attribute.Date;
+    mood: Attribute.Enumeration<['HAPPY', 'GOOD', 'SOSO', 'BAD', 'SAD']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

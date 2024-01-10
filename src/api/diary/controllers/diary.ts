@@ -4,41 +4,47 @@
 
 import { factories } from "@strapi/strapi";
 import { errors } from "@strapi/utils";
-const { UnauthorizedError } = errors;
+const { UnauthorizedError, NotFoundError } = errors;
 
 export default factories.createCoreController(
   "api::diary.diary",
   ({ strapi }) => ({
     // 일기 조회 (일일 또는 월별)
     async find(ctx) {
+      if (!ctx.state.user) {
+        throw new UnauthorizedError("Permission denied.");
+      }
+      if (!ctx.query.date) {
+        return ctx.badRequest("date is required.");
+      }
+      // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
+      if (
+        !(
+          /^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date) ||
+          /^\d{4}-\d{2}$/.test(ctx.query.date)
+        )
+      ) {
+        return ctx.badRequest(
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
+        );
+      }
+
+      const { id: userId } = ctx.state.user;
+      const { date } = ctx.query;
+
       try {
-        // 날짜 또는 월 파라미터 추출
-        const { dateOrMonth } = ctx.params;
-
-        // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
-        if (
-          !dateOrMonth ||
-          !(
-            /^\d{4}-\d{2}-\d{2}$/.test(dateOrMonth) ||
-            /^\d{4}-\d{2}$/.test(dateOrMonth)
-          )
-        ) {
-          return ctx.badRequest(
-            "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
-          );
-        }
-
         let filters;
-        if (dateOrMonth.length === 7) {
+
+        if (date.length === 7) {
           // 월별 조회 ("YYYY-MM")
-          const startDate = new Date(dateOrMonth + "-01");
+          const startDate = new Date(date + "-01");
           const endDate = new Date(
-            new Date(dateOrMonth).setMonth(startDate.getMonth() + 1)
+            new Date(date).setMonth(startDate.getMonth() + 1)
           );
-          filters = { date: { $gte: startDate, $lt: endDate } };
+          filters = { date: { $gte: startDate, $lt: endDate }, user: userId };
         } else {
           // 일일 조회 ("YYYY-MM-DD")
-          filters = { date: dateOrMonth };
+          filters = { date, user: userId };
         }
 
         // 일기 조회
@@ -69,137 +75,176 @@ export default factories.createCoreController(
     async create(ctx) {
       // 로그인 여부 검증
       if (!ctx.state.user) {
-        throw new UnauthorizedError("로그인이 필요합니다");
+        throw new UnauthorizedError("Permission denied.");
       }
-      console.log(ctx.query);
 
-      try {
-        // 일기 데이터 추출 (Strapi가 자동으로 파싱한 데이터 사용)
-        const data = JSON.parse(ctx.request.body.data);
+      if (!ctx.request.body.data || !ctx.query.date) {
+        return ctx.badRequest("No data or query parameters available.");
+      }
 
-        // 사진 파일 업로드
-        const files = ctx.request.files;
-
-        // 날짜 파라미터 추출
-        const { date } = ctx.query;
-
-        // // 날짜 형식 검증 (옵션)
-        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-          return ctx.badRequest("Invalid date format. Please use YYYY-MM-DD.");
-        }
-
-        const newdiary = await strapi.entityService.create("api::diary.diary", {
-          data: {
-            date,
-            ...data,
-          },
-          files: { photos: files.file },
-        });
-
-        const diaryWithPhotos = await strapi.entityService.findOne(
-          "api::diary.diary",
-          newdiary.id,
-          { populate: ["photos"] }
+      // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
+      if (
+        !(
+          /^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date) ||
+          /^\d{4}-\d{2}$/.test(ctx.query.date)
+        )
+      ) {
+        return ctx.badRequest(
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
         );
+      }
 
-        return ctx.send({ diary: diaryWithPhotos });
-      } catch (e) {
-        console.error(e);
-        return ctx.badRequest("일기 생성 실패");
+      const { id: userId } = ctx.state.user;
+      const { date } = ctx.query;
+
+      // 같은 날짜에 일기가 기존에 있는지
+      const diary = await strapi.entityService.findMany("api::diary.diary", {
+        filters: { date: { $eq: date }, user: userId },
+      });
+
+      if (diary.length === 0) {
+        try {
+          // 일기 데이터 추출 (Strapi가 자동으로 파싱한 데이터 사용)
+          const parsedData = JSON.parse(ctx.request.body.data);
+
+          // 사진 파일 업로드
+          const files = ctx.request.files;
+
+          // // 날짜 형식 검증 (옵션)
+          if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            return ctx.badRequest(
+              "Invalid date format. Please use YYYY-MM-DD."
+            );
+          }
+
+          let data;
+
+          if (Object.keys(files).length !== 0) {
+            data = {
+              data: { date, user: userId, ...parsedData },
+              files: { photos: files.file },
+            };
+          } else {
+            data = {
+              data: { date, user: userId, ...parsedData },
+            };
+          }
+
+          const newDiary = await strapi.entityService.create(
+            "api::diary.diary",
+            data
+          );
+
+          return ctx.send("Successfully created a diary.");
+        } catch (e) {
+          console.error(e);
+          return ctx.badRequest("Failed to create diary.");
+        }
+      } else {
+        return ctx.badRequest("A diary already exists for this date.");
       }
     },
 
     // 일기 수정
     async update(ctx) {
+      if (!ctx.state.user) {
+        throw new UnauthorizedError("Permission denied.");
+      }
+
+      if (!ctx.query.date) {
+        return ctx.badRequest("date is required.");
+      }
+
+      if (!ctx.request.body.data || !ctx.query.date) {
+        return ctx.badRequest("No data or query parameters available.");
+      }
+
+      // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
+      if (
+        !(
+          /^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date) ||
+          /^\d{4}-\d{2}$/.test(ctx.query.date)
+        )
+      ) {
+        return ctx.badRequest(
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
+        );
+      }
+
+      const { id: userId } = ctx.state.user;
+      const { date } = ctx.query;
+      const files = ctx.request.files;
+      const parsedData = JSON.parse(ctx.request.body.data);
+
       try {
-        const userId = ctx.state.user.id; // 유저 ID 추출
-        const { date } = ctx.params; // 날짜 파라미터 추출
-        const files = ctx.request.files; // 사진 파일 데이터 추출
-        const updateData = JSON.parse(ctx.request.body.data); // 수정할 데이터 추출
-
         // 유저와 연관된 일기 데이터 조회
-        const userWithDiaries = await strapi.entityService.findOne(
-          "plugin::users-permissions.user",
-          userId,
-          {
-            populate: { diaries: true },
-          }
-        );
-
-        if (!userWithDiaries || !userWithDiaries.diaries) {
-          return ctx.notFound("유저 또는 유저의 일기를 찾을 수 없습니다.");
-        }
-
-        const diaries = userWithDiaries.diaries as any[];
-
-        // 해당 날짜에 맞는 일기 필터링
-        const diaryToUpdate = diaries.find((diary) => diary.date === date);
-
-        if (!diaryToUpdate) {
-          return ctx.notFound("해당 날짜의 일기를 찾을 수 없습니다.");
-        }
-
-        console.log(diaryToUpdate);
-
-        // 일기 업데이트
-        const updatedDiary = await strapi.entityService.update(
-          "api::diary.diary",
-          diaryToUpdate.id,
-          {
-            data: updateData,
-            files: { photos: files.file },
-          }
-        );
-
-        return ctx.send({
-          message: "성공적으로 일기가 수정되었습니다",
-          diary: updatedDiary,
+        const diary = await strapi.entityService.findMany("api::diary.diary", {
+          filters: { date: { $eq: date }, user: userId },
         });
+
+        if (diary.length !== 0) {
+          let data;
+
+          if (Object.keys(files).length !== 0) {
+            data = {
+              data: { date, user: userId, ...parsedData },
+              files: { photos: files.file },
+            };
+          } else {
+            data = {
+              data: { date, user: userId, ...parsedData },
+            };
+          }
+          const updatedDiary = await strapi.entityService.update(
+            "api::diary.diary",
+            diary[0].id,
+            data
+          );
+        }
+
+        return ctx.send("Successfully updated a diary.");
       } catch (e) {
         console.error(e);
         return ctx.badRequest("일기 수정 실패");
       }
     },
 
+    // 일기 삭제
     async delete(ctx) {
+      // 로그인 여부 검증
+      if (!ctx.state.user) {
+        throw new UnauthorizedError("Permission denied.");
+      }
+
+      // 날짜 형식 검증
+      if (!ctx.query.date || !/^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date)) {
+        return ctx.badRequest("Invalid date format. Please use YYYY-MM-DD.");
+      }
+
+      // 날짜 파라미터 추출
+      const { date } = ctx.query;
+
       try {
-        // 로그인 여부 검증
-        if (!ctx.state.user) {
-          return ctx.unauthorized("로그인이 필요합니다");
-        }
-
-        // 날짜 파라미터 추출
-        const { date } = ctx.params;
-
-        // 날짜 형식 검증
-        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-          return ctx.badRequest("Invalid date format. Please use YYYY-MM-DD.");
-        }
-
         // 해당 날짜에 일치하는 일기 조회
-        const diariesToDelete = (await strapi.entityService.findMany(
-          "api::diary.diary",
-          {
-            filters: { date },
-          }
-        )) as any[];
+        const diary = await strapi.entityService.findMany("api::diary.diary", {
+          filters: { date: { $eq: date } },
+        });
 
-        // 일기가 존재하는 경우, 각 일기 삭제
-        if (diariesToDelete.length > 0) {
-          await Promise.all(
-            diariesToDelete.map((diary) =>
-              strapi.entityService.delete("api::diary.diary", diary.id)
-            )
+        // // 일기가 존재하는 경우, 각 일기 삭제
+        if ((diary.length as number) > 0) {
+          const deletedDiary = await strapi.entityService.delete(
+            "api::diary.diary",
+            diary[0].id
           );
           return ctx.send(`Diaries for ${date} deleted successfully`);
         } else {
-          return ctx.notFound(
-            "해당 날짜의 일기가 존재하지 않거나 이미 삭제되었습니다"
+          throw new NotFoundError(
+            "The diary for the specified date does not exist or has already been deleted."
           );
         }
       } catch (e) {
         console.error(e);
-        return ctx.badRequest("Error deleting diaries");
+        return ctx.badRequest("Failed to delete the diary.");
       }
     },
   })

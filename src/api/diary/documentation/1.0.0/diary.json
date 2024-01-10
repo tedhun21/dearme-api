@@ -1,5 +1,5 @@
 {
-  "/{dateOrMonth}/diary": {
+  "/diaries": {
     "get": {
       "responses": {
         "200": {
@@ -167,22 +167,10 @@
           "schema": {
             "type": "string"
           }
-        },
-        {
-          "name": "dateOrMonth",
-          "in": "path",
-          "description": "",
-          "deprecated": false,
-          "required": true,
-          "schema": {
-            "type": "number"
-          }
         }
       ],
-      "operationId": "get/{dateOrMonth}/diary"
-    }
-  },
-  "/diary": {
+      "operationId": "get/diaries"
+    },
     "post": {
       "responses": {
         "200": {
@@ -250,7 +238,7 @@
         "Diary"
       ],
       "parameters": [],
-      "operationId": "post/diary",
+      "operationId": "post/diaries",
       "requestBody": {
         "required": true,
         "content": {
@@ -261,9 +249,7 @@
           }
         }
       }
-    }
-  },
-  "/{date}/diary": {
+    },
     "put": {
       "responses": {
         "200": {
@@ -330,19 +316,8 @@
       "tags": [
         "Diary"
       ],
-      "parameters": [
-        {
-          "name": "date",
-          "in": "path",
-          "description": "",
-          "deprecated": false,
-          "required": true,
-          "schema": {
-            "type": "number"
-          }
-        }
-      ],
-      "operationId": "put/{date}/diary",
+      "parameters": [],
+      "operationId": "put/diaries",
       "requestBody": {
         "required": true,
         "content": {
@@ -421,19 +396,8 @@
       "tags": [
         "Diary"
       ],
-      "parameters": [
-        {
-          "name": "date",
-          "in": "path",
-          "description": "",
-          "deprecated": false,
-          "required": true,
-          "schema": {
-            "type": "number"
-          }
-        }
-      ],
-      "operationId": "delete/{date}/diary"
+      "parameters": [],
+      "operationId": "delete/diaries"
     }
   }
 }
