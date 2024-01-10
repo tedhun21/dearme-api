@@ -17,9 +17,11 @@ module.exports = {
     // 일기 생성
     {
       method: "POST",
-      path: "/:date/diary/create",
+      path: "/diary",
       handler: "diary.create",
     },
+    // 일기 수정
+    { method: "PUT", path: "/:date/diary", handler: "diary.update" },
     // 일기 삭제
     {
       method: "DELETE",

@@ -3,6 +3,8 @@
  */
 
 import { factories } from "@strapi/strapi";
+import { errors } from "@strapi/utils";
+const { UnauthorizedError } = errors;
 
 export default factories.createCoreController(
   "api::comment.comment",
@@ -11,34 +13,36 @@ export default factories.createCoreController(
     // TODO: commentSettings (public, friends, off)
     async create(ctx) {
       if (!ctx.state.user) {
-        ctx.send("No access");
-      } else {
-        try {
-          const { postId, body } = JSON.parse(ctx.request.body.data);
-          const user = ctx.state.user.id;
+        return ctx.UnauthorizedError();
+      }
+      if (!ctx.request.body) {
+        return ctx.badRequest("body가 없습니다.");
+      }
+      try {
+        const { postId, body } = JSON.parse(ctx.request.body.data);
+        const user = ctx.state.user.id;
 
-          let data = {
-            data: {
-              user: user,
-              post: postId,
-              body,
-            },
-          };
+        let data = {
+          data: {
+            user: user,
+            post: postId,
+            body,
+          },
+        };
 
-          const newComment = await strapi.entityService.create(
-            "api::comment.comment",
-            data
-          );
+        const newComment = await strapi.entityService.create(
+          "api::comment.comment",
+          data
+        );
 
-          ctx.send({
-            message: "Uploaded your comment successfully",
-            comment: newComment,
-          });
-        } catch (e) {
-          return ctx.badRequest(
-            "Failed to upload your post, error: " + e.message
-          );
-        }
+        ctx.send({
+          message: "Uploaded your comment successfully",
+          comment: newComment,
+        });
+      } catch (e) {
+        return ctx.badRequest(
+          "Failed to upload your post, error: " + e.message
+        );
       }
     },
 

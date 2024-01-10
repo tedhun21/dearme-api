@@ -53,6 +53,10 @@ module.exports = (plugin) => {
         {
           populate: {
             photo: true,
+            friendships_receive: {
+              fields: ["status"],
+              populate: { follow_sender: { fields: ["nickname"] } },
+            },
           },
         }
       );
@@ -64,6 +68,7 @@ module.exports = (plugin) => {
         phone: user.phone,
         address: user.address,
         photo: user.photo,
+        friendships_receive: user.friendships_receive,
       };
 
       ctx.send(modifiedUser);

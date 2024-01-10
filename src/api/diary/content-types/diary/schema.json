@@ -15,10 +15,6 @@
     "title": {
       "type": "string"
     },
-    "body": {
-      "type": "blocks",
-      "required": true
-    },
     "mood": {
       "type": "enumeration",
       "enum": [
@@ -44,9 +40,6 @@
         "audios"
       ]
     },
-    "companions": {
-      "type": "string"
-    },
     "startSleep": {
       "type": "time"
     },
@@ -67,6 +60,19 @@
     },
     "date": {
       "type": "date"
+    },
+    "companions": {
+      "type": "enumeration",
+      "enum": [
+        "FAMILY",
+        "FRIEND",
+        "LOVER",
+        "ACQUAINTANCE",
+        "ALONE"
+      ]
+    },
+    "body": {
+      "type": "blocks"
     }
   }
 }

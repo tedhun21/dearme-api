@@ -35,6 +35,7 @@ export default factories.createCoreController(
             "api::post.post",
             data
           );
+
           ctx.send({
             message: "Uploaded your post successfully",
             post: newPost,
@@ -93,6 +94,18 @@ export default factories.createCoreController(
           },
           // 댓글 > 유저 프로필 사진 & ID, 댓글, 시간
           comments: {
+            sort: { createdAt: "desc" },
+            populate: {
+              user: {
+                fields: ["nickname"],
+                populate: {
+                  photo: true,
+                },
+              },
+            },
+          },
+          // TODO 좋아요 > 유저 프로필 사진 & 닉네임 수정 (최신순)
+          likes: {
             populate: {
               user: {
                 fields: ["nickname"],
@@ -106,6 +119,7 @@ export default factories.createCoreController(
       });
 
       console.log(posts);
+      console.log(posts[0].likes as any);
 
       const postsData = Array.isArray(posts)
         ? posts.map((post) => ({
@@ -131,6 +145,18 @@ export default factories.createCoreController(
                   createdAt: comment.createdAt,
                 }))
               : [],
+            likes: post.likes,
+
+            // likes: Array.isArray(post.likes)
+            //   ? post.likes.map((like) => ({
+            //       id: like.id,
+            //       user: like.user.nickname,
+            //       userPhoto: like.user.photo
+            //         ? like.user.photo.formats.thumbnail.url
+            //         : null,
+            //       createdAt: like.createdAt,
+            //     }))
+            //   : [],
           }))
         : [];
 

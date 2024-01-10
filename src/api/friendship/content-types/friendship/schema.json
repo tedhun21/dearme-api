@@ -12,37 +12,38 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "friend_confirm": {
+    "follow_receiver": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "friendship"
-    },
-    "friend_request": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "plugin::users-permissions.user",
-      "inversedBy": "friendship"
+      "inversedBy": "friendships_receive"
     },
     "status": {
       "type": "enumeration",
       "enum": [
-        "pending",
-        "friend",
-        "block"
+        "PENDING",
+        "FRIEND",
+        "BLOCK_ONE",
+        "BLOCK_BOTH"
       ]
     },
-    "blocked_by": {
+    "follow_sender": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "block"
+      "inversedBy": "friendships_send"
     },
     "block": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
-      "inversedBy": "block"
+      "inversedBy": "blocks"
+    },
+    "blocked": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "blocked_by"
     }
   }
 }

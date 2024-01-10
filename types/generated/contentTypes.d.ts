@@ -790,14 +790,29 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToMany',
       'api::comment.comment'
     >;
-    friendship: Attribute.Relation<
+    like_posts: Attribute.Relation<
       'plugin::users-permissions.user',
-      'oneToOne',
+      'manyToMany',
+      'api::post.post'
+    >;
+    friendships_receive: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'oneToMany',
       'api::friendship.friendship'
     >;
-    block: Attribute.Relation<
+    friendships_send: Attribute.Relation<
       'plugin::users-permissions.user',
-      'oneToOne',
+      'oneToMany',
+      'api::friendship.friendship'
+    >;
+    blocked_by: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
+      'api::friendship.friendship'
+    >;
+    blocks: Attribute.Relation<
+      'plugin::users-permissions.user',
+      'manyToMany',
       'api::friendship.friendship'
     >;
     createdAt: Attribute.DateTime;
@@ -876,12 +891,10 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String;
-    body: Attribute.Blocks & Attribute.Required;
     mood: Attribute.Enumeration<['happy', 'good', 'soso', 'bad', 'sad']> &
       Attribute.Required;
     feelings: Attribute.Text;
     photos: Attribute.Media;
-    companions: Attribute.String;
     startSleep: Attribute.Time;
     endSleep: Attribute.Time;
     weather: Attribute.String;
@@ -892,6 +905,10 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     date: Attribute.Date;
+    companions: Attribute.Enumeration<
+      ['FAMILY', 'FRIEND', 'LOVER', 'ACQUAINTANCE', 'ALONE']
+    >;
+    body: Attribute.Blocks;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -922,25 +939,27 @@ export interface ApiFriendshipFriendship extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    friend_confirm: Attribute.Relation<
+    follow_receiver: Attribute.Relation<
       'api::friendship.friendship',
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
-    friend_request: Attribute.Relation<
-      'api::friendship.friendship',
-      'oneToOne',
-      'plugin::users-permissions.user'
+    status: Attribute.Enumeration<
+      ['PENDING', 'FRIEND', 'BLOCK_ONE', 'BLOCK_BOTH']
     >;
-    status: Attribute.Enumeration<['pending', 'friend', 'block']>;
-    blocked_by: Attribute.Relation<
+    follow_sender: Attribute.Relation<
       'api::friendship.friendship',
-      'oneToOne',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     block: Attribute.Relation<
       'api::friendship.friendship',
-      'oneToOne',
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+    blocked: Attribute.Relation<
+      'api::friendship.friendship',
+      'manyToMany',
       'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
@@ -1015,7 +1034,7 @@ export interface ApiNoticeNotice extends Schema.CollectionType {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
-    event: Attribute.Enumeration<['todo', 'like']>;
+    event: Attribute.Enumeration<['LIKE', 'FRIEND', 'COMMENT']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1058,6 +1077,11 @@ export interface ApiPostPost extends Schema.CollectionType {
     user: Attribute.Relation<
       'api::post.post',
       'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    likes: Attribute.Relation<
+      'api::post.post',
+      'manyToMany',
       'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;

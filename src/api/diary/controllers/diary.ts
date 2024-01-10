@@ -3,6 +3,8 @@
  */
 
 import { factories } from "@strapi/strapi";
+import { errors } from "@strapi/utils";
+const { UnauthorizedError } = errors;
 
 export default factories.createCoreController(
   "api::diary.diary",
@@ -65,12 +67,13 @@ export default factories.createCoreController(
 
     // 일기 생성
     async create(ctx) {
-      try {
-        // 로그인 여부 검증
-        if (!ctx.state.user) {
-          return ctx.unauthorized("로그인이 필요합니다");
-        }
+      // 로그인 여부 검증
+      if (!ctx.state.user) {
+        throw new UnauthorizedError("로그인이 필요합니다");
+      }
+      console.log(ctx.query);
 
+      try {
         // 일기 데이터 추출 (Strapi가 자동으로 파싱한 데이터 사용)
         const data = JSON.parse(ctx.request.body.data);
 
@@ -78,7 +81,7 @@ export default factories.createCoreController(
         const files = ctx.request.files;
 
         // 날짜 파라미터 추출
-        const { date } = ctx.params;
+        const { date } = ctx.query;
 
         // // 날짜 형식 검증 (옵션)
         if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
@@ -88,15 +91,7 @@ export default factories.createCoreController(
         const newdiary = await strapi.entityService.create("api::diary.diary", {
           data: {
             date,
-            title: data.title,
-            body: data.body,
-            mood: data.mood,
-            feelings: data.feelings,
-            companions: data.companions,
-            weather: data.weather,
-            remember: data.remember,
-            startSleep: data.startSleep,
-            endSleep: data.endSleep,
+            ...data,
           },
           files: { photos: files.file },
         });

@@ -30,8 +30,9 @@
     "event": {
       "type": "enumeration",
       "enum": [
-        "todo",
-        "like"
+        "LIKE",
+        "FRIEND",
+        "COMMENT"
       ]
     }
   }

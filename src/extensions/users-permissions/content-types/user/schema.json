@@ -132,15 +132,33 @@
       "target": "api::comment.comment",
       "mappedBy": "user"
     },
-    "friendship": {
+    "like_posts": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::friendship.friendship",
-      "mappedBy": "friend_request"
+      "relation": "manyToMany",
+      "target": "api::post.post",
+      "inversedBy": "likes"
     },
-    "block": {
+    "friendships_receive": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
+      "target": "api::friendship.friendship",
+      "mappedBy": "follow_receiver"
+    },
+    "friendships_send": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::friendship.friendship",
+      "mappedBy": "follow_sender"
+    },
+    "blocked_by": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::friendship.friendship",
+      "mappedBy": "blocked"
+    },
+    "blocks": {
+      "type": "relation",
+      "relation": "manyToMany",
       "target": "api::friendship.friendship",
       "mappedBy": "block"
     }

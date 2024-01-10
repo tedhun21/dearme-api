@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-09T04:30:04.780Z"
+    "x-generation-date": "2024-01-10T04:44:01.006Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -934,7 +934,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "body": {},
                                                               "mood": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -1321,9 +1320,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "companions": {
-                                                                "type": "string"
-                                                              },
                                                               "startSleep": {
                                                                 "type": "string",
                                                                 "format": "time",
@@ -1361,6 +1357,17 @@
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
+                                                              "companions": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "FAMILY",
+                                                                  "FRIEND",
+                                                                  "LOVER",
+                                                                  "ACQUAINTANCE",
+                                                                  "ALONE"
+                                                                ]
+                                                              },
+                                                              "body": {},
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -1466,8 +1473,9 @@
                                                             "event": {
                                                               "type": "string",
                                                               "enum": [
-                                                                "todo",
-                                                                "like"
+                                                                "LIKE",
+                                                                "FRIEND",
+                                                                "COMMENT"
                                                               ]
                                                             },
                                                             "createdAt": {
@@ -1710,135 +1718,165 @@
                                                     }
                                                   }
                                                 },
-                                                "friendship": {
+                                                "like_posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {
-                                                            "friend_confirm": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "friendships_receive": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "follow_receiver": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "friend_request": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "status": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
+                                                                ]
+                                                              },
+                                                              "follow_sender": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "status": {
-                                                              "type": "string",
-                                                              "enum": [
-                                                                "pending",
-                                                                "friend",
-                                                                "block"
-                                                              ]
-                                                            },
-                                                            "blocked_by": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
+                                                              },
+                                                              "block": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
                                                                       "type": "object",
-                                                                      "properties": {}
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "block": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
                                                                       "type": "object",
-                                                                      "properties": {}
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "createdAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "updatedAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "publishedAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "createdBy": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "createdAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "updatedAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "publishedAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "createdBy": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "updatedBy": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "updatedBy": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
@@ -1850,18 +1888,61 @@
                                                     }
                                                   }
                                                 },
-                                                "block": {
+                                                "friendships_send": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "blocked_by": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "blocks": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -2144,6 +2225,26 @@
                           }
                         }
                       },
+                      "likes": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -2308,7 +2409,6 @@
         "properties": {
           "data": {
             "required": [
-              "body",
               "mood"
             ],
             "type": "object",
@@ -2316,7 +2416,6 @@
               "title": {
                 "type": "string"
               },
-              "body": {},
               "mood": {
                 "type": "string",
                 "enum": [
@@ -2343,9 +2442,6 @@
                   ],
                   "example": "string or id"
                 }
-              },
-              "companions": {
-                "type": "string"
               },
               "startSleep": {
                 "type": "string",
@@ -2377,7 +2473,18 @@
               "date": {
                 "type": "string",
                 "format": "date"
-              }
+              },
+              "companions": {
+                "type": "string",
+                "enum": [
+                  "FAMILY",
+                  "FRIEND",
+                  "LOVER",
+                  "ACQUAINTANCE",
+                  "ALONE"
+                ]
+              },
+              "body": {}
             }
           }
         }
@@ -2431,14 +2538,12 @@
       "Diary": {
         "type": "object",
         "required": [
-          "body",
           "mood"
         ],
         "properties": {
           "title": {
             "type": "string"
           },
-          "body": {},
           "mood": {
             "type": "string",
             "enum": [
@@ -3077,9 +3182,6 @@
               }
             }
           },
-          "companions": {
-            "type": "string"
-          },
           "startSleep": {
             "type": "string",
             "format": "time",
@@ -3385,24 +3487,7 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "friend_confirm": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                  "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "friend_request": {
+                                                              "follow_receiver": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -3422,12 +3507,13 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "pending",
-                                                                  "friend",
-                                                                  "block"
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
                                                                 ]
                                                               },
-                                                              "blocked_by": {
+                                                              "follow_sender": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -3448,14 +3534,37 @@
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -3720,6 +3829,26 @@
                                             "attributes": {
                                               "type": "object",
                                               "properties": {}
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
                                             }
                                           }
                                         }
@@ -3995,7 +4124,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "body": {},
                                     "mood": {
                                       "type": "string",
                                       "enum": [
@@ -4151,9 +4279,6 @@
                                         }
                                       }
                                     },
-                                    "companions": {
-                                      "type": "string"
-                                    },
                                     "startSleep": {
                                       "type": "string",
                                       "format": "time",
@@ -4191,6 +4316,17 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "companions": {
+                                      "type": "string",
+                                      "enum": [
+                                        "FAMILY",
+                                        "FRIEND",
+                                        "LOVER",
+                                        "ACQUAINTANCE",
+                                        "ALONE"
+                                      ]
+                                    },
+                                    "body": {},
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -4296,8 +4432,9 @@
                                   "event": {
                                     "type": "string",
                                     "enum": [
-                                      "todo",
-                                      "like"
+                                      "LIKE",
+                                      "FRIEND",
+                                      "COMMENT"
                                     ]
                                   },
                                   "createdAt": {
@@ -4540,35 +4677,101 @@
                           }
                         }
                       },
-                      "friendship": {
+                      "like_posts": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
                         }
                       },
-                      "block": {
+                      "friendships_receive": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "friendships_send": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked_by": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocks": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
@@ -4626,6 +4829,17 @@
             "type": "string",
             "format": "date"
           },
+          "companions": {
+            "type": "string",
+            "enum": [
+              "FAMILY",
+              "FRIEND",
+              "LOVER",
+              "ACQUAINTANCE",
+              "ALONE"
+            ]
+          },
+          "body": {},
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -4705,18 +4919,7 @@
           "data": {
             "type": "object",
             "properties": {
-              "friend_confirm": {
-                "oneOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ],
-                "example": "string or id"
-              },
-              "friend_request": {
+              "follow_receiver": {
                 "oneOf": [
                   {
                     "type": "integer"
@@ -4730,12 +4933,13 @@
               "status": {
                 "type": "string",
                 "enum": [
-                  "pending",
-                  "friend",
-                  "block"
+                  "PENDING",
+                  "FRIEND",
+                  "BLOCK_ONE",
+                  "BLOCK_BOTH"
                 ]
               },
-              "blocked_by": {
+              "follow_sender": {
                 "oneOf": [
                   {
                     "type": "integer"
@@ -4747,15 +4951,32 @@
                 "example": "string or id"
               },
               "block": {
-                "oneOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ],
-                "example": "string or id"
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
+              },
+              "blocked": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
               }
             }
           }
@@ -4810,7 +5031,7 @@
       "Friendship": {
         "type": "object",
         "properties": {
-          "friend_confirm": {
+          "follow_receiver": {
             "type": "object",
             "properties": {
               "data": {
@@ -5351,24 +5572,7 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "friend_confirm": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                  "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "friend_request": {
+                                                              "follow_receiver": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -5388,12 +5592,13 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "pending",
-                                                                  "friend",
-                                                                  "block"
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
                                                                 ]
                                                               },
-                                                              "blocked_by": {
+                                                              "follow_sender": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -5414,14 +5619,37 @@
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -5922,6 +6150,26 @@
                                         }
                                       }
                                     },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -6192,7 +6440,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "body": {},
                                     "mood": {
                                       "type": "string",
                                       "enum": [
@@ -6348,9 +6595,6 @@
                                         }
                                       }
                                     },
-                                    "companions": {
-                                      "type": "string"
-                                    },
                                     "startSleep": {
                                       "type": "string",
                                       "format": "time",
@@ -6388,6 +6632,17 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "companions": {
+                                      "type": "string",
+                                      "enum": [
+                                        "FAMILY",
+                                        "FRIEND",
+                                        "LOVER",
+                                        "ACQUAINTANCE",
+                                        "ALONE"
+                                      ]
+                                    },
+                                    "body": {},
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -6493,8 +6748,9 @@
                                   "event": {
                                     "type": "string",
                                     "enum": [
-                                      "todo",
-                                      "like"
+                                      "LIKE",
+                                      "FRIEND",
+                                      "COMMENT"
                                     ]
                                   },
                                   "createdAt": {
@@ -6737,35 +6993,101 @@
                           }
                         }
                       },
-                      "friendship": {
+                      "like_posts": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
                         }
                       },
-                      "block": {
+                      "friendships_receive": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "friendships_send": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked_by": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocks": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
@@ -6819,32 +7141,16 @@
               }
             }
           },
-          "friend_request": {
-            "type": "object",
-            "properties": {
-              "data": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "number"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "properties": {}
-                  }
-                }
-              }
-            }
-          },
           "status": {
             "type": "string",
             "enum": [
-              "pending",
-              "friend",
-              "block"
+              "PENDING",
+              "FRIEND",
+              "BLOCK_ONE",
+              "BLOCK_BOTH"
             ]
           },
-          "blocked_by": {
+          "follow_sender": {
             "type": "object",
             "properties": {
               "data": {
@@ -6865,14 +7171,37 @@
             "type": "object",
             "properties": {
               "data": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "number"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "properties": {}
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "type": "object",
+                      "properties": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "blocked": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "type": "object",
+                      "properties": {}
+                    }
                   }
                 }
               }
@@ -7590,24 +7919,7 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "friend_confirm": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                  "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "friend_request": {
+                                                              "follow_receiver": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -7627,12 +7939,13 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "pending",
-                                                                  "friend",
-                                                                  "block"
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
                                                                 ]
                                                               },
-                                                              "blocked_by": {
+                                                              "follow_sender": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -7653,14 +7966,37 @@
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -8161,6 +8497,26 @@
                                         }
                                       }
                                     },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -8431,7 +8787,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "body": {},
                                     "mood": {
                                       "type": "string",
                                       "enum": [
@@ -8587,9 +8942,6 @@
                                         }
                                       }
                                     },
-                                    "companions": {
-                                      "type": "string"
-                                    },
                                     "startSleep": {
                                       "type": "string",
                                       "format": "time",
@@ -8627,6 +8979,17 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "companions": {
+                                      "type": "string",
+                                      "enum": [
+                                        "FAMILY",
+                                        "FRIEND",
+                                        "LOVER",
+                                        "ACQUAINTANCE",
+                                        "ALONE"
+                                      ]
+                                    },
+                                    "body": {},
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -8732,8 +9095,9 @@
                                   "event": {
                                     "type": "string",
                                     "enum": [
-                                      "todo",
-                                      "like"
+                                      "LIKE",
+                                      "FRIEND",
+                                      "COMMENT"
                                     ]
                                   },
                                   "createdAt": {
@@ -8976,35 +9340,101 @@
                           }
                         }
                       },
-                      "friendship": {
+                      "like_posts": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
                         }
                       },
-                      "block": {
+                      "friendships_receive": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "friendships_send": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked_by": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocks": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
@@ -9165,8 +9595,9 @@
               "event": {
                 "type": "string",
                 "enum": [
-                  "todo",
-                  "like"
+                  "LIKE",
+                  "FRIEND",
+                  "COMMENT"
                 ]
               }
             }
@@ -9766,24 +10197,7 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "friend_confirm": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                  "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "friend_request": {
+                                                              "follow_receiver": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -9803,12 +10217,13 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "pending",
-                                                                  "friend",
-                                                                  "block"
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
                                                                 ]
                                                               },
-                                                              "blocked_by": {
+                                                              "follow_sender": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -9829,14 +10244,37 @@
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -10337,6 +10775,26 @@
                                         }
                                       }
                                     },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -10607,7 +11065,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "body": {},
                                     "mood": {
                                       "type": "string",
                                       "enum": [
@@ -10763,9 +11220,6 @@
                                         }
                                       }
                                     },
-                                    "companions": {
-                                      "type": "string"
-                                    },
                                     "startSleep": {
                                       "type": "string",
                                       "format": "time",
@@ -10803,6 +11257,17 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "companions": {
+                                      "type": "string",
+                                      "enum": [
+                                        "FAMILY",
+                                        "FRIEND",
+                                        "LOVER",
+                                        "ACQUAINTANCE",
+                                        "ALONE"
+                                      ]
+                                    },
+                                    "body": {},
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -10908,8 +11373,9 @@
                                   "event": {
                                     "type": "string",
                                     "enum": [
-                                      "todo",
-                                      "like"
+                                      "LIKE",
+                                      "FRIEND",
+                                      "COMMENT"
                                     ]
                                   },
                                   "createdAt": {
@@ -11152,35 +11618,101 @@
                           }
                         }
                       },
-                      "friendship": {
+                      "like_posts": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
                         }
                       },
-                      "block": {
+                      "friendships_receive": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "friendships_send": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked_by": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocks": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
@@ -11254,8 +11786,9 @@
           "event": {
             "type": "string",
             "enum": [
-              "todo",
-              "like"
+              "LIKE",
+              "FRIEND",
+              "COMMENT"
             ]
           },
           "createdAt": {
@@ -11381,6 +11914,20 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "likes": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
               }
             }
           }
@@ -12564,7 +13111,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "body": {},
                                                               "mood": {
                                                                 "type": "string",
                                                                 "enum": [
@@ -12720,9 +13266,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "companions": {
-                                                                "type": "string"
-                                                              },
                                                               "startSleep": {
                                                                 "type": "string",
                                                                 "format": "time",
@@ -12760,6 +13303,17 @@
                                                                 "type": "string",
                                                                 "format": "date"
                                                               },
+                                                              "companions": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "FAMILY",
+                                                                  "FRIEND",
+                                                                  "LOVER",
+                                                                  "ACQUAINTANCE",
+                                                                  "ALONE"
+                                                                ]
+                                                              },
+                                                              "body": {},
                                                               "createdAt": {
                                                                 "type": "string",
                                                                 "format": "date-time"
@@ -12865,8 +13419,9 @@
                                                             "event": {
                                                               "type": "string",
                                                               "enum": [
-                                                                "todo",
-                                                                "like"
+                                                                "LIKE",
+                                                                "FRIEND",
+                                                                "COMMENT"
                                                               ]
                                                             },
                                                             "createdAt": {
@@ -13109,135 +13664,165 @@
                                                     }
                                                   }
                                                 },
-                                                "friendship": {
+                                                "like_posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {
-                                                            "friend_confirm": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "friendships_receive": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                              "follow_receiver": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "friend_request": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "status": {
+                                                                "type": "string",
+                                                                "enum": [
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
+                                                                ]
+                                                              },
+                                                              "follow_sender": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "status": {
-                                                              "type": "string",
-                                                              "enum": [
-                                                                "pending",
-                                                                "friend",
-                                                                "block"
-                                                              ]
-                                                            },
-                                                            "blocked_by": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
+                                                              },
+                                                              "block": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
                                                                       "type": "object",
-                                                                      "properties": {}
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "block": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
                                                                       "type": "object",
-                                                                      "properties": {}
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "createdAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "updatedAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "publishedAt": {
-                                                              "type": "string",
-                                                              "format": "date-time"
-                                                            },
-                                                            "createdBy": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "createdAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "updatedAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "publishedAt": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "createdBy": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
-                                                              }
-                                                            },
-                                                            "updatedBy": {
-                                                              "type": "object",
-                                                              "properties": {
-                                                                "data": {
-                                                                  "type": "object",
-                                                                  "properties": {
-                                                                    "id": {
-                                                                      "type": "number"
-                                                                    },
-                                                                    "attributes": {
-                                                                      "type": "object",
-                                                                      "properties": {}
+                                                              },
+                                                              "updatedBy": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                      "id": {
+                                                                        "type": "number"
+                                                                      },
+                                                                      "attributes": {
+                                                                        "type": "object",
+                                                                        "properties": {}
+                                                                      }
                                                                     }
                                                                   }
                                                                 }
@@ -13249,18 +13834,61 @@
                                                     }
                                                   }
                                                 },
-                                                "block": {
+                                                "friendships_send": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "blocked_by": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "blocks": {
+                                                  "type": "object",
+                                                  "properties": {
+                                                    "data": {
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -13308,6 +13936,26 @@
                                                     }
                                                   }
                                                 }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
                                               }
                                             }
                                           }
@@ -13607,6 +14255,26 @@
                   "attributes": {
                     "type": "object",
                     "properties": {}
+                  }
+                }
+              }
+            }
+          },
+          "likes": {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "type": "object",
+                      "properties": {}
+                    }
                   }
                 }
               }
@@ -15090,24 +15758,7 @@
                                                           "attributes": {
                                                             "type": "object",
                                                             "properties": {
-                                                              "friend_confirm": {
-                                                                "type": "object",
-                                                                "properties": {
-                                                                  "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
-                                                                      }
-                                                                    }
-                                                                  }
-                                                                }
-                                                              },
-                                                              "friend_request": {
+                                                              "follow_receiver": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -15127,12 +15778,13 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "pending",
-                                                                  "friend",
-                                                                  "block"
+                                                                  "PENDING",
+                                                                  "FRIEND",
+                                                                  "BLOCK_ONE",
+                                                                  "BLOCK_BOTH"
                                                                 ]
                                                               },
-                                                              "blocked_by": {
+                                                              "follow_sender": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
@@ -15153,14 +15805,37 @@
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              "blocked": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                  "data": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -15661,6 +16336,26 @@
                                         }
                                       }
                                     },
+                                    "likes": {
+                                      "type": "object",
+                                      "properties": {
+                                        "data": {
+                                          "type": "array",
+                                          "items": {
+                                            "type": "object",
+                                            "properties": {
+                                              "id": {
+                                                "type": "number"
+                                              },
+                                              "attributes": {
+                                                "type": "object",
+                                                "properties": {}
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -15931,7 +16626,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "body": {},
                                     "mood": {
                                       "type": "string",
                                       "enum": [
@@ -16087,9 +16781,6 @@
                                         }
                                       }
                                     },
-                                    "companions": {
-                                      "type": "string"
-                                    },
                                     "startSleep": {
                                       "type": "string",
                                       "format": "time",
@@ -16127,6 +16818,17 @@
                                       "type": "string",
                                       "format": "date"
                                     },
+                                    "companions": {
+                                      "type": "string",
+                                      "enum": [
+                                        "FAMILY",
+                                        "FRIEND",
+                                        "LOVER",
+                                        "ACQUAINTANCE",
+                                        "ALONE"
+                                      ]
+                                    },
+                                    "body": {},
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -16232,8 +16934,9 @@
                                   "event": {
                                     "type": "string",
                                     "enum": [
-                                      "todo",
-                                      "like"
+                                      "LIKE",
+                                      "FRIEND",
+                                      "COMMENT"
                                     ]
                                   },
                                   "createdAt": {
@@ -16476,35 +17179,101 @@
                           }
                         }
                       },
-                      "friendship": {
+                      "like_posts": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
                         }
                       },
-                      "block": {
+                      "friendships_receive": {
                         "type": "object",
                         "properties": {
                           "data": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "number"
-                              },
-                              "attributes": {
-                                "type": "object",
-                                "properties": {}
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "friendships_send": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocked_by": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "blocks": {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "number"
+                                },
+                                "attributes": {
+                                  "type": "object",
+                                  "properties": {}
+                                }
                               }
                             }
                           }
@@ -17539,8 +18308,89 @@
         "operationId": "get/{dateOrMonth}/diary"
       }
     },
-    "/{date}/diary/create": {
+    "/diary": {
       "post": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Diary"
+        ],
+        "parameters": [],
+        "operationId": "post/diary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiaryRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{date}/diary": {
+      "put": {
         "responses": {
           "200": {
             "description": "OK",
@@ -17618,7 +18468,7 @@
             }
           }
         ],
-        "operationId": "post/{date}/diary/create",
+        "operationId": "put/{date}/diary",
         "requestBody": {
           "required": true,
           "content": {
@@ -17629,9 +18479,7 @@
             }
           }
         }
-      }
-    },
-    "/{date}/diary": {
+      },
       "delete": {
         "responses": {
           "200": {

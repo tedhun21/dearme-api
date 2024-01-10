@@ -58,10 +58,9 @@ export default factories.createCoreController(
           }
         );
 
-        // 타입 에러(업데이트 필요)
-        // if (goal.user.id !== ctx.state.user.id) {
-        //   throw new ForbiddenError("권한이 없습니다.");
-        // }
+        if ((goal.user as any).id !== ctx.state.user.id) {
+          throw new ForbiddenError("권한이 없습니다.");
+        }
 
         const updatedGoal = await strapi.entityService.update(
           "api::goal.goal",
