@@ -63,6 +63,9 @@ export default factories.createCoreController(
             ],
           }
         );
+        if (diaries.length === 0) {
+          throw new NotFoundError(`No diary found for ${date}.`);
+        }
 
         return ctx.send(diaries);
       } catch (e) {
@@ -200,6 +203,8 @@ export default factories.createCoreController(
             diary[0].id,
             data
           );
+        } else {
+          throw new NotFoundError("No diary found for update.");
         }
 
         return ctx.send("Successfully updated a diary.");
