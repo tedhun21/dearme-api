@@ -12,8 +12,9 @@ export default factories.createCoreController(
     // 일기 조회 (일일 또는 월별)
     async find(ctx) {
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
+
       if (!ctx.query.date) {
         return ctx.badRequest("date is required.");
       }
@@ -64,7 +65,7 @@ export default factories.createCoreController(
           }
         );
         if (diaries.length === 0) {
-          throw new NotFoundError(`No diary found for ${date}.`);
+          return ctx.notFound(`No diary found for ${date}.`);
         }
 
         return ctx.send(diaries);
@@ -78,7 +79,7 @@ export default factories.createCoreController(
     async create(ctx) {
       // 로그인 여부 검증
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
       if (!ctx.request.body.data || !ctx.query.date) {
@@ -151,7 +152,7 @@ export default factories.createCoreController(
     // 일기 수정
     async update(ctx) {
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
       if (!ctx.query.date) {
@@ -204,7 +205,7 @@ export default factories.createCoreController(
             data
           );
         } else {
-          throw new NotFoundError("No diary found for update.");
+          return ctx.notFound("No diary found for update.");
         }
 
         return ctx.send("Successfully updated a diary.");
@@ -218,7 +219,7 @@ export default factories.createCoreController(
     async delete(ctx) {
       // 로그인 여부 검증
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
       // 날짜 형식 검증
@@ -243,7 +244,7 @@ export default factories.createCoreController(
           );
           return ctx.send(`Diaries for ${date} deleted successfully`);
         } else {
-          throw new NotFoundError(
+          return ctx.notFound(
             "The diary for the specified date does not exist or has already been deleted."
           );
         }

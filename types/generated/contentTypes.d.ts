@@ -1000,6 +1000,7 @@ export interface ApiGoalGoal extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+    post: Attribute.Relation<'api::goal.goal', 'oneToOne', 'api::post.post'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1064,15 +1065,14 @@ export interface ApiPostPost extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    title: Attribute.String;
     body: Attribute.Text;
     comments: Attribute.Relation<
       'api::post.post',
       'oneToMany',
       'api::comment.comment'
     >;
-    privateComment: Attribute.Boolean;
-    image: Attribute.Media;
+    public: Attribute.Boolean;
+    photo: Attribute.Media;
     user: Attribute.Relation<
       'api::post.post',
       'manyToOne',
@@ -1083,6 +1083,8 @@ export interface ApiPostPost extends Schema.CollectionType {
       'manyToMany',
       'plugin::users-permissions.user'
     >;
+    goal: Attribute.Relation<'api::post.post', 'oneToOne', 'api::goal.goal'>;
+    commentSettings: Attribute.Enumeration<['PUBLIC', 'FRIENDS', 'OFF']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

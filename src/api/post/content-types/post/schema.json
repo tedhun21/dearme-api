@@ -12,9 +12,6 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "title": {
-      "type": "string"
-    },
     "body": {
       "type": "text"
     },
@@ -24,10 +21,10 @@
       "target": "api::comment.comment",
       "mappedBy": "post"
     },
-    "privateComment": {
+    "public": {
       "type": "boolean"
     },
-    "image": {
+    "photo": {
       "type": "media",
       "multiple": false,
       "required": false,
@@ -49,6 +46,20 @@
       "relation": "manyToMany",
       "target": "plugin::users-permissions.user",
       "mappedBy": "like_posts"
+    },
+    "goal": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::goal.goal",
+      "inversedBy": "post"
+    },
+    "commentSettings": {
+      "type": "enumeration",
+      "enum": [
+        "PUBLIC",
+        "FRIENDS",
+        "OFF"
+      ]
     }
   }
 }

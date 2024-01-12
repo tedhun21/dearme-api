@@ -16,8 +16,9 @@ export default factories.createCoreController(
       const { friendId } = ctx.query;
 
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
+
       if (!ctx.query) {
         return ctx.badRequest("friendId is required.");
       }
@@ -82,8 +83,9 @@ export default factories.createCoreController(
     // 친분 있으면 못 만들게
     async create(ctx) {
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
+
       if (!ctx.query) {
         return ctx.badRequest("friendId is required.");
       }
@@ -179,8 +181,9 @@ export default factories.createCoreController(
       const { friendId, status } = ctx.query;
 
       if (!ctx.state.user) {
-        throw new UnauthorizedError("Permission denied.");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
+
       if (!ctx.query) {
         return ctx.badRequest("friendId, status are required.");
       }
@@ -309,8 +312,13 @@ export default factories.createCoreController(
     },
 
     async delete(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid.");
+      }
+
       const { id: userId } = ctx.state.user;
       const { friendId } = ctx.query;
+
       try {
         const friendship = await strapi.entityService.findMany(
           "api::friendship.friendship",
