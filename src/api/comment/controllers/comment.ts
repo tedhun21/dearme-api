@@ -2,19 +2,17 @@
  * comment controller
  */
 
-import { Strapi, factories } from "@strapi/strapi";
-import { Context } from "koa";
-import { errors } from "@strapi/utils";
-const { UnauthorizedError } = errors;
+import { factories } from "@strapi/strapi";
 
 export default factories.createCoreController(
   "api::comment.comment",
-  ({ strapi }: { strapi: Strapi }) => ({
+  ({ strapi }) => ({
     // CREATE comment 생성 (client에서 postId 보내기)
     // TODO: commentSettings (public, friends, off)
-    async create(ctx: Context) {
-      return ctx.unauthorized("Authentication token is missing or invalid.");
-
+    async create(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid.");
+      }
       if (!ctx.request.body.body) {
         return ctx.badRequest("body is required.");
       }
@@ -164,7 +162,9 @@ export default factories.createCoreController(
 
     // UPDATE 댓글 수정
     async update(ctx) {
-      return ctx.unauthorized("Authentication token is missing or invalid.");
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid.");
+      }
 
       if (!ctx.request.body.body) {
         return ctx.badRequest("body is required.");
