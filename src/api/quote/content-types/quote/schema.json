@@ -15,9 +15,6 @@
     "author": {
       "type": "string"
     },
-    "body": {
-      "type": "blocks"
-    },
     "image": {
       "type": "media",
       "multiple": false,
@@ -28,6 +25,9 @@
         "videos",
         "audios"
       ]
+    },
+    "body": {
+      "type": "text"
     }
   }
 }

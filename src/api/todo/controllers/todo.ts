@@ -9,23 +9,24 @@ export default factories.createCoreController(
   ({ strapi }: { strapi: Strapi }) => ({
     // todo 전체 조회 (query date & jwt)
     async find(ctx) {
-      const { id: userId } = ctx.state.user;
-      const { date: queryDate } = ctx.query;
-      let todos;
+      const { date, page, size } = ctx.query;
 
+      let todos;
       // query (date & jwt)
-      if (queryDate && userId) {
+      if (date && ctx.state.user) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
           filters: {
-            date: ctx.request.query.date,
+            date,
             user: { id: ctx.state.user.id },
           },
+          page,
+          pageSize: size,
         });
 
         // query date
-      } else if (queryDate) {
+      } else if (date) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
@@ -34,7 +35,7 @@ export default factories.createCoreController(
           },
         });
         // query jwt
-      } else if (userId) {
+      } else if (ctx.state.user) {
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
@@ -45,9 +46,12 @@ export default factories.createCoreController(
 
         // jwt 안쓰고 그냥 최신순으로 가져오기
       } else {
+        console.log("hi");
         todos = await strapi.entityService.findPage("api::todo.todo", {
           sort: { id: "desc" },
           populate: { user: { fields: ["username"] } },
+          page,
+          pageSize: size,
         });
       }
 
@@ -66,31 +70,35 @@ export default factories.createCoreController(
     // todo 생성 (jwt 필요)
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.badRequest("권한이 없습니다.");
-      } else {
-        try {
-          const newTodo = await strapi.entityService.create("api::todo.todo", {
-            data: {
-              ...ctx.request.body,
-              user: ctx.state.user.id,
-            },
-          });
+        return ctx.unauthorized("Authentication token is missing or invalid.");
+      }
 
-          return ctx.send("Create Todo Success");
-        } catch (e) {
-          console.log(e);
-        }
+      const { id: userId } = ctx.state.user;
+
+      try {
+        const newTodo = await strapi.entityService.create("api::todo.todo", {
+          data: {
+            ...ctx.request.body,
+            user: userId,
+          },
+        });
+
+        return ctx.send("Successfully created a todo.");
+      } catch (e) {
+        return ctx.badRequest("Failed to create a todo.");
       }
     },
 
     // todo 수정 (jwt 필요)
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.badRequest("권한이 없습니다");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
-      try {
-        const { id: todoId } = ctx.params;
 
+      const { id: userId } = ctx.state.user;
+      const { id: todoId } = ctx.params;
+
+      try {
         const todo = await strapi.entityService.findOne(
           "api::todo.todo",
           todoId,
@@ -99,9 +107,11 @@ export default factories.createCoreController(
           }
         );
 
-        // if (!todo || !todo.user || !todo.user.id) {
-        //   return ctx.badRequest("권한이 없습니다");
-        // }
+        if (!todo || (todo.user as any).id !== userId) {
+          return ctx.badRequest(
+            "Only the owner of this todo can make modifications."
+          );
+        }
 
         const updatedTodo = await strapi.entityService.update(
           "api::todo.todo",
@@ -121,26 +131,36 @@ export default factories.createCoreController(
         return ctx.badRequest("권한이 없습니다");
       }
 
+      const { id: userId } = ctx.state.user;
+      const { id: todoId } = ctx.params;
+
       try {
         const user = await strapi.entityService.findOne(
           "plugin::users-permissions.user",
-          ctx.state.user.id,
+          userId,
           { populate: { todos: { fields: ["id"] } } }
         );
 
-        console.log(user.todos);
+        const todo = await strapi.entityService.findOne(
+          "api::todo.todo",
+          todoId,
+          { populate: { user: { fields: ["id"] } } }
+        );
 
-        const { id: todoId } = ctx.params;
-        console.log(typeof todoId);
+        if (!todo || (todo.user as any).id !== userId) {
+          return ctx.badRequest(
+            "Todo does not exist or you are not the owner of the todo."
+          );
+        }
 
         const deleteTodo = await strapi.entityService.delete(
           "api::todo.todo",
           todoId
         );
 
-        return ctx.send("Delete Todo Success");
+        return ctx.send("Successfully deleted a todo.");
       } catch (e) {
-        console.log(e);
+        return ctx.badRequest("Failed to delete a todo.");
       }
     },
   })

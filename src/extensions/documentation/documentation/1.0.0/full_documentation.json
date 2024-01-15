@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-12T08:27:01.404Z"
+    "x-generation-date": "2024-01-15T02:55:35.511Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -758,9 +758,9 @@
                                                               "public": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "all",
-                                                                  "friend",
-                                                                  "private"
+                                                                  "ALL",
+                                                                  "FRIEND",
+                                                                  "PRIVATE"
                                                                 ]
                                                               },
                                                               "createdAt": {
@@ -4095,9 +4095,9 @@
                                     "public": {
                                       "type": "string",
                                       "enum": [
-                                        "all",
-                                        "friend",
-                                        "private"
+                                        "ALL",
+                                        "FRIEND",
+                                        "PRIVATE"
                                       ]
                                     },
                                     "createdAt": {
@@ -6464,9 +6464,9 @@
                                     "public": {
                                       "type": "string",
                                       "enum": [
-                                        "all",
-                                        "friend",
-                                        "private"
+                                        "ALL",
+                                        "FRIEND",
+                                        "PRIVATE"
                                       ]
                                     },
                                     "createdAt": {
@@ -8863,9 +8863,9 @@
                                     "public": {
                                       "type": "string",
                                       "enum": [
-                                        "all",
-                                        "friend",
-                                        "private"
+                                        "ALL",
+                                        "FRIEND",
+                                        "PRIVATE"
                                       ]
                                     },
                                     "createdAt": {
@@ -11199,9 +11199,9 @@
                                     "public": {
                                       "type": "string",
                                       "enum": [
-                                        "all",
-                                        "friend",
-                                        "private"
+                                        "ALL",
+                                        "FRIEND",
+                                        "PRIVATE"
                                       ]
                                     },
                                     "createdAt": {
@@ -13179,9 +13179,9 @@
                                                               "public": {
                                                                 "type": "string",
                                                                 "enum": [
-                                                                  "all",
-                                                                  "friend",
-                                                                  "private"
+                                                                  "ALL",
+                                                                  "FRIEND",
+                                                                  "PRIVATE"
                                                                 ]
                                                               },
                                                               "createdAt": {
@@ -14672,7 +14672,6 @@
               "author": {
                 "type": "string"
               },
-              "body": {},
               "image": {
                 "oneOf": [
                   {
@@ -14683,6 +14682,9 @@
                   }
                 ],
                 "example": "string or id"
+              },
+              "body": {
+                "type": "string"
               }
             }
           }
@@ -14740,7 +14742,6 @@
           "author": {
             "type": "string"
           },
-          "body": {},
           "image": {
             "type": "object",
             "properties": {
@@ -15363,6 +15364,9 @@
               }
             }
           },
+          "body": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -15466,9 +15470,9 @@
               "public": {
                 "type": "string",
                 "enum": [
-                  "all",
-                  "friend",
-                  "private"
+                  "ALL",
+                  "FRIEND",
+                  "PRIVATE"
                 ]
               }
             }
@@ -16880,9 +16884,9 @@
                                     "public": {
                                       "type": "string",
                                       "enum": [
-                                        "all",
-                                        "friend",
-                                        "private"
+                                        "ALL",
+                                        "FRIEND",
+                                        "PRIVATE"
                                       ]
                                     },
                                     "createdAt": {
@@ -17688,9 +17692,9 @@
           "public": {
             "type": "string",
             "enum": [
-              "all",
-              "friend",
-              "private"
+              "ALL",
+              "FRIEND",
+              "PRIVATE"
             ]
           },
           "createdAt": {

@@ -1108,8 +1108,8 @@ export interface ApiQuoteQuote extends Schema.CollectionType {
   };
   attributes: {
     author: Attribute.String;
-    body: Attribute.Blocks;
     image: Attribute.Media;
+    body: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1148,7 +1148,7 @@ export interface ApiTodoTodo extends Schema.CollectionType {
     >;
     date: Attribute.Date;
     done: Attribute.Boolean & Attribute.DefaultTo<false>;
-    public: Attribute.Enumeration<['all', 'friend', 'private']>;
+    public: Attribute.Enumeration<['ALL', 'FRIEND', 'PRIVATE']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

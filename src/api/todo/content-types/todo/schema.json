@@ -31,9 +31,9 @@
     "public": {
       "type": "enumeration",
       "enum": [
-        "all",
-        "friend",
-        "private"
+        "ALL",
+        "FRIEND",
+        "PRIVATE"
       ]
     }
   }
