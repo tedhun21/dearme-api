@@ -189,9 +189,7 @@ export default factories.createCoreController(
       }
     },
 
-    // UPDATE: 게시물 수정 히히히히히히히히히히히힣히히히히히히히히히히히히히
-    // 스트라피 헬~~~~
-    // 아 유 오케이??????
+    // UPDATE: 게시물 수정
     async update(ctx) {
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid.");
@@ -309,7 +307,6 @@ export default factories.createCoreController(
 
       const { id: userId } = ctx.state.user;
       const { postId } = ctx.params;
-      console.log(postId);
 
       try {
         const post = await strapi.entityService.findOne(
@@ -330,9 +327,6 @@ export default factories.createCoreController(
           return ctx.notFound("Post not Found");
         }
 
-        // console.log(post);
-        // console.log(post.likes);
-
         // 좋아요 유저 목록
         const likeIds = post.likes
           ? (post.likes as any).map((like) => like.id)
@@ -350,9 +344,9 @@ export default factories.createCoreController(
           );
 
           if (likeCancelPost) {
-            return ctx.send("Successfully cancelled a like.");
+            ctx.send("Successfully cancelled a like.");
           } else {
-            return ctx.badRequest("Failed to cancel a like.");
+            ctx.badRequest("Failed to cancel a like.");
           }
           // 좋아요 없는 상태 -> 좋아요 실행
         } else {
@@ -363,13 +357,20 @@ export default factories.createCoreController(
           );
 
           if (likePost) {
-            // console.log(post);
-
             // notice 중복 여부
-            // const notice = await strapi.entityService.findMany("api::notice.notice",{filters:{sender:userId,receiver:}})
-            // if (notice.length !== 0) {
-            //   return ctx.badRequest("Already sent a follow request.");
-            // }
+            const notice = await strapi.entityService.findMany(
+              "api::notice.notice",
+              {
+                filters: {
+                  sender: userId,
+                  receiver: (post.user as any).id,
+                  event: "LIKE",
+                },
+              }
+            );
+            if (notice) {
+              return ctx.badRequest("Already sent a like request.");
+            }
 
             const newNotice = await strapi.entityService.create(
               "api::notice.notice",
