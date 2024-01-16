@@ -128,7 +128,7 @@ export default factories.createCoreController(
     // todo 삭제 (jwt 필요)
     async delete(ctx) {
       if (!ctx.state.user) {
-        return ctx.badRequest("권한이 없습니다");
+        return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
       const { id: userId } = ctx.state.user;
