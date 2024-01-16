@@ -37,6 +37,7 @@ module.exports = (plugin) => {
             goals: true,
             diaries: true,
             photo: { fields: ["url"] },
+            background: { fields: ["url"] },
           },
         }
       );
@@ -50,6 +51,7 @@ module.exports = (plugin) => {
         email: user.email,
         nickname: user.nickname,
         photo: (user.photo as any).url,
+        background: (user.background as any).url,
         address: user.address,
         private: user.private,
       };
@@ -88,26 +90,40 @@ module.exports = (plugin) => {
         phone: user.phone,
         address: user.address,
         photo: user.photo,
+        background: user.background,
       };
 
-      ctx.send(modifiedUser);
+      return ctx.send(modifiedUser);
     } catch (e) {
-      console.log(e);
+      return ctx.badRequest("Can't find me.");
     }
   };
 
   // 유저 정보 수정
   plugin.controllers.user.update = async (ctx) => {
     const { id: userId } = ctx.params;
+
     if (!ctx.state.user || ctx.state.user.id !== +userId) {
       return ctx.unauthorized("Authentication token is missing or invalid.");
+    }
+    const { photo, background } = ctx.request.files;
+
+    let data;
+
+    const parsedData = JSON.parse(ctx.request.body.data);
+    if (photo && background) {
+      data = { data: { ...parsedData }, files: { photo, background } };
+    } else if (photo) {
+      data = { data: { ...parsedData }, files: { photo } };
+    } else if (background) {
+      data = { data: { ...parsedData }, files: { background } };
     }
 
     try {
       const updatedUser = await strapi.entityService.update(
         "plugin::users-permissions.user",
         userId,
-        { data: { ...ctx.request.body } }
+        data
       );
 
       return ctx.send("Successfully updated a user.");

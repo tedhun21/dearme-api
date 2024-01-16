@@ -161,6 +161,16 @@
       "relation": "manyToMany",
       "target": "api::friendship.friendship",
       "mappedBy": "block"
+    },
+    "background": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }
