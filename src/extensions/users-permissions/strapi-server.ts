@@ -74,7 +74,7 @@ module.exports = (plugin) => {
         ctx.state.user.id,
         {
           populate: {
-            photo: true,
+            photo: { fields: ["url"] },
             friendships_receive: {
               fields: ["status"],
               populate: { follow_sender: { fields: ["nickname"] } },
@@ -84,6 +84,7 @@ module.exports = (plugin) => {
       );
 
       const modifiedUser = {
+        id: user.id,
         email: user.email,
         username: user.username,
         nickname: user.nickname,

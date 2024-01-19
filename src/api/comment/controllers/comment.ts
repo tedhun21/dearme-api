@@ -25,7 +25,7 @@ export default factories.createCoreController(
         // post 불러오기
         const post = await strapi.entityService.findOne(
           "api::post.post",
-          +postId,
+          postId,
           { populate: { user: { fields: ["nickname"] } } }
         );
 
@@ -63,8 +63,26 @@ export default factories.createCoreController(
 
         let data;
 
-        // 1. post PUBLIC이면 관계가 어떤 것이든 상관 x
-        if (post.commentSettings === "PUBLIC") {
+        // 1. 유저는 자기 소유의 포스트에 댓글을 무조건 달 수 있다.
+        if ((post.user as any).id === userId && friendship.length === 0) {
+          data = {
+            data: { user: userId, post: postId },
+          };
+
+          try {
+            const newComment = await strapi.entityService.create(
+              "api::comment.comment",
+              data
+            );
+
+            return ctx.send("Successfully created a comment.");
+          } catch (e) {
+            return ctx.send("Failed to create a comment.");
+          }
+        }
+
+        // 2. post PUBLIC이면 관계가 어떤 것이든 상관 x
+        else if (post.commentSettings === "PUBLIC") {
           data = {
             data: {
               user: userId,
@@ -73,14 +91,17 @@ export default factories.createCoreController(
             },
           };
 
-          const newComment = await strapi.entityService.create(
-            "api::comment.comment",
-            data
-          );
+          try {
+            const newComment = await strapi.entityService.create(
+              "api::comment.comment",
+              data
+            );
+            return ctx.send("Successfully created a comment.");
+          } catch (e) {
+            return ctx.badRequest("Failed to create a comment.");
+          }
 
-          return ctx.send("Successfully created a comment.");
-
-          // 2. post FRIENDS면 관계가 FRIEND만 comment를 달 수 있다.
+          // 3. post FRIENDS면 관계가 FRIEND만 comment를 달 수 있다.
         } else if (
           post.commentSettings === "FRIENDS" &&
           friendship[0].status === "FRIEND"

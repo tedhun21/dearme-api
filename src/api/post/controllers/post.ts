@@ -10,40 +10,41 @@ export default factories.createCoreController(
     // CREATE: post 생성
     async create(ctx) {
       if (!ctx.state.user) {
-        ctx.send("로그인 필요");
-      } else {
-        try {
-          const { goal, body, isPublic, commentSettings } = JSON.parse(
-            ctx.request.body.data
-          );
-          const files = ctx.request.files;
-          const user = ctx.state.user.id;
+        return ctx.unauthorized("Authentication token is missing or invalid.");
+      }
 
-          let data = {
-            data: {
-              user: user,
-              goal,
-              body,
-              public: isPublic,
-              commentSettings,
-            },
-            files: files && files.file ? { photo: files.file } : {},
-          };
+      try {
+        const { goal, body, isPublic, commentSettings } = JSON.parse(
+          ctx.request.body.data
+        );
 
-          const newPost = await strapi.entityService.create(
-            "api::post.post",
-            data
-          );
+        const files = ctx.request.files;
+        const { id: userId } = ctx.state.user;
 
-          ctx.send({
-            message: "Uploaded your post successfully",
-            post: newPost,
-          });
-        } catch (e) {
-          return ctx.badRequest(
-            "Failed to upload your post, error: " + e.message
-          );
-        }
+        let data = {
+          data: {
+            user: userId,
+            goal,
+            body,
+            public: isPublic,
+            commentSettings,
+          },
+          files: files.file ? { photo: files.file } : {},
+        };
+
+        const newPost = await strapi.entityService.create(
+          "api::post.post",
+          data
+        );
+
+        return ctx.send({
+          message: "Successfully created a post.",
+          post: newPost,
+        });
+      } catch (e) {
+        return ctx.badRequest(
+          "Failed to upload your post, error: " + e.message
+        );
       }
     },
 
@@ -63,7 +64,7 @@ export default factories.createCoreController(
         filters = { public: { $eq: true } };
       }
 
-      // 2. 친구꺼 (public === true && public === false)
+      // 2. 친구꺼 (public === true || public === false)
       if (ctx.state.user) {
         const { id: userId } = ctx.state.user;
 
@@ -215,36 +216,21 @@ export default factories.createCoreController(
           );
           const files = ctx.request.files;
 
-          let data;
-          if (Object.keys(files).length === 0) {
-            data = {
-              data: {
-                body,
-                comments: existingPost.comments,
-                user: userId,
-                goal,
-                public: isPublic,
-                commentSettings,
-              },
-            };
-          } else {
-            data = {
-              data: {
-                body,
-                comments: existingPost.comments,
-                user: userId,
-                goal,
-                public: isPublic,
-                commentSettings,
-              },
-              files: { photo: files.file },
-            };
-          }
+          let data = {
+            data: {
+              body,
+              user: userId,
+              goal,
+              public: isPublic,
+              commentSettings,
+            },
+            files: files.file ? { photo: files.file } : {},
+          };
 
           const updatedPost = await strapi.entityService.update(
             "api::post.post",
             postId,
-            data
+            data as any
           );
 
           return ctx.send({
