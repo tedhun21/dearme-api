@@ -16,9 +16,9 @@ module.exports = (plugin) => {
         }
       );
 
-      return ctx.send("Successfully created a user.");
+      return ctx.send({ status: 201, message: "Successfully created a user." });
     } catch (e) {
-      return ctx.send("Failed to create a user.");
+      return ctx.badRequest("Failed to create a user.");
     }
   };
 
@@ -42,7 +42,7 @@ module.exports = (plugin) => {
         }
       );
       if (!user) {
-        return ctx.notfound("Can't find a user.");
+        return ctx.notFound("Can't find a user.");
       }
 
       const modifiedUser = {
@@ -50,15 +50,14 @@ module.exports = (plugin) => {
         username: user.username,
         email: user.email,
         nickname: user.nickname,
-        photo: (user.photo as any).url,
-        background: (user.background as any).url,
-        address: user.address,
+        photo: user.photo ? user.photo : null,
+        background: user.background ? user.background : null,
         private: user.private,
       };
 
-      return ctx.send(modifiedUser);
+      return ctx.send({ status: 200, data: modifiedUser });
     } catch (e) {
-      return ctx.badRequest("Can't find a user.");
+      return ctx.notFound("Can't find a user.");
     }
   };
 
@@ -88,15 +87,13 @@ module.exports = (plugin) => {
         email: user.email,
         username: user.username,
         nickname: user.nickname,
-        phone: user.phone,
-        address: user.address,
-        photo: user.photo,
-        background: user.background,
+        photo: user.photo ? user.photo : null,
+        background: user.background ? user.background : null,
       };
 
-      return ctx.send(modifiedUser);
+      return ctx.send({ status: 200, data: modifiedUser });
     } catch (e) {
-      return ctx.badRequest("Can't find me.");
+      return ctx.notFound("Can't find me.");
     }
   };
 
@@ -109,25 +106,26 @@ module.exports = (plugin) => {
     }
     const { photo, background } = ctx.request.files;
 
-    let data;
-
     const parsedData = JSON.parse(ctx.request.body.data);
-    if (photo && background) {
-      data = { data: { ...parsedData }, files: { photo, background } };
-    } else if (photo) {
-      data = { data: { ...parsedData }, files: { photo } };
-    } else if (background) {
-      data = { data: { ...parsedData }, files: { background } };
-    }
 
     try {
       const updatedUser = await strapi.entityService.update(
         "plugin::users-permissions.user",
         userId,
-        data
+        {
+          data: { ...parsedData },
+          files:
+            photo && background
+              ? { photo: photo, background: background }
+              : photo
+              ? { photo: photo }
+              : background
+              ? { background: background }
+              : null,
+        }
       );
 
-      return ctx.send("Successfully updated a user.");
+      return ctx.send({ status: 200, message: "Successfully updated a user." });
     } catch (e) {
       return ctx.badRequest("Failed to update a user.");
     }
@@ -140,14 +138,19 @@ module.exports = (plugin) => {
     if (!ctx.state.user || ctx.state.user.id !== +userId) {
       return ctx.unauthorized("Authentication token is missing or invalid.");
     }
-    if (ctx.state.user.id === +ctx.params.id) {
+    if (ctx.state.user.id !== +ctx.params.id) {
+      return ctx.unauthorized("User does not match.");
+    } else {
       try {
         const deleteUser = await strapi.entityService.delete(
           "plugin::users-permissions.user",
           userId
         );
 
-        return ctx.send("Successfully deleted a user.");
+        return ctx.send({
+          status: 200,
+          message: "Successfully deleted a user.",
+        });
       } catch (e) {
         return ctx.badRequest("Failed to delete a user.");
       }

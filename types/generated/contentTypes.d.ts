@@ -783,7 +783,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     photo: Attribute.Media;
     nickname: Attribute.String & Attribute.Required;
     address: Attribute.String;
-    phone: Attribute.String & Attribute.Required;
+    phone: Attribute.String;
     private: Attribute.Boolean;
     comments: Attribute.Relation<
       'plugin::users-permissions.user',

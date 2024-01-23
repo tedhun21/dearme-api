@@ -121,18 +121,10 @@ export default factories.createCoreController(
             );
           }
 
-          let data;
-
-          if (Object.keys(files).length !== 0) {
-            data = {
-              data: { date, user: userId, ...parsedData },
-              files: { photos: files.file },
-            };
-          } else {
-            data = {
-              data: { date, user: userId, ...parsedData },
-            };
-          }
+          let data = {
+            data: { date, user: userId, ...parsedData },
+            files: files.file ? { photos: files.file } : {},
+          };
 
           const newDiary = await strapi.entityService.create(
             "api::diary.diary",
@@ -187,18 +179,15 @@ export default factories.createCoreController(
         });
 
         if (diary.length !== 0) {
-          let data;
+          let data = {
+            data: {
+              date,
+              user: userId,
+              ...parsedData,
+            },
+            files: files.file ? { photos: files.file } : {},
+          };
 
-          if (Object.keys(files).length !== 0) {
-            data = {
-              data: { date, user: userId, ...parsedData },
-              files: { photos: files.file },
-            };
-          } else {
-            data = {
-              data: { date, user: userId, ...parsedData },
-            };
-          }
           const updatedDiary = await strapi.entityService.update(
             "api::diary.diary",
             diary[0].id,
