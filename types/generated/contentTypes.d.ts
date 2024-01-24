@@ -724,12 +724,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    username: Attribute.String &
-      Attribute.Required &
-      Attribute.Unique &
-      Attribute.SetMinMaxLength<{
-        minLength: 3;
-      }>;
     email: Attribute.Email &
       Attribute.Required &
       Attribute.SetMinMaxLength<{
@@ -750,6 +744,11 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    username: Attribute.String &
+      Attribute.Required &
+      Attribute.SetMinMaxLength<{
+        minLength: 2;
+      }>;
     posts: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -781,7 +780,12 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::notice.notice'
     >;
     photo: Attribute.Media;
-    nickname: Attribute.String & Attribute.Required;
+    nickname: Attribute.String &
+      Attribute.Required &
+      Attribute.Unique &
+      Attribute.SetMinMaxLength<{
+        minLength: 2;
+      }>;
     address: Attribute.String;
     phone: Attribute.String;
     private: Attribute.Boolean;

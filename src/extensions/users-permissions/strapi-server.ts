@@ -1,7 +1,29 @@
 module.exports = (plugin) => {
   // 유저 등록
   plugin.controllers.auth.register = async (ctx) => {
+    const { username, email, nickname, password } = ctx.request.body;
+
     try {
+      // 닉네임 중복 체크
+      const existingUserWithNickname = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        { filters: { nickname } }
+      );
+
+      if ((existingUserWithNickname as any).length > 0) {
+        return ctx.conflict("Username already exists.");
+      }
+
+      // email 중복체크
+      const existingUserWithEmail = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        { filters: { email } }
+      );
+
+      if ((existingUserWithEmail as any).length > 0) {
+        return ctx.conflict("Email already exists.");
+      }
+
       const newMember = await strapi.entityService.create(
         "plugin::users-permissions.user",
         {
@@ -55,7 +77,7 @@ module.exports = (plugin) => {
         private: user.private,
       };
 
-      return ctx.send({ status: 200, data: modifiedUser });
+      return ctx.send({ status: 200, user: modifiedUser });
     } catch (e) {
       return ctx.notFound("Can't find a user.");
     }
@@ -91,7 +113,7 @@ module.exports = (plugin) => {
         background: user.background ? user.background : null,
       };
 
-      return ctx.send({ status: 200, data: modifiedUser });
+      return ctx.send({ status: 200, user: modifiedUser });
     } catch (e) {
       return ctx.notFound("Can't find me.");
     }
@@ -157,5 +179,61 @@ module.exports = (plugin) => {
     }
   };
 
+  // nickname 중복 체크
+  plugin.controllers.user.checkNickname = async (ctx) => {
+    const { nickname } = ctx.query;
+
+    try {
+      const existingUserWithNickname = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        { filters: { nickname } }
+      );
+      if ((existingUserWithNickname as any).length > 0) {
+        return ctx.send({ duplicate: true });
+      } else {
+        return ctx.send({ duplicate: false });
+      }
+    } catch (e) {
+      return ctx.badRequest("Failed to check duplicate.");
+    }
+  };
+
+  // email 중복 체크
+  plugin.controllers.user.checkEmail = async (ctx) => {
+    const { email } = ctx.query;
+    try {
+      const existingUserWithEmail = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        { filters: { email } }
+      );
+      if ((existingUserWithEmail as any).length > 0) {
+        return ctx.send({ duplicate: true });
+      } else {
+        return ctx.send({ duplicate: false });
+      }
+    } catch (e) {
+      return ctx.badRequest("Failed to check duplicate.");
+    }
+  };
+
+  // nickname 중복 체크 route
+  plugin.routes["content-api"].routes.push({
+    method: "GET",
+    path: "/check-nickname",
+    handler: "user.checkNickname",
+    config: {
+      prefix: "",
+    },
+  });
+
+  // email 중복 체크 route
+  plugin.routes["content-api"].routes.push({
+    method: "GET",
+    path: "/check-email",
+    handler: "user.checkEmail",
+    config: {
+      prefix: "",
+    },
+  });
   return plugin;
 };

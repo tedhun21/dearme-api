@@ -12,13 +12,6 @@
     "draftAndPublish": false
   },
   "attributes": {
-    "username": {
-      "type": "string",
-      "minLength": 3,
-      "unique": true,
-      "configurable": false,
-      "required": true
-    },
     "email": {
       "type": "email",
       "minLength": 6,
@@ -64,6 +57,12 @@
       "target": "plugin::users-permissions.role",
       "inversedBy": "users",
       "configurable": false
+    },
+    "username": {
+      "type": "string",
+      "minLength": 2,
+      "unique": false,
+      "required": true
     },
     "posts": {
       "type": "relation",
@@ -114,7 +113,9 @@
     },
     "nickname": {
       "type": "string",
-      "required": true
+      "required": true,
+      "unique": true,
+      "minLength": 2
     },
     "address": {
       "type": "string"

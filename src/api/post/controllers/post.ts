@@ -13,23 +13,22 @@ export default factories.createCoreController(
         return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
+      const { id: userId } = ctx.state.user;
+      const { goalId, body, isPublic, commentSettings } = JSON.parse(
+        ctx.request.body.data
+      );
+      const { file } = ctx.request.files;
+
       try {
-        const { goal, body, isPublic, commentSettings } = JSON.parse(
-          ctx.request.body.data
-        );
-
-        const files = ctx.request.files;
-        const { id: userId } = ctx.state.user;
-
         let data = {
           data: {
             user: userId,
-            goal,
+            goal: { connect: [goalId] },
             body,
             public: isPublic,
             commentSettings,
           },
-          files: files.file ? { photo: files.file } : {},
+          files: file ? { photo: file } : null,
         };
 
         const newPost = await strapi.entityService.create(
@@ -38,8 +37,8 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
+          status: 201,
           message: "Successfully created a post.",
-          post: newPost,
         });
       } catch (e) {
         return ctx.badRequest(
@@ -134,9 +133,13 @@ export default factories.createCoreController(
           likes: post.likes,
         }));
 
-        return ctx.send({ posts: modifiedPosts, pagination: posts.pagination });
+        return ctx.send({
+          status: 200,
+          posts: modifiedPosts,
+          pagination: posts.pagination,
+        });
       } catch (e) {
-        console.log(e);
+        return ctx.notFound("Can't find posts.");
       }
 
       async function getFriendsList(userId) {
@@ -196,10 +199,10 @@ export default factories.createCoreController(
         return ctx.unauthorized("Authentication token is missing or invalid.");
       }
 
-      try {
-        const { id: postId } = ctx.params;
-        const { id: userId } = ctx.state.user;
+      const { id: userId } = ctx.state.user;
+      const { id: postId } = ctx.params;
 
+      try {
         const existingPost = await strapi.entityService.findOne(
           "api::post.post",
           postId,
@@ -214,7 +217,7 @@ export default factories.createCoreController(
           const { goal, body, isPublic, commentSettings } = JSON.parse(
             ctx.request.body.data
           );
-          const files = ctx.request.files;
+          const { file } = ctx.request.files;
 
           let data = {
             data: {
@@ -224,7 +227,7 @@ export default factories.createCoreController(
               public: isPublic,
               commentSettings,
             },
-            files: files.file ? { photo: files.file } : {},
+            files: file ? { photo: file } : null,
           };
 
           const updatedPost = await strapi.entityService.update(
@@ -234,8 +237,8 @@ export default factories.createCoreController(
           );
 
           return ctx.send({
-            message: "Updated your post Successfully",
-            post: updatedPost,
+            status: 200,
+            message: "Successfully updated a post.",
           });
         } else {
           return ctx.unauthorized("You can only edit your own posts.");
