@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-01-24T08:30:36.790Z"
+    "x-generation-date": "2024-01-25T15:02:37.959Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -861,18 +861,21 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "post": {
+                                                              "posts": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -1788,6 +1791,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -3670,6 +3674,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -4060,18 +4065,21 @@
                                                     }
                                                   }
                                                 },
-                                                "post": {
+                                                "posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -5291,6 +5299,7 @@
               "status": {
                 "type": "string",
                 "enum": [
+                  "SELF",
                   "PENDING",
                   "FRIEND",
                   "BLOCK_ONE",
@@ -5947,6 +5956,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -6568,18 +6578,21 @@
                                                     }
                                                   }
                                                 },
-                                                "post": {
+                                                "posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -7682,6 +7695,7 @@
           "status": {
             "type": "string",
             "enum": [
+              "SELF",
               "PENDING",
               "FRIEND",
               "BLOCK_ONE",
@@ -7849,16 +7863,19 @@
                 ],
                 "example": "string or id"
               },
-              "post": {
-                "oneOf": [
-                  {
-                    "type": "integer"
-                  },
-                  {
-                    "type": "string"
-                  }
-                ],
-                "example": "string or id"
+              "posts": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ],
+                  "example": "string or id"
+                }
               }
             }
           }
@@ -8485,6 +8502,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -9106,18 +9124,21 @@
                                                     }
                                                   }
                                                 },
-                                                "post": {
+                                                "posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -10217,18 +10238,21 @@
               }
             }
           },
-          "post": {
+          "posts": {
             "type": "object",
             "properties": {
               "data": {
-                "type": "object",
-                "properties": {
-                  "id": {
-                    "type": "number"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "properties": {}
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "number"
+                    },
+                    "attributes": {
+                      "type": "object",
+                      "properties": {}
+                    }
                   }
                 }
               }
@@ -10960,6 +10984,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -11581,18 +11606,21 @@
                                                     }
                                                   }
                                                 },
-                                                "post": {
+                                                "posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }
@@ -13977,18 +14005,21 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "post": {
+                                                              "posts": {
                                                                 "type": "object",
                                                                 "properties": {
                                                                   "data": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                      "id": {
-                                                                        "type": "number"
-                                                                      },
-                                                                      "attributes": {
-                                                                        "type": "object",
-                                                                        "properties": {}
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                        "id": {
+                                                                          "type": "number"
+                                                                        },
+                                                                        "attributes": {
+                                                                          "type": "object",
+                                                                          "properties": {}
+                                                                        }
                                                                       }
                                                                     }
                                                                   }
@@ -14673,6 +14704,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -16923,6 +16955,7 @@
                                                               "status": {
                                                                 "type": "string",
                                                                 "enum": [
+                                                                  "SELF",
                                                                   "PENDING",
                                                                   "FRIEND",
                                                                   "BLOCK_ONE",
@@ -17544,18 +17577,21 @@
                                                     }
                                                   }
                                                 },
-                                                "post": {
+                                                "posts": {
                                                   "type": "object",
                                                   "properties": {
                                                     "data": {
-                                                      "type": "object",
-                                                      "properties": {
-                                                        "id": {
-                                                          "type": "number"
-                                                        },
-                                                        "attributes": {
-                                                          "type": "object",
-                                                          "properties": {}
+                                                      "type": "array",
+                                                      "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                          "id": {
+                                                            "type": "number"
+                                                          },
+                                                          "attributes": {
+                                                            "type": "object",
+                                                            "properties": {}
+                                                          }
                                                         }
                                                       }
                                                     }

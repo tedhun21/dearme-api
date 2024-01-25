@@ -49,9 +49,9 @@
     },
     "goal": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "api::goal.goal",
-      "inversedBy": "post"
+      "inversedBy": "posts"
     },
     "commentSettings": {
       "type": "enumeration",

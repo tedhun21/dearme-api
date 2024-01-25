@@ -9,62 +9,50 @@ export default factories.createCoreController(
   ({ strapi }: { strapi: Strapi }) => ({
     // todo 전체 조회 (query date & jwt)
     async find(ctx) {
-      const { date, page, size } = ctx.query;
+      const { date, userId, page, size } = ctx.query;
 
-      let todos;
-      // query (date & jwt)
+      let filters;
+
+      // 나의 일일 Todo (date & jwt)
       if (date && ctx.state.user) {
-        todos = await strapi.entityService.findPage("api::todo.todo", {
-          sort: { id: "desc" },
-          populate: { user: { fields: ["username"] } },
-          filters: {
-            date,
-            user: { id: ctx.state.user.id },
-          },
-          page,
-          pageSize: size,
-        });
+        filters = {
+          date,
+          user: { id: ctx.state.user.id },
+        };
 
-        // query date
-      } else if (date) {
-        todos = await strapi.entityService.findPage("api::todo.todo", {
-          sort: { id: "desc" },
-          populate: { user: { fields: ["username"] } },
-          filters: {
-            date: ctx.request.query.date,
-          },
-        });
-        // query jwt
-      } else if (ctx.state.user) {
-        todos = await strapi.entityService.findPage("api::todo.todo", {
-          sort: { id: "desc" },
-          populate: { user: { fields: ["username"] } },
-          filters: {
-            user: { id: ctx.state.user.id },
-          },
-        });
-
-        // jwt 안쓰고 그냥 최신순으로 가져오기
-      } else {
-        console.log("hi");
-        todos = await strapi.entityService.findPage("api::todo.todo", {
-          sort: { id: "desc" },
-          populate: { user: { fields: ["username"] } },
-          page,
-          pageSize: size,
-        });
+        // 다른 사람의 Todo (data & userId)
+      } else if (date && userId) {
+        filters = {
+          date: ctx.request.query.date,
+          user: { id: userId },
+        };
       }
 
-      const modifiedTodos = todos.results.map((todo) => ({
-        id: todo.id,
-        date: todo.date,
-        body: todo.body,
-        done: todo.done,
-        public: todo.public,
-        user: todo.user,
-      }));
+      try {
+        const todos = await strapi.entityService.findPage("api::todo.todo", {
+          sort: { id: "desc" },
+          populate: { user: { fields: ["username"] } },
+          filters,
+          page,
+          pageSize: size,
+        });
 
-      return ctx.send({ result: modifiedTodos, pagination: todos.pagination });
+        const modifiedTodos = todos.results.map((todo) => ({
+          id: todo.id,
+          date: todo.date,
+          body: todo.body,
+          done: todo.done,
+          public: todo.public,
+          user: todo.user,
+        }));
+
+        return ctx.send({
+          status: 200,
+          data: { results: modifiedTodos, pagination: todos.pagination },
+        });
+      } catch (e) {
+        return ctx.badRequest("Fail to find todos.");
+      }
     },
 
     // todo 생성 (jwt 필요)
@@ -83,9 +71,13 @@ export default factories.createCoreController(
           },
         });
 
-        return ctx.send("Successfully created a todo.");
+        return ctx.send({
+          status: 201,
+          message: "Successfully create a todo.",
+          todoId: newTodo.id,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to create a todo.");
+        return ctx.badRequest("Fail to create a todo.");
       }
     },
 
@@ -108,9 +100,7 @@ export default factories.createCoreController(
         );
 
         if (!todo || (todo.user as any).id !== userId) {
-          return ctx.badRequest(
-            "Only the owner of this todo can make modifications."
-          );
+          return ctx.forbidden("No permission to update this todo.");
         }
 
         const updatedTodo = await strapi.entityService.update(
@@ -119,9 +109,13 @@ export default factories.createCoreController(
           { data: { ...ctx.request.body } }
         );
 
-        return ctx.send("Update Todo Success");
+        return ctx.send({
+          status: 200,
+          message: "Successfully update a user.",
+          todoId: updatedTodo.id,
+        });
       } catch (e) {
-        console.log(e);
+        return ctx.badRequest("Fail to update a user.");
       }
     },
 
@@ -147,20 +141,22 @@ export default factories.createCoreController(
           { populate: { user: { fields: ["id"] } } }
         );
 
-        if (!todo || (todo.user as any).id !== userId) {
-          return ctx.badRequest(
-            "Todo does not exist or you are not the owner of the todo."
-          );
+        if (!todo || (todo.user as any).id !== user.id) {
+          return ctx.forbidden("No permission to delete this todo.");
         }
 
-        const deleteTodo = await strapi.entityService.delete(
+        const deletedTodo = await strapi.entityService.delete(
           "api::todo.todo",
           todoId
         );
 
-        return ctx.send("Successfully deleted a todo.");
+        return ctx.send({
+          status: 200,
+          message: "Successfully delete a todo.",
+          todoId: deletedTodo.id,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to delete a todo.");
+        return ctx.badRequest("Fail to delete a todo.");
       }
     },
   })

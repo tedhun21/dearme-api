@@ -3,13 +3,11 @@
  */
 
 import { Strapi, factories } from "@strapi/strapi";
-import { errors } from "@strapi/utils";
-const { UnauthorizedError } = errors;
 
 export default factories.createCoreController(
   "api::friendship.friendship",
   ({ strapi }: { strapi: Strapi }) => ({
-    // 서로 무슨 관계인지
+    // 친구 관계 확인
     // jwt & 상대방 user id
     async find(ctx) {
       const { id: userId } = ctx.state.user;
@@ -22,6 +20,7 @@ export default factories.createCoreController(
       if (!ctx.query) {
         return ctx.badRequest("friendId is required.");
       }
+
       try {
         const friendship = await strapi.entityService.findMany(
           "api::friendship.friendship",
@@ -51,6 +50,10 @@ export default factories.createCoreController(
           }
         );
 
+        if (friendship.length === 0) {
+          return ctx.notFound("The friendship cannot be found.");
+        }
+
         let modifiedFriendship;
 
         if (
@@ -73,9 +76,9 @@ export default factories.createCoreController(
           };
         }
 
-        ctx.send(modifiedFriendship);
+        return ctx.send(modifiedFriendship);
       } catch (e) {
-        console.log(e);
+        return ctx.badRequest("Fail to find the friendship");
       }
     },
 
@@ -123,7 +126,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length !== 0) {
-          return ctx.badRequest("Already following this user.");
+          return ctx.badRequest("The friendship already exists.");
         }
 
         const newFriendship = await strapi.entityService.create(
@@ -167,8 +170,13 @@ export default factories.createCoreController(
 
           return ctx.send("Follow request sent.");
         }
+
+        return ctx.send({
+          status: 201,
+          message: `Successfully create a friendship between ${userId} and ${friendId}.`,
+        });
       } catch (e) {
-        console.log(e);
+        return ctx.badRequest("Fail to create a friendship.");
       }
     },
 
@@ -218,11 +226,11 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.badRequest("No friendship exists.");
+          return ctx.notFound("No friendship exists.");
         }
 
-        // // pending -> friend
-        // // 상대방이 팔로우 요청을 보냈다면 수락 하는 단계 (맞팔)
+        // pending -> friend
+        // 상대방이 팔로우 요청을 보냈다면 수락 하는 단계 (맞팔)
         if (
           friendship[0].status === "PENDING" &&
           status === "friend" &&
@@ -235,10 +243,18 @@ export default factories.createCoreController(
               friendship[0].id,
               { data: { ...friendship[0], status: "FRIEND" } }
             );
+
+            return ctx.send({
+              status: 200,
+              message: `${
+                (updatedFriendship.follow_receiver as any).id
+              } accept the follow request from ${
+                (updatedFriendship.follow_sender as any).id
+              }.`,
+              friendshipId: updatedFriendship.id,
+            });
           } catch (e) {
-            ctx.badRequest(
-              "Failed to update friendship. Invalid date or missing required fields."
-            );
+            return ctx.badRequest("Fail to accept the follow request.");
           }
 
           // friend -> block
@@ -263,10 +279,15 @@ export default factories.createCoreController(
                 },
               }
             );
+
+            return ctx.send({
+              status: 200,
+              message: `${(updatedFriendship.block as any).id} block ${
+                (updatedFriendship.blocked as any).id
+              }.`,
+            });
           } catch (e) {
-            ctx.badRequest(
-              "Failed to update friendship. Invalid date or missing required fields."
-            );
+            return ctx.badRequest("Fail to block the friendship.");
           }
 
           // block -> friend
@@ -296,18 +317,19 @@ export default factories.createCoreController(
                 },
               }
             );
+
+            return ctx.send({
+              status: 200,
+              message: `${updatedFriendship.block} unblock ${updatedFriendship.blocked}`,
+            });
           } catch (e) {
-            ctx.badRequest(
-              "Failed to update friendship. Invalid date or missing required fields."
-            );
+            return ctx.badRequest("Fail to unblock the friendship.");
           }
         } else {
-          return ctx.badRequest("Failed to update friendship");
+          return ctx.badRequest("Fail to update friendship.");
         }
-
-        ctx.send("Update Friendship Success");
       } catch (e) {
-        return ctx.badRequest("Failed to update friendship");
+        return ctx.badRequest("Fail to update friendship.");
       }
     },
 
@@ -320,6 +342,7 @@ export default factories.createCoreController(
       const { friendId } = ctx.query;
 
       try {
+        // 관계가 이미 있는지 검색
         const friendship = await strapi.entityService.findMany(
           "api::friendship.friendship",
           {
@@ -348,17 +371,21 @@ export default factories.createCoreController(
           }
         );
 
-        if (friendship.length !== 0) {
-          const deleteFriendship = await strapi.entityService.delete(
-            "api::friendship.friendship",
-            friendship[0].id
-          );
-          return ctx.send(
-            `${userId} and ${+friendId}'s friendship has been deleted.`
-          );
+        if (friendship.length === 0) {
+          return ctx.notFound("No friendship exists.");
         }
+
+        const deletedFriendship = await strapi.entityService.delete(
+          "api::friendship.friendship",
+          friendship[0].id
+        );
+        return ctx.send(
+          `${(deletedFriendship.follow_receiver as any).id} and ${
+            (deletedFriendship.follow_sender as any).id
+          }'s friendship has been deleted.`
+        );
       } catch (e) {
-        console.log(e);
+        return ctx.badRequest("Fail to delete the friendship.");
       }
     },
   })

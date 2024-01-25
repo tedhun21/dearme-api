@@ -21,6 +21,7 @@
     "status": {
       "type": "enumeration",
       "enum": [
+        "SELF",
         "PENDING",
         "FRIEND",
         "BLOCK_ONE",

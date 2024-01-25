@@ -3,33 +3,32 @@
  */
 
 import { Strapi, factories } from "@strapi/strapi";
-import { errors } from "@strapi/utils";
-const { UnauthorizedError, ForbiddenError } = errors;
 
 export default factories.createCoreController(
   "api::goal.goal",
   ({ strapi }: { strapi: Strapi }) => ({
     // 목표 조회 (특정 목표 id)
-    // 1. 한 유저의 목표들 모두 보여주기
     // query로 그 날짜 사이에 있는 애만 보여주기
     async find(ctx) {
       const { date } = ctx.query;
       const { userId, page, size } = ctx.query;
 
-      console.log(date);
       let filters;
 
-      if (date) {
+      // 1. 나의 Goal 조회 (jwt, date)
+      if (ctx.state.user && date) {
         filters = {
-          user: { id: userId },
+          user: { id: ctx.state.user.id },
           startDate: { $lte: date },
           endDate: { $gte: date },
         };
+        // 2. 한 유저의 목표 (userId, date)
       } else {
         filters = {
           user: { id: userId },
         };
       }
+
       try {
         const goals = await strapi.entityService.findPage("api::goal.goal", {
           filters,
@@ -37,9 +36,13 @@ export default factories.createCoreController(
           pageSize: size,
         });
 
-        return ctx.send(goals);
+        return ctx.send({
+          status: 200,
+          message: "Successfully find goals.",
+          data: goals,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to find goals.");
+        return ctx.badRequest("Fail to find goals.");
       }
     },
 
@@ -59,9 +62,13 @@ export default factories.createCoreController(
           },
         });
 
-        return ctx.send("Successfully created a goal.");
+        return ctx.send({
+          status: 201,
+          message: "Successfully create a goal.",
+          goalId: newGoal.id,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to create a goal.");
+        return ctx.badRequest("Fail to create a goal.");
       }
     },
 
@@ -85,7 +92,7 @@ export default factories.createCoreController(
         );
 
         if ((goal.user as any).id !== userId) {
-          return ctx.forbidden("This goal is not owned by you.");
+          return ctx.forbidden("No permission to update this goal.");
         }
 
         const updatedGoal = await strapi.entityService.update(
@@ -94,9 +101,13 @@ export default factories.createCoreController(
           { data: { ...ctx.request.body } }
         );
 
-        return ctx.send("Successfully updated a goal.");
+        return ctx.send({
+          status: 200,
+          message: "Successfully update the goal.",
+          goalId: updatedGoal.id,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to update a goal.");
+        return ctx.badRequest("Fail to update the goal.");
       }
     },
 
@@ -126,9 +137,13 @@ export default factories.createCoreController(
           "api::goal.goal",
           ctx.params.id
         );
-        return ctx.send("Successfully deleted a goal.");
+        return ctx.send({
+          status: 200,
+          message: "Successfully delete a goal.",
+          goalId: deletedGoal.id,
+        });
       } catch (e) {
-        return ctx.badRequest("Failed to delete a goal.");
+        return ctx.badRequest("Fail to delete a goal.");
       }
     },
   })

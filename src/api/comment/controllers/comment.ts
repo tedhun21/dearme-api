@@ -8,7 +8,6 @@ export default factories.createCoreController(
   "api::comment.comment",
   ({ strapi }) => ({
     // CREATE comment 생성 (client에서 postId 보내기)
-    // TODO: commentSettings (public, friends, off)
     async create(ctx) {
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid.");
@@ -64,45 +63,18 @@ export default factories.createCoreController(
         let data;
 
         // 1. 유저는 자기 소유의 포스트에 댓글을 무조건 달 수 있다.
-        if ((post.user as any).id === userId && friendship.length === 0) {
+        // 2. post PUBLIC이면 관계가 어떤 것이든 상관 x
+        if (
+          ((post.user as any).id === userId && friendship.length === 0) ||
+          post.commentSettings === "PUBLIC"
+        ) {
           data = {
-            data: { user: userId, post: postId },
+            data: { user: userId, post: postId, body },
           };
-
-          try {
-            const newComment = await strapi.entityService.create(
-              "api::comment.comment",
-              data
-            );
-
-            return ctx.send("Successfully created a comment.");
-          } catch (e) {
-            return ctx.send("Failed to create a comment.");
-          }
         }
 
-        // 2. post PUBLIC이면 관계가 어떤 것이든 상관 x
-        else if (post.commentSettings === "PUBLIC") {
-          data = {
-            data: {
-              user: userId,
-              post: postId,
-              body,
-            },
-          };
-
-          try {
-            const newComment = await strapi.entityService.create(
-              "api::comment.comment",
-              data
-            );
-            return ctx.send("Successfully created a comment.");
-          } catch (e) {
-            return ctx.badRequest("Failed to create a comment.");
-          }
-
-          // 3. post FRIENDS면 관계가 FRIEND만 comment를 달 수 있다.
-        } else if (
+        // 3. post commentSettings가 FRIENDS면 friendship 관계가 FRIEND만 comment를 달 수 있다.
+        else if (
           post.commentSettings === "FRIENDS" &&
           friendship[0].status === "FRIEND"
         ) {
@@ -111,7 +83,7 @@ export default factories.createCoreController(
               user: userId,
               post: postId,
               body,
-              friendship: friendship[0].id,
+              friendship: { connect: [friendship[0].id] },
             },
           };
 
@@ -120,14 +92,18 @@ export default factories.createCoreController(
               "api::comment.comment",
               data
             );
-            return ctx.send("Successfully created a comment.");
+            return ctx.send({
+              status: 200,
+              message: "Successfully create a comment.",
+              commentId: newComment.id,
+            });
           } catch (e) {
-            return ctx.badRequest("Failed to create a comment.");
+            return ctx.badRequest("Fail to create a comment.");
           }
 
           // 3. post OFF면 관계가 무엇이든지 comment를 달 수 없다.
         } else if (post.commentSettings === "OFF") {
-          return ctx.send(
+          return ctx.badRequest(
             "The owner of the post has disabled commenting on it."
           );
           // post comment 설정이 친구인 상태에서 친분이 없거나 친분이 PENDING 상태일때
@@ -135,14 +111,14 @@ export default factories.createCoreController(
           post.commentSettings === "FRIENDS" &&
           (friendship.length === 0 || friendship[0].status === "PENDING")
         ) {
-          return ctx.badRequest(
-            "Cannot leave a comment as you are not friends with the owner of this post."
+          return ctx.forbidden(
+            "Can't leave a comment as you are not friends with the owner of this post."
           );
         } else {
-          return ctx.badRequest("Failed to leave a comment");
+          return ctx.badRequest("Fail to leave a comment");
         }
       } catch (e) {
-        return ctx.badRequest("Failed to leave a comment, error: " + e.message);
+        return ctx.badRequest("Fail to leave a comment, error: " + e.message);
       }
     },
 
@@ -154,18 +130,16 @@ export default factories.createCoreController(
         return ctx.badRequest("page, size are required.");
       }
 
-      const post = await strapi.entityService.findOne("api::post.post", postId);
+      try {
+        const post = await strapi.entityService.findOne(
+          "api::post.post",
+          postId
+        );
 
-      if (!post) {
-        return ctx.badRequest("Could not find a post matching the postId.");
-      }
+        if (!post) {
+          return ctx.notFound("The post cannot be found matching the postId.");
+        }
 
-      let filters;
-      if (postId) {
-        filters = { post: +postId };
-      }
-
-      if (page && size) {
         const comments = await strapi.entityService.findPage(
           "api::comment.comment",
           {
@@ -173,11 +147,17 @@ export default factories.createCoreController(
             page,
             pageSize: size,
             populate: { user: { fields: ["nickname"] } },
-            filters,
+            filters: { post: { id: postId } },
           }
         );
 
-        return ctx.send(comments);
+        return ctx.send({
+          status: 200,
+          message: "Successfully find comments.",
+          data: comments,
+        });
+      } catch (e) {
+        return ctx.badRequest("Fail to find comments.");
       }
     },
 
@@ -190,12 +170,13 @@ export default factories.createCoreController(
       if (!ctx.request.body.body) {
         return ctx.badRequest("body is required.");
       }
-      try {
-        const { id: userId } = ctx.state.user;
-        const { body } = ctx.request.body;
-        const { id: commentId } = ctx.params;
-        const { postId } = ctx.query;
 
+      const { id: userId } = ctx.state.user;
+      const { body } = ctx.request.body;
+      const { id: commentId } = ctx.params;
+      const { postId } = ctx.query;
+
+      try {
         const existingComment = await strapi.entityService.findOne(
           "api::comment.comment",
           commentId,
@@ -205,11 +186,13 @@ export default factories.createCoreController(
         );
 
         if (!existingComment) {
-          return ctx.notFound("Comment not found");
+          return ctx.notFound(
+            "The comment cannot be found matching the commentId."
+          );
         }
 
         if (userId !== (existingComment.user as any).id) {
-          return ctx.unauthorized("You can only edit your own comments");
+          return ctx.forbidden("No permission to update this comment.");
         }
 
         let data = {
@@ -227,13 +210,12 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          message: "Successfully updated a comment.",
-          comment: updatedComment,
+          status: 200,
+          message: "Successfully update the comment.",
+          comment: updatedComment.id,
         });
       } catch (e) {
-        return ctx.badRequest(
-          "Failed to update a comment, error: " + e.message
-        );
+        return ctx.badRequest("Fail to update a comment, error: " + e.message);
       }
     },
 
@@ -247,30 +229,32 @@ export default factories.createCoreController(
       const { id: userId } = ctx.state.user;
       const { id: commentId } = ctx.params;
 
-      const existingComment = await strapi.entityService.findOne(
-        "api::comment.comment",
-        commentId,
-        { populate: { user: { fields: ["nickname"] } } }
-      );
+      try {
+        const existingComment = await strapi.entityService.findOne(
+          "api::comment.comment",
+          commentId,
+          { populate: { user: { fields: ["nickname"] } } }
+        );
 
-      console.log(existingComment);
+        if (!existingComment) {
+          return ctx.notFound("The comment cannot be found.");
+        }
 
-      if (userId === (existingComment.user as any).id) {
-        try {
+        if (userId === (existingComment.user as any).id) {
           const deletedComment = await strapi.entityService.delete(
             "api::comment.comment",
             commentId
           );
 
           return ctx.send({
-            message: "Successfully deleted a comment.",
+            message: "Successfully delete a comment.",
             id: deletedComment.id,
           });
-        } catch (e) {
-          console.log(e);
+        } else {
+          return ctx.forbidden("No permission to delete this todo.");
         }
-      } else {
-        return ctx.badRequest("You can only delete your own comments.");
+      } catch (e) {
+        return ctx.badRequest();
       }
     },
   })

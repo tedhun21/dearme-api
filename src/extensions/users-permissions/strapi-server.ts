@@ -11,7 +11,7 @@ module.exports = (plugin) => {
       );
 
       if ((existingUserWithNickname as any).length > 0) {
-        return ctx.conflict("Username already exists.");
+        return ctx.conflict("The username already exists.");
       }
 
       // email 중복체크
@@ -21,7 +21,7 @@ module.exports = (plugin) => {
       );
 
       if ((existingUserWithEmail as any).length > 0) {
-        return ctx.conflict("Email already exists.");
+        return ctx.conflict("The email already exists.");
       }
 
       const newMember = await strapi.entityService.create(
@@ -38,9 +38,13 @@ module.exports = (plugin) => {
         }
       );
 
-      return ctx.send({ status: 201, message: "Successfully created a user." });
+      return ctx.send({
+        status: 201,
+        message: "Successfully create a user.",
+        userId: newMember.id,
+      });
     } catch (e) {
-      return ctx.badRequest("Failed to create a user.");
+      return ctx.badRequest("Fail to create a user.");
     }
   };
 
@@ -64,7 +68,7 @@ module.exports = (plugin) => {
         }
       );
       if (!user) {
-        return ctx.notFound("Can't find a user.");
+        return ctx.notFound("The user cannot be found.");
       }
 
       const modifiedUser = {
@@ -77,9 +81,9 @@ module.exports = (plugin) => {
         private: user.private,
       };
 
-      return ctx.send({ status: 200, user: modifiedUser });
+      return ctx.send({ status: 200, data: modifiedUser });
     } catch (e) {
-      return ctx.notFound("Can't find a user.");
+      return ctx.notFound("The user cannot be found.");
     }
   };
 
@@ -113,9 +117,9 @@ module.exports = (plugin) => {
         background: user.background ? user.background : null,
       };
 
-      return ctx.send({ status: 200, user: modifiedUser });
+      return ctx.send({ status: 200, data: modifiedUser });
     } catch (e) {
-      return ctx.notFound("Can't find me.");
+      return ctx.notFound("The user cannot be found.");
     }
   };
 
@@ -147,9 +151,13 @@ module.exports = (plugin) => {
         }
       );
 
-      return ctx.send({ status: 200, message: "Successfully updated a user." });
+      return ctx.send({
+        status: 200,
+        message: "Successfully update the user.",
+        userId: updatedUser.id,
+      });
     } catch (e) {
-      return ctx.badRequest("Failed to update a user.");
+      return ctx.badRequest("Fail to update the user.");
     }
   };
 
@@ -171,10 +179,11 @@ module.exports = (plugin) => {
 
         return ctx.send({
           status: 200,
-          message: "Successfully deleted a user.",
+          message: "Successfully delete the user.",
+          userId: deleteUser.id,
         });
       } catch (e) {
-        return ctx.badRequest("Failed to delete a user.");
+        return ctx.badRequest("Fail to delete the user.");
       }
     }
   };
@@ -194,7 +203,7 @@ module.exports = (plugin) => {
         return ctx.send({ duplicate: false });
       }
     } catch (e) {
-      return ctx.badRequest("Failed to check duplicate.");
+      return ctx.badRequest("Fail to check duplicate.");
     }
   };
 
@@ -212,7 +221,7 @@ module.exports = (plugin) => {
         return ctx.send({ duplicate: false });
       }
     } catch (e) {
-      return ctx.badRequest("Failed to check duplicate.");
+      return ctx.badRequest("Fail to check duplicate.");
     }
   };
 

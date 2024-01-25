@@ -949,7 +949,7 @@ export interface ApiFriendshipFriendship extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     status: Attribute.Enumeration<
-      ['PENDING', 'FRIEND', 'BLOCK_ONE', 'BLOCK_BOTH']
+      ['SELF', 'PENDING', 'FRIEND', 'BLOCK_ONE', 'BLOCK_BOTH']
     >;
     follow_sender: Attribute.Relation<
       'api::friendship.friendship',
@@ -1005,7 +1005,7 @@ export interface ApiGoalGoal extends Schema.CollectionType {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
-    post: Attribute.Relation<'api::goal.goal', 'oneToOne', 'api::post.post'>;
+    posts: Attribute.Relation<'api::goal.goal', 'oneToMany', 'api::post.post'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1088,7 +1088,7 @@ export interface ApiPostPost extends Schema.CollectionType {
       'manyToMany',
       'plugin::users-permissions.user'
     >;
-    goal: Attribute.Relation<'api::post.post', 'oneToOne', 'api::goal.goal'>;
+    goal: Attribute.Relation<'api::post.post', 'manyToOne', 'api::goal.goal'>;
     commentSettings: Attribute.Enumeration<['PUBLIC', 'FRIENDS', 'OFF']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

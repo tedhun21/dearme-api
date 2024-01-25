@@ -38,12 +38,11 @@ export default factories.createCoreController(
 
         return ctx.send({
           status: 201,
-          message: "Successfully created a post.",
+          message: "Successfully create a post.",
+          postId: newPost.id,
         });
       } catch (e) {
-        return ctx.badRequest(
-          "Failed to upload your post, error: " + e.message
-        );
+        return ctx.badRequest("Fail to upload your post, error: " + e.message);
       }
     },
 
@@ -52,8 +51,7 @@ export default factories.createCoreController(
     // 2. query public을 넣었을 경우
     // 3. 유저와 관련된 친구가 가지고 있는 post들만 가져오기 (여긴 친구가 public을 하든 안 하든 보이기)
     async find(ctx) {
-      const { public: isPublic } = ctx.query;
-      const { page, size } = ctx.query;
+      const { page, size, userId, public: isPublic } = ctx.query;
 
       // 필터링 조건
       let filters = {};
@@ -71,6 +69,11 @@ export default factories.createCoreController(
         filters = {
           user: [...friendsList],
         };
+      }
+
+      // 3. 한 유저의 모든 포스트
+      if (userId) {
+        filters = { user: { id: userId } };
       }
 
       try {
@@ -135,11 +138,11 @@ export default factories.createCoreController(
 
         return ctx.send({
           status: 200,
-          posts: modifiedPosts,
-          pagination: posts.pagination,
+          message: "Successfully find posts.",
+          data: { results: modifiedPosts, pagination: posts.pagination },
         });
       } catch (e) {
-        return ctx.notFound("Can't find posts.");
+        return ctx.notFound("The posts cannot be found");
       }
 
       async function getFriendsList(userId) {
@@ -210,7 +213,7 @@ export default factories.createCoreController(
         );
 
         if (!existingPost) {
-          return ctx.notFound("Post not found");
+          return ctx.notFound("The post cannot be found.");
         }
 
         if (userId === (existingPost.user as any).id) {
@@ -238,13 +241,14 @@ export default factories.createCoreController(
 
           return ctx.send({
             status: 200,
-            message: "Successfully updated a post.",
+            message: "Successfully update the post.",
+            postId: updatedPost.id,
           });
         } else {
           return ctx.unauthorized("You can only edit your own posts.");
         }
       } catch (e) {
-        return ctx.badRequest("Failed to update a post.");
+        return ctx.badRequest("Fail to update the post.");
       }
     },
 
@@ -257,34 +261,35 @@ export default factories.createCoreController(
       const { id: userId } = ctx.state.user;
       const { id: postId } = ctx.params;
 
-      const post = await strapi.entityService.findOne(
-        "api::post.post",
-        postId,
-        {
-          populate: {
-            user: {
-              fields: ["id"],
+      try {
+        const post = await strapi.entityService.findOne(
+          "api::post.post",
+          postId,
+          {
+            populate: {
+              user: {
+                fields: ["id"],
+              },
             },
-          },
-        }
-      );
+          }
+        );
 
-      if (userId === (post.user as any).id) {
-        try {
+        if (userId === (post.user as any).id) {
           const deletedPost = await strapi.entityService.delete(
             "api::post.post",
             postId
           );
 
           return ctx.send({
-            message: "Successfully deleted a post.",
-            id: deletedPost.id,
+            status: 200,
+            message: "Successfully delete the post.",
+            postId: deletedPost.id,
           });
-        } catch (e) {
-          return ctx.badRequest("Failed to delete a post.");
+        } else {
+          return ctx.badRequest("You can only delete your own posts.");
         }
-      } else {
-        ctx.send("You can only delete your own posts.");
+      } catch (e) {
+        return ctx.badRequest("Fail to delete the post.");
       }
     },
 
@@ -313,7 +318,7 @@ export default factories.createCoreController(
         // 좋아요가 없으면 좋아요
 
         if (!post) {
-          return ctx.notFound("Post not Found");
+          return ctx.notFound("The post cannot be found.");
         }
 
         // 좋아요 유저 목록
@@ -335,7 +340,7 @@ export default factories.createCoreController(
           if (likeCancelPost) {
             ctx.send("Successfully cancelled a like.");
           } else {
-            ctx.badRequest("Failed to cancel a like.");
+            ctx.badRequest("Fail to cancel a like.");
           }
           // 좋아요 없는 상태 -> 좋아요 실행
         } else {
@@ -373,9 +378,12 @@ export default factories.createCoreController(
               }
             );
 
-            return ctx.send("Successfully created a like.");
+            return ctx.send({
+              status: 200,
+              message: "Successfully create a like.",
+            });
           } else {
-            return ctx.badRequest("Failed to create a like.");
+            return ctx.badRequest("Fail to create a like.");
           }
         }
       } catch (e) {
