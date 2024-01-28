@@ -39,7 +39,6 @@ module.exports = (plugin) => {
       );
 
       return ctx.send({
-        status: 201,
         message: "Successfully create a user.",
         userId: newMember.id,
       });
@@ -68,7 +67,7 @@ module.exports = (plugin) => {
         }
       );
       if (!user) {
-        return ctx.notFound("The user cannot be found.");
+        return ctx.notFound("The user cannot be found");
       }
 
       const modifiedUser = {
@@ -81,16 +80,16 @@ module.exports = (plugin) => {
         private: user.private,
       };
 
-      return ctx.send({ status: 200, data: modifiedUser });
+      return ctx.send(modifiedUser);
     } catch (e) {
-      return ctx.notFound("The user cannot be found.");
+      return ctx.notFound("The user cannot be found");
     }
   };
 
   // 나의 정보 조회
   plugin.controllers.user.me = async (ctx) => {
     if (!ctx.state.user) {
-      return ctx.unauthorized("Authentication token is missing or invalid.");
+      return ctx.unauthorized("Authentication token is missing or invalid");
     }
 
     try {
@@ -118,9 +117,9 @@ module.exports = (plugin) => {
         background: user.background ? user.background : null,
       };
 
-      return ctx.send({ status: 200, data: modifiedUser });
+      return ctx.send(modifiedUser);
     } catch (e) {
-      return ctx.notFound("The user cannot be found.");
+      return ctx.notFound("The user cannot be found");
     }
   };
 
@@ -129,7 +128,7 @@ module.exports = (plugin) => {
     const { id: userId } = ctx.params;
 
     if (!ctx.state.user || ctx.state.user.id !== +userId) {
-      return ctx.unauthorized("Authentication token is missing or invalid.");
+      return ctx.unauthorized("Authentication token is missing or invalid");
     }
     const { photo, background } = ctx.request.files;
 
@@ -153,12 +152,11 @@ module.exports = (plugin) => {
       );
 
       return ctx.send({
-        status: 200,
-        message: "Successfully update the user.",
+        message: "Successfully update the user",
         userId: updatedUser.id,
       });
     } catch (e) {
-      return ctx.badRequest("Fail to update the user.");
+      return ctx.badRequest("Fail to update the user");
     }
   };
 
@@ -167,10 +165,10 @@ module.exports = (plugin) => {
     const { id: userId } = ctx.state.user;
 
     if (!ctx.state.user || ctx.state.user.id !== +userId) {
-      return ctx.unauthorized("Authentication token is missing or invalid.");
+      return ctx.unauthorized("Authentication token is missing or invalid");
     }
     if (ctx.state.user.id !== +ctx.params.id) {
-      return ctx.unauthorized("User does not match.");
+      return ctx.unauthorized("User does not match");
     } else {
       try {
         const deleteUser = await strapi.entityService.delete(
@@ -179,12 +177,11 @@ module.exports = (plugin) => {
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully delete the user.",
+          message: "Successfully delete the user",
           userId: deleteUser.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to delete the user.");
+        return ctx.badRequest("Fail to delete the user");
       }
     }
   };
@@ -204,7 +201,7 @@ module.exports = (plugin) => {
         return ctx.send({ duplicate: false });
       }
     } catch (e) {
-      return ctx.badRequest("Fail to check duplicate.");
+      return ctx.badRequest("Fail to check duplicate");
     }
   };
 
@@ -222,7 +219,7 @@ module.exports = (plugin) => {
         return ctx.send({ duplicate: false });
       }
     } catch (e) {
-      return ctx.badRequest("Fail to check duplicate.");
+      return ctx.badRequest("Fail to check duplicate");
     }
   };
 
