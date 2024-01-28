@@ -14,11 +14,11 @@ export default factories.createCoreController(
       const { friendId } = ctx.query;
 
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.query) {
-        return ctx.badRequest("friendId is required.");
+        return ctx.badRequest("friendId is required");
       }
 
       try {
@@ -51,7 +51,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.notFound("The friendship cannot be found.");
+          return ctx.notFound("The friendship cannot be found");
         }
 
         let modifiedFriendship;
@@ -86,11 +86,11 @@ export default factories.createCoreController(
     // 친분 있으면 못 만들게
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.query) {
-        return ctx.badRequest("friendId is required.");
+        return ctx.badRequest("friendId is required");
       }
       try {
         const { id: userId, nickname: userNickname } = ctx.state.user;
@@ -126,7 +126,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length !== 0) {
-          return ctx.badRequest("The friendship already exists.");
+          return ctx.badRequest("The friendship already exists");
         }
 
         const newFriendship = await strapi.entityService.create(
@@ -141,42 +141,42 @@ export default factories.createCoreController(
         );
 
         // 친구 신청 알림
-        if (newFriendship) {
-          const notice = await strapi.entityService.findMany(
-            "api::notice.notice",
-            {
-              filters: {
-                sender: userId,
-                receiver: +friendId,
-              },
-            }
-          );
+        // if (newFriendship) {
+        //   const notice = await strapi.entityService.findMany(
+        //     "api::notice.notice",
+        //     {
+        //       filters: {
+        //         sender: userId,
+        //         receiver: +friendId,
+        //       },
+        //     }
+        //   );
 
-          if (notice.length !== 0) {
-            return ctx.badRequest("Already sent a follow request.");
-          }
+        //   if (notice.length !== 0) {
+        //     return ctx.badRequest("Already sent a follow request.");
+        //   }
 
-          const newNotice = await strapi.entityService.create(
-            "api::notice.notice",
-            {
-              data: {
-                body: `${userNickname} sent a friend request.`,
-                receiver: +friendId,
-                sender: userId,
-                event: "FRIEND",
-              },
-            }
-          );
+        //   const newNotice = await strapi.entityService.create(
+        //     "api::notice.notice",
+        //     {
+        //       data: {
+        //         body: `${userNickname} sent a friend request.`,
+        //         receiver: +friendId,
+        //         sender: userId,
+        //         event: "FRIEND",
+        //       },
+        //     }
+        //   );
 
-          return ctx.send("Follow request sent.");
-        }
+        //   return ctx.send("Follow request sent.");
+        // }
 
         return ctx.send({
-          status: 201,
-          message: `Successfully create a friendship between ${userId} and ${friendId}.`,
+          message: `Successfully create a friendship between ${userId} and ${friendId}`,
+          friendshipId: [userId, friendId],
         });
       } catch (e) {
-        return ctx.badRequest("Fail to create a friendship.");
+        return ctx.badRequest("Fail to create a friendship");
       }
     },
 
@@ -189,11 +189,11 @@ export default factories.createCoreController(
       const { friendId, status } = ctx.query;
 
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.query) {
-        return ctx.badRequest("friendId, status are required.");
+        return ctx.badRequest("friendId, status are required");
       }
       try {
         // 친분 유무
@@ -226,7 +226,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.notFound("No friendship exists.");
+          return ctx.notFound("No friendship exists");
         }
 
         // pending -> friend
@@ -245,7 +245,6 @@ export default factories.createCoreController(
             );
 
             return ctx.send({
-              status: 200,
               message: `${
                 (updatedFriendship.follow_receiver as any).id
               } accept the follow request from ${
@@ -254,7 +253,7 @@ export default factories.createCoreController(
               friendshipId: updatedFriendship.id,
             });
           } catch (e) {
-            return ctx.badRequest("Fail to accept the follow request.");
+            return ctx.badRequest("Fail to accept the follow request");
           }
 
           // friend -> block
@@ -335,7 +334,7 @@ export default factories.createCoreController(
 
     async delete(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -372,20 +371,20 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.notFound("No friendship exists.");
+          return ctx.notFound("No friendship exists");
         }
 
         const deletedFriendship = await strapi.entityService.delete(
           "api::friendship.friendship",
           friendship[0].id
         );
-        return ctx.send(
-          `${(deletedFriendship.follow_receiver as any).id} and ${
+        return ctx.send({
+          message: `${(deletedFriendship.follow_receiver as any).id} and ${
             (deletedFriendship.follow_sender as any).id
-          }'s friendship has been deleted.`
-        );
+          }'s friendship has been deleted`,
+        });
       } catch (e) {
-        return ctx.badRequest("Fail to delete the friendship.");
+        return ctx.badRequest("Fail to delete the friendship");
       }
     },
   })

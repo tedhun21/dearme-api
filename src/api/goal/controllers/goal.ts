@@ -31,25 +31,25 @@ export default factories.createCoreController(
 
       try {
         const goals = await strapi.entityService.findPage("api::goal.goal", {
+          sort: { endDate: "asc" },
           filters,
           page,
           pageSize: size,
         });
 
         return ctx.send({
-          status: 200,
-          message: "Successfully find goals.",
+          message: "Successfully find goals",
           data: goals,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to find goals.");
+        return ctx.badRequest("Fail to find goals");
       }
     },
 
     // 목표 생성
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -63,19 +63,18 @@ export default factories.createCoreController(
         });
 
         return ctx.send({
-          status: 201,
-          message: "Successfully create a goal.",
+          message: "Successfully create a goal",
           goalId: newGoal.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to create a goal.");
+        return ctx.badRequest("Fail to create a goal");
       }
     },
 
     // 목표 수정
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -92,7 +91,7 @@ export default factories.createCoreController(
         );
 
         if ((goal.user as any).id !== userId) {
-          return ctx.forbidden("No permission to update this goal.");
+          return ctx.forbidden("No permission to update this goal");
         }
 
         const updatedGoal = await strapi.entityService.update(
@@ -102,19 +101,18 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully update the goal.",
+          message: "Successfully update the goal",
           goalId: updatedGoal.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to update the goal.");
+        return ctx.badRequest("Fail to update the goal");
       }
     },
 
     // 목표 삭제
     async delete(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -130,7 +128,7 @@ export default factories.createCoreController(
         );
 
         if ((goal.user as any).id !== userId) {
-          return ctx.forbidden("No permission to delete this goal.");
+          return ctx.forbidden("No permission to delete this goal");
         }
 
         const deletedGoal = await strapi.entityService.delete(
@@ -138,12 +136,11 @@ export default factories.createCoreController(
           ctx.params.id
         );
         return ctx.send({
-          status: 200,
-          message: "Successfully delete a goal.",
+          message: "Successfully delete the goal",
           goalId: deletedGoal.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to delete a goal.");
+        return ctx.badRequest("Fail to delete the goal");
       }
     },
   })

@@ -37,8 +37,7 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 201,
-          message: "Successfully create a post.",
+          message: "Successfully create a post",
           postId: newPost.id,
         });
       } catch (e) {
@@ -51,7 +50,7 @@ export default factories.createCoreController(
     // 2. query public을 넣었을 경우
     // 3. 유저와 관련된 친구가 가지고 있는 post들만 가져오기 (여긴 친구가 public을 하든 안 하든 보이기)
     async find(ctx) {
-      const { page, size, userId, public: isPublic } = ctx.query;
+      const { page, size, userId, public: isPublic, friend } = ctx.query;
 
       // 필터링 조건
       let filters = {};
@@ -62,7 +61,7 @@ export default factories.createCoreController(
       }
 
       // 2. 친구꺼 (public === true || public === false)
-      if (ctx.state.user) {
+      if (ctx.state.user && friend === true) {
         const { id: userId } = ctx.state.user;
 
         const friendsList = await getFriendsList(userId);
@@ -74,6 +73,13 @@ export default factories.createCoreController(
       // 3. 한 유저의 모든 포스트
       if (userId) {
         filters = { user: { id: userId } };
+      }
+      // 4. 나의 모든 포스트 (jwt)
+      if (ctx.state.user && friend === false) {
+        const { id: userId } = ctx.state.user;
+        filters = {
+          user: { id: userId },
+        };
       }
 
       try {
@@ -137,9 +143,9 @@ export default factories.createCoreController(
         }));
 
         return ctx.send({
-          status: 200,
-          message: "Successfully find posts.",
-          data: { results: modifiedPosts, pagination: posts.pagination },
+          message: "Successfully find posts",
+          results: modifiedPosts,
+          pagination: posts.pagination,
         });
       } catch (e) {
         return ctx.notFound("The posts cannot be found");
@@ -199,7 +205,7 @@ export default factories.createCoreController(
     // UPDATE: 게시물 수정
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -213,7 +219,7 @@ export default factories.createCoreController(
         );
 
         if (!existingPost) {
-          return ctx.notFound("The post cannot be found.");
+          return ctx.notFound("The post cannot be found");
         }
 
         if (userId === (existingPost.user as any).id) {
@@ -240,15 +246,14 @@ export default factories.createCoreController(
           );
 
           return ctx.send({
-            status: 200,
-            message: "Successfully update the post.",
+            message: "Successfully update the post",
             postId: updatedPost.id,
           });
         } else {
-          return ctx.unauthorized("You can only edit your own posts.");
+          return ctx.unauthorized("You can only edit your own posts");
         }
       } catch (e) {
-        return ctx.badRequest("Fail to update the post.");
+        return ctx.badRequest("Fail to update the post");
       }
     },
 
@@ -281,8 +286,7 @@ export default factories.createCoreController(
           );
 
           return ctx.send({
-            status: 200,
-            message: "Successfully delete the post.",
+            message: "Successfully delete the post",
             postId: deletedPost.id,
           });
         } else {
@@ -296,7 +300,7 @@ export default factories.createCoreController(
     //UPDATE Like(post)
     async like(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -318,7 +322,7 @@ export default factories.createCoreController(
         // 좋아요가 없으면 좋아요
 
         if (!post) {
-          return ctx.notFound("The post cannot be found.");
+          return ctx.notFound("The post cannot be found");
         }
 
         // 좋아요 유저 목록
@@ -338,9 +342,12 @@ export default factories.createCoreController(
           );
 
           if (likeCancelPost) {
-            ctx.send("Successfully cancelled a like.");
+            ctx.send({
+              message: "Successfully cancell the like",
+              postId: likeCancelPost.id,
+            });
           } else {
-            ctx.badRequest("Fail to cancel a like.");
+            ctx.badRequest("Fail to cancel the like");
           }
           // 좋아요 없는 상태 -> 좋아요 실행
         } else {
@@ -350,44 +357,45 @@ export default factories.createCoreController(
             { data: { ...post, likes: { connect: [userId] } } }
           );
 
-          if (likePost) {
-            // notice 중복 여부
-            const notice = await strapi.entityService.findMany(
-              "api::notice.notice",
-              {
-                filters: {
-                  sender: userId,
-                  receiver: (post.user as any).id,
-                  event: "LIKE",
-                },
-              }
-            );
-            if (notice) {
-              return ctx.badRequest("Already sent a like request.");
-            }
+          return ctx.send({
+            message: "Successfully create a like",
+            postId: likePost.id,
+          });
 
-            const newNotice = await strapi.entityService.create(
-              "api::notice.notice",
-              {
-                data: {
-                  body: `${ctx.state.user.nickname} liked your post.`,
-                  receiver: (post.user as any).id,
-                  sender: userId,
-                  event: "FRIEND",
-                },
-              }
-            );
+          // if (likePost) {
+          //   // notice 중복 여부
+          //   const notice = await strapi.entityService.findMany(
+          //     "api::notice.notice",
+          //     {
+          //       filters: {
+          //         sender: userId,
+          //         receiver: (post.user as any).id,
+          //         event: "LIKE",
+          //       },
+          //     }
+          //   );
+          //   if (notice) {
+          //     return ctx.badRequest("Already sent a like request.");
+          //   }
 
-            return ctx.send({
-              status: 200,
-              message: "Successfully create a like.",
-            });
-          } else {
-            return ctx.badRequest("Fail to create a like.");
-          }
+          //   const newNotice = await strapi.entityService.create(
+          //     "api::notice.notice",
+          //     {
+          //       data: {
+          //         body: `${ctx.state.user.nickname} liked your post.`,
+          //         receiver: (post.user as any).id,
+          //         sender: userId,
+          //         event: "FRIEND",
+          //       },
+          //     }
+          //   );
+
+          // } else {
+          //   return ctx.badRequest("Fail to create a like.");
+          // }
         }
       } catch (e) {
-        return ctx.badRequest("Error");
+        return ctx.badRequest("Fail to update a like.");
       }
     },
   })

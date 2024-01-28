@@ -10,10 +10,10 @@ export default factories.createCoreController(
     // CREATE comment 생성 (client에서 postId 보내기)
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
       if (!ctx.request.body.body) {
-        return ctx.badRequest("body is required.");
+        return ctx.badRequest("body is required");
       }
 
       const { id: userId } = ctx.state.user;
@@ -93,12 +93,11 @@ export default factories.createCoreController(
               data
             );
             return ctx.send({
-              status: 200,
-              message: "Successfully create a comment.",
+              message: "Successfully create a comment",
               commentId: newComment.id,
             });
           } catch (e) {
-            return ctx.badRequest("Fail to create a comment.");
+            return ctx.badRequest("Fail to create a comment");
           }
 
           // 3. post OFF면 관계가 무엇이든지 comment를 달 수 없다.
@@ -112,7 +111,7 @@ export default factories.createCoreController(
           (friendship.length === 0 || friendship[0].status === "PENDING")
         ) {
           return ctx.forbidden(
-            "Can't leave a comment as you are not friends with the owner of this post."
+            "Can't leave a comment as you are not friends with the owner of this post"
           );
         } else {
           return ctx.badRequest("Fail to leave a comment");
@@ -127,7 +126,7 @@ export default factories.createCoreController(
       const { postId, page, size } = ctx.query;
 
       if (!page || !size) {
-        return ctx.badRequest("page, size are required.");
+        return ctx.badRequest("page, size are required");
       }
 
       try {
@@ -137,7 +136,7 @@ export default factories.createCoreController(
         );
 
         if (!post) {
-          return ctx.notFound("The post cannot be found matching the postId.");
+          return ctx.notFound("The post cannot be found matching the postId");
         }
 
         const comments = await strapi.entityService.findPage(
@@ -152,23 +151,23 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully find comments.",
-          data: comments,
+          message: "Successfully find comments",
+          results: comments.results,
+          pagination: comments.pagination,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to find comments.");
+        return ctx.badRequest("Fail to find comments");
       }
     },
 
     // UPDATE 댓글 수정
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.request.body.body) {
-        return ctx.badRequest("body is required.");
+        return ctx.badRequest("body is required");
       }
 
       const { id: userId } = ctx.state.user;
@@ -187,12 +186,12 @@ export default factories.createCoreController(
 
         if (!existingComment) {
           return ctx.notFound(
-            "The comment cannot be found matching the commentId."
+            "The comment cannot be found matching the commentId"
           );
         }
 
         if (userId !== (existingComment.user as any).id) {
-          return ctx.forbidden("No permission to update this comment.");
+          return ctx.forbidden("No permission to update this comment");
         }
 
         let data = {
@@ -210,8 +209,7 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully update the comment.",
+          message: "Successfully update the comment",
           comment: updatedComment.id,
         });
       } catch (e) {
@@ -223,7 +221,7 @@ export default factories.createCoreController(
     // comment 소유자가 삭제 && post 소유자가 삭제
     async delete(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -237,7 +235,7 @@ export default factories.createCoreController(
         );
 
         if (!existingComment) {
-          return ctx.notFound("The comment cannot be found.");
+          return ctx.notFound("The comment cannot be found");
         }
 
         if (userId === (existingComment.user as any).id) {
@@ -251,10 +249,10 @@ export default factories.createCoreController(
             id: deletedComment.id,
           });
         } else {
-          return ctx.forbidden("No permission to delete this todo.");
+          return ctx.forbidden("No permission to delete this todo");
         }
       } catch (e) {
-        return ctx.badRequest();
+        return ctx.badRequest("Fail to delete the todo");
       }
     },
   })

@@ -113,6 +113,7 @@ module.exports = (plugin) => {
         email: user.email,
         username: user.username,
         nickname: user.nickname,
+        body: user.body,
         photo: user.photo ? user.photo : null,
         background: user.background ? user.background : null,
       };

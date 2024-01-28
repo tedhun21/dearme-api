@@ -47,8 +47,9 @@ export default factories.createCoreController(
         }));
 
         return ctx.send({
-          status: 200,
-          data: { results: modifiedTodos, pagination: todos.pagination },
+          results: modifiedTodos,
+          pagination: todos.pagination,
+          message: "Successfully find todos",
         });
       } catch (e) {
         return ctx.badRequest("Fail to find todos.");
@@ -58,7 +59,7 @@ export default factories.createCoreController(
     // todo 생성 (jwt 필요)
     async create(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -72,19 +73,18 @@ export default factories.createCoreController(
         });
 
         return ctx.send({
-          status: 201,
-          message: "Successfully create a todo.",
+          message: "Successfully create a todo",
           todoId: newTodo.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to create a todo.");
+        return ctx.badRequest("Fail to create a todo");
       }
     },
 
     // todo 수정 (jwt 필요)
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -100,7 +100,7 @@ export default factories.createCoreController(
         );
 
         if (!todo || (todo.user as any).id !== userId) {
-          return ctx.forbidden("No permission to update this todo.");
+          return ctx.forbidden("No permission to update this todo");
         }
 
         const updatedTodo = await strapi.entityService.update(
@@ -110,19 +110,18 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully update a user.",
+          message: "Successfully update a user",
           todoId: updatedTodo.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to update a user.");
+        return ctx.badRequest("Fail to update a user");
       }
     },
 
     // todo 삭제 (jwt 필요)
     async delete(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       const { id: userId } = ctx.state.user;
@@ -142,7 +141,7 @@ export default factories.createCoreController(
         );
 
         if (!todo || (todo.user as any).id !== user.id) {
-          return ctx.forbidden("No permission to delete this todo.");
+          return ctx.forbidden("No permission to delete this todo");
         }
 
         const deletedTodo = await strapi.entityService.delete(
@@ -151,8 +150,7 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully delete a todo.",
+          message: "Successfully delete a todo",
           todoId: deletedTodo.id,
         });
       } catch (e) {

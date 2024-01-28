@@ -820,6 +820,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'api::friendship.friendship'
     >;
     background: Attribute.Media;
+    body: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

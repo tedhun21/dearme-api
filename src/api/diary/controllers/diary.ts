@@ -10,11 +10,11 @@ export default factories.createCoreController(
     // 일기 조회 (일일 또는 월별)
     async find(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.query.date) {
-        return ctx.badRequest("date is required.");
+        return ctx.badRequest("date is required");
       }
       // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
       if (
@@ -24,12 +24,12 @@ export default factories.createCoreController(
         )
       ) {
         return ctx.badRequest(
-          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM"
         );
       }
 
       const { id: userId } = ctx.state.user;
-      const { date } = ctx.query;
+      const { date, page, size } = ctx.query;
 
       try {
         let filters;
@@ -47,24 +47,26 @@ export default factories.createCoreController(
         }
 
         // 일기 조회
-        const diaries = await strapi.entityService.findMany(
+        const diaries = await strapi.entityService.findPage(
           "api::diary.diary",
           {
             filters,
+            page,
+            pageSize: size,
           }
         );
 
-        if (diaries.length === 0) {
-          return ctx.notFound(`No diary found for ${date}.`);
+        if (diaries.results.length === 0) {
+          return ctx.notFound(`No diary found for ${date}`);
         }
 
         return ctx.send({
-          status: 200,
-          message: "Successfully find diaries.",
-          data: diaries,
+          message: "Successfully find diaries",
+          results: diaries.results,
+          pagination: diaries.pagination,
         });
       } catch (e) {
-        return ctx.notFound("The diaries cannot be found.");
+        return ctx.notFound("The diaries cannot be found");
       }
     },
 
@@ -72,11 +74,11 @@ export default factories.createCoreController(
     async create(ctx) {
       // 로그인 여부 검증
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.request.body.data || !ctx.query.date) {
-        return ctx.badRequest("No data or query parameters available.");
+        return ctx.badRequest("No data or query parameters available");
       }
 
       // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
@@ -87,7 +89,7 @@ export default factories.createCoreController(
         )
       ) {
         return ctx.badRequest(
-          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM"
         );
       }
 
@@ -118,12 +120,11 @@ export default factories.createCoreController(
           );
 
           return ctx.send({
-            status: 200,
-            message: "Successfully create a diary.",
+            message: "Successfully create a diary",
             diaryId: newDiary.id,
           });
         } else {
-          return ctx.badRequest("A diary already exists for this date.");
+          return ctx.badRequest("A diary already exists for this date");
         }
       } catch (e) {
         return ctx.badRequest("Fail to create a diary.");
@@ -133,15 +134,15 @@ export default factories.createCoreController(
     // 일기 수정
     async update(ctx) {
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       if (!ctx.query.date) {
-        return ctx.badRequest("date is required.");
+        return ctx.badRequest("date is required");
       }
 
       if (!ctx.request.body.data || !ctx.query.date) {
-        return ctx.badRequest("No data or query parameters available.");
+        return ctx.badRequest("No data or query parameters available");
       }
 
       // 날짜 형식 검증 (YYYY-MM-DD 또는 YYYY-MM)
@@ -152,7 +153,7 @@ export default factories.createCoreController(
         )
       ) {
         return ctx.badRequest(
-          "Invalid format. Please use YYYY-MM-DD or YYYY-MM."
+          "Invalid format. Please use YYYY-MM-DD or YYYY-MM"
         );
       }
 
@@ -169,7 +170,7 @@ export default factories.createCoreController(
 
         // 연관된 일기가 없다면 에러
         if (diary.length === 0) {
-          return ctx.notFound("The diary cannot be found matching the user.");
+          return ctx.notFound("The diary cannot be found matching the user");
         }
 
         let data = {
@@ -188,12 +189,11 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          status: 200,
-          message: "Successfully update the diary.",
+          message: "Successfully update the diary",
           diaryId: updatedDiary.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to update the diary.");
+        return ctx.badRequest("Fail to update the diary");
       }
     },
 
@@ -201,12 +201,12 @@ export default factories.createCoreController(
     async delete(ctx) {
       // 로그인 여부 검증
       if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid.");
+        return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
       // 날짜 형식 검증
       if (!ctx.query.date || !/^\d{4}-\d{2}-\d{2}$/.test(ctx.query.date)) {
-        return ctx.badRequest("Invalid date format. Please use YYYY-MM-DD.");
+        return ctx.badRequest("Invalid date format. Please use YYYY-MM-DD");
       }
 
       // 날짜 파라미터 추출
@@ -222,12 +222,12 @@ export default factories.createCoreController(
 
         // 일치의 소유자와 일치하지 않을 때
         if (diary[0].user.id !== userId) {
-          return ctx.forbidden("No permission to delete the diary.");
+          return ctx.forbidden("No permission to delete the diary");
         }
 
         // 일기가 존재하지 않을 때
         if (diary.length === 0) {
-          return ctx.notFound("The diary cannot be found.");
+          return ctx.notFound("The diary cannot be found");
         }
 
         const deletedDiary = await strapi.entityService.delete(
@@ -235,12 +235,11 @@ export default factories.createCoreController(
           diary[0].id
         );
         return ctx.send({
-          status: 200,
           message: `Successfully delete the diary for ${date}`,
           diaryId: deletedDiary.id,
         });
       } catch (e) {
-        return ctx.badRequest("Fail to delete the diary.");
+        return ctx.badRequest("Fail to delete the diary");
       }
     },
   })
