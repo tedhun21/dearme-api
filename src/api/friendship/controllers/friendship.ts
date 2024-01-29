@@ -387,5 +387,15 @@ export default factories.createCoreController(
         return ctx.badRequest("Fail to delete the friendship");
       }
     },
+
+    // 유저의 친구 찾기
+    async findFriends(ctx) {
+      const { id: userId } = ctx.state.user;
+
+      try {
+        // const friends = await strapi.entityService.findPage("")
+        // console.log(user);
+      } catch (e) {}
+    },
   })
 );

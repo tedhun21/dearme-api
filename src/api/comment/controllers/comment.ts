@@ -87,19 +87,6 @@ export default factories.createCoreController(
             },
           };
 
-          try {
-            const newComment = await strapi.entityService.create(
-              "api::comment.comment",
-              data
-            );
-            return ctx.send({
-              message: "Successfully create a comment",
-              commentId: newComment.id,
-            });
-          } catch (e) {
-            return ctx.badRequest("Fail to create a comment");
-          }
-
           // 3. post OFF면 관계가 무엇이든지 comment를 달 수 없다.
         } else if (post.commentSettings === "OFF") {
           return ctx.badRequest(
@@ -115,6 +102,19 @@ export default factories.createCoreController(
           );
         } else {
           return ctx.badRequest("Fail to leave a comment");
+        }
+
+        try {
+          const newComment = await strapi.entityService.create(
+            "api::comment.comment",
+            data
+          );
+          return ctx.send({
+            message: "Successfully create a comment",
+            commentId: newComment.id,
+          });
+        } catch (e) {
+          return ctx.badRequest("Fail to create a comment");
         }
       } catch (e) {
         return ctx.badRequest("Fail to leave a comment, error: " + e.message);
