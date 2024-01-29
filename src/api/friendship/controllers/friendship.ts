@@ -389,13 +389,132 @@ export default factories.createCoreController(
     },
 
     // 유저의 친구 찾기
-    async findFriends(ctx) {
+    async findFriend(ctx) {
+      const { page, size } = ctx.query;
       const { id: userId } = ctx.state.user;
 
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
       try {
-        // const friends = await strapi.entityService.findPage("")
-        // console.log(user);
-      } catch (e) {}
+        const friendships = await strapi.entityService.findPage(
+          "api::friendship.friendship",
+          {
+            sort: { createdAt: "desc" },
+            filters: {
+              $or: [
+                {
+                  $and: [{ follow_sender: userId }, { status: "FRIEND" }],
+                },
+                {
+                  $and: [{ follow_receiver: userId }, { status: "FRIEND" }],
+                },
+                {
+                  $and: [{ $not: { block: userId } }, { status: "BLOCK_ONE" }],
+                },
+              ],
+            },
+
+            populate: {
+              follow_sender: { fields: ["id"] },
+              follow_receiver: { fields: ["id"] },
+              block: { fields: ["id"] },
+              blocked: { fields: ["id"] },
+            },
+            page,
+            pageSize: size,
+          }
+        );
+
+        if (friendships.results.length === 0) {
+          return ctx.notFound("You have no friend");
+        }
+
+        // 친구인 아이디를 배열로
+        const friendArray = (friendships) => {
+          return friendships.map((friend) => {
+            if ((friend.follow_sender as any).id !== userId) {
+              return (friend.follow_sender as any).id;
+            } else {
+              return (friend.follow_receiver as any).id;
+            }
+          });
+        };
+
+        const friends = await strapi.entityService.findPage(
+          "plugin::users-permissions.user",
+          {
+            filters: { id: friendArray(friendships.results) },
+            populate: { photo: { fields: ["id", "url"] } },
+            page,
+            pageSize: size,
+          }
+        );
+
+        const modifiedFriends = friends.results.map((friend) => ({
+          id: friend.id,
+          username: friend.username,
+          nickname: friend.nickname,
+          photo: friend.photo,
+        }));
+
+        return ctx.send(modifiedFriends);
+      } catch (e) {
+        return ctx.badRequest("Fail to find friends");
+      }
+    },
+
+    // 유저의 친구 요청 찾기
+    async findRequest(ctx) {
+      const { page, size } = ctx.query;
+      const { id: userId } = ctx.state.user;
+
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
+      try {
+        const friendships = await strapi.entityService.findPage(
+          "api::friendship.friendship",
+          {
+            filters: {
+              follow_receiver: userId,
+              status: "PENDING",
+            },
+            populate: { follow_sender: { fields: ["id"] } },
+            page,
+            pageSize: size,
+          }
+        );
+
+        if (friendships.results.length === 0) {
+          return ctx.notFound("You have no request");
+        }
+
+        const requests = friendships.results.map(
+          (friendship) => (friendship.follow_sender as any).id
+        );
+
+        const requestUsers = await strapi.entityService.findPage(
+          "plugin::users-permissions.user",
+          {
+            filters: { id: requests },
+            populate: { photo: { fields: ["id", "url"] } },
+          }
+        );
+
+        const modifiedRequestUsers = requestUsers.results.map((user) => ({
+          id: user.id,
+          username: user.username,
+          nickname: user.nickname,
+          photo: user.photo,
+        }));
+
+        return ctx.send(modifiedRequestUsers);
+      } catch (e) {
+        return ctx.badRequest("Fail to find request");
+      }
     },
   })
 );

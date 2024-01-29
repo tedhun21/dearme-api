@@ -11,7 +11,7 @@ export default factories.createCoreController(
     // query로 그 날짜 사이에 있는 애만 보여주기
     async find(ctx) {
       const { date } = ctx.query;
-      const { userId, page, size } = ctx.query;
+      const { userId } = ctx.query;
 
       let filters;
 
@@ -30,16 +30,14 @@ export default factories.createCoreController(
       }
 
       try {
-        const goals = await strapi.entityService.findPage("api::goal.goal", {
+        const goals = await strapi.entityService.findMany("api::goal.goal", {
           sort: { endDate: "asc" },
           filters,
-          page,
-          pageSize: size,
         });
 
         return ctx.send({
           message: "Successfully find goals",
-          data: goals,
+          goals,
         });
       } catch (e) {
         return ctx.badRequest("Fail to find goals");

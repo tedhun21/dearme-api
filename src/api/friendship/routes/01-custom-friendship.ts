@@ -7,8 +7,13 @@ module.exports = {
     // 유저의 친구 확인
     {
       method: "GET",
-      path: "/friendships/friends",
-      handler: "friendship.findFriends",
+      path: "/friendships/friend",
+      handler: "friendship.findFriend",
+    },
+    {
+      method: "GET",
+      path: "/friendships/request",
+      handler: "friendship.findRequest",
     },
   ],
 };
