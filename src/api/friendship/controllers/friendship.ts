@@ -390,12 +390,13 @@ export default factories.createCoreController(
 
     // 유저의 친구 찾기
     async findFriend(ctx) {
-      const { page, size } = ctx.query;
-      const { id: userId } = ctx.state.user;
+      const { q, page, size } = ctx.query;
 
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
+
+      const { id: userId } = ctx.state.user;
 
       try {
         const friendships = await strapi.entityService.findPage(
@@ -405,13 +406,37 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [{ follow_sender: userId }, { status: "FRIEND" }],
+                  $and: [
+                    { follow_sender: userId },
+                    { status: "FRIEND" },
+                    {
+                      follow_receiver: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
                 },
                 {
-                  $and: [{ follow_receiver: userId }, { status: "FRIEND" }],
+                  $and: [
+                    { follow_receiver: userId },
+                    { status: "FRIEND" },
+                    {
+                      follow_sender: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
                 },
                 {
-                  $and: [{ $not: { block: userId } }, { status: "BLOCK_ONE" }],
+                  $and: [
+                    { $not: { block: userId } },
+                    { status: "BLOCK_ONE" },
+                    {
+                      block: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
                 },
               ],
             },
@@ -426,10 +451,6 @@ export default factories.createCoreController(
             pageSize: size,
           }
         );
-
-        if (friendships.results.length === 0) {
-          return ctx.notFound("You have no friend");
-        }
 
         // 친구인 아이디를 배열로
         const friendArray = (friendships) => {
@@ -459,7 +480,10 @@ export default factories.createCoreController(
           photo: friend.photo,
         }));
 
-        return ctx.send(modifiedFriends);
+        return ctx.send({
+          users: modifiedFriends,
+          pagination: friends.pagination,
+        });
       } catch (e) {
         return ctx.badRequest("Fail to find friends");
       }
@@ -488,10 +512,6 @@ export default factories.createCoreController(
           }
         );
 
-        if (friendships.results.length === 0) {
-          return ctx.notFound("You have no request");
-        }
-
         const requests = friendships.results.map(
           (friendship) => (friendship.follow_sender as any).id
         );
@@ -511,7 +531,10 @@ export default factories.createCoreController(
           photo: user.photo,
         }));
 
-        return ctx.send(modifiedRequestUsers);
+        return ctx.send({
+          users: modifiedRequestUsers,
+          pagination: requestUsers.pagination,
+        });
       } catch (e) {
         return ctx.badRequest("Fail to find request");
       }
