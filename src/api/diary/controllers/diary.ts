@@ -40,6 +40,7 @@ export default factories.createCoreController(
           const endDate = new Date(
             new Date(date).setMonth(startDate.getMonth() + 1)
           );
+          console.log(endDate);
           filters = { date: { $gte: startDate, $lt: endDate }, user: userId };
         } else {
           // 일일 조회 ("YYYY-MM-DD")
@@ -61,7 +62,6 @@ export default factories.createCoreController(
         }
 
         return ctx.send({
-          message: "Successfully find diaries",
           results: diaries.results,
           pagination: diaries.pagination,
         });

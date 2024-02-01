@@ -7,23 +7,33 @@ import { Strapi, factories } from "@strapi/strapi";
 export default factories.createCoreController(
   "api::todo.todo",
   ({ strapi }: { strapi: Strapi }) => ({
-    // todo 전체 조회 (query date & jwt)
+    // todo 일일 / 월별 조회 (query date & jwt)
     async find(ctx) {
       const { date, userId, page, size } = ctx.query;
 
       let filters;
 
-      // 나의 일일 Todo (date & jwt)
+      // 나의 Todo (date & jwt)
       if (date && ctx.state.user) {
-        filters = {
-          date,
-          user: { id: ctx.state.user.id },
-        };
+        // 월별 조회
+        if (date.length === 7) {
+          const startDate = new Date(date + "01");
+          const endDate = new Date(
+            new Date(date).setMonth(startDate.getMonth() + 1)
+          );
+          filters = {
+            date: { $gte: startDate, $lt: endDate },
+            user: { id: ctx.state.user.id },
+          };
+          // 일일 조회
+        } else {
+          filters = { date, user: ctx.state.user.id };
+        }
 
-        // 다른 사람의 Todo (data & userId)
+        // 다른 사람의 일일 Todo (data & userId)
       } else if (date && userId) {
         filters = {
-          date: ctx.request.query.date,
+          date,
           user: { id: userId },
         };
       }
@@ -49,7 +59,6 @@ export default factories.createCoreController(
         return ctx.send({
           results: modifiedTodos,
           pagination: todos.pagination,
-          message: "Successfully find todos",
         });
       } catch (e) {
         return ctx.badRequest("Fail to find todos.");
