@@ -9,7 +9,7 @@ export default factories.createCoreController(
   ({ strapi }: { strapi: Strapi }) => ({
     // todo 일일 / 월별 조회 (query date & jwt)
     async find(ctx) {
-      const { date, userId, page, size } = ctx.query;
+      const { date, userId } = ctx.query;
 
       let filters;
 
@@ -17,7 +17,7 @@ export default factories.createCoreController(
       if (date && ctx.state.user) {
         // 월별 조회
         if (date.length === 7) {
-          const startDate = new Date(date + "01");
+          const startDate = new Date(date + "-01");
           const endDate = new Date(
             new Date(date).setMonth(startDate.getMonth() + 1)
           );
@@ -25,6 +25,7 @@ export default factories.createCoreController(
             date: { $gte: startDate, $lt: endDate },
             user: { id: ctx.state.user.id },
           };
+
           // 일일 조회
         } else {
           filters = { date, user: ctx.state.user.id };
@@ -39,27 +40,23 @@ export default factories.createCoreController(
       }
 
       try {
-        const todos = await strapi.entityService.findPage("api::todo.todo", {
-          sort: { id: "desc" },
-          populate: { user: { fields: ["username"] } },
+        const todos = await strapi.entityService.findMany("api::todo.todo", {
+          sort: { priority: "asc" },
+          populate: { user: { fields: ["username"] }, priority: true },
           filters,
-          page,
-          pageSize: size,
         });
 
-        const modifiedTodos = todos.results.map((todo) => ({
+        const modifiedTodos = (todos as any).map((todo) => ({
           id: todo.id,
           date: todo.date,
           body: todo.body,
           done: todo.done,
           public: todo.public,
           user: todo.user,
+          priority: todo.priority,
         }));
 
-        return ctx.send({
-          results: modifiedTodos,
-          pagination: todos.pagination,
-        });
+        return ctx.send(modifiedTodos);
       } catch (e) {
         return ctx.badRequest("Fail to find todos.");
       }
@@ -119,7 +116,6 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          message: "Successfully update a user",
           todoId: updatedTodo.id,
         });
       } catch (e) {

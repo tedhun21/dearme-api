@@ -178,7 +178,6 @@ export default factories.createCoreController(
             },
           }
         );
-        // console.log(friendship);
 
         // 유저의 친구 리스트
         const friendsList =
@@ -396,6 +395,82 @@ export default factories.createCoreController(
         }
       } catch (e) {
         return ctx.badRequest("Fail to update a like.");
+      }
+    },
+
+    // 목표 검색 > 포스트 1개 조회
+    async findByPostId(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+      const { postId } = ctx.params;
+
+      try {
+        const post = await strapi.entityService.findOne(
+          "api::post.post",
+          postId,
+          {
+            populate: {
+              // 게시물 사진
+              photo: {
+                fields: ["url"],
+              },
+              // 작성 유저 프로필 사진 & ID
+              user: {
+                fields: ["nickname"],
+                populate: {
+                  photo: {
+                    fields: ["url"],
+                  },
+                },
+              },
+              // 댓글 > 유저 프로필 사진 & ID, 댓글, 시간
+
+              comments: {
+                sort: { createdAt: "desc" },
+                populate: {
+                  user: {
+                    fields: ["nickname"],
+                    populate: {
+                      photo: {
+                        fields: ["url"],
+                      },
+                    },
+                  },
+                },
+              },
+              likes: {
+                fields: ["nickname"],
+                populate: {
+                  photo: {
+                    fields: ["url"],
+                  },
+                },
+              },
+              goal: { fields: ["body"] },
+            },
+          }
+        );
+
+        const modifiedPosts = {
+          id: post.id,
+          photo: post.photo,
+          body: post.body,
+          createdAt: post.createdAt,
+          public: post.public,
+          commentSettings: post.commentSettings,
+          user: post.user,
+          goal: post.goal,
+          comments: post.comments,
+          likes: post.likes,
+        };
+
+        return ctx.send({
+          message: "Successfully find the post",
+          results: modifiedPosts,
+        });
+      } catch (e) {
+        return ctx.badRequest("Fail to find the post");
       }
     },
   })

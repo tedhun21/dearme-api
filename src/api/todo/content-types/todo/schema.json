@@ -35,6 +35,9 @@
         "FRIEND",
         "PRIVATE"
       ]
+    },
+    "priority": {
+      "type": "integer"
     }
   }
 }

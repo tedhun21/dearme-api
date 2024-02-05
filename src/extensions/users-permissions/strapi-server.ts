@@ -93,12 +93,13 @@ module.exports = (plugin) => {
     }
 
     try {
-      const user = await strapi.entityService.findOne(
+      const me = await strapi.entityService.findOne(
         "plugin::users-permissions.user",
         ctx.state.user.id,
         {
           populate: {
             photo: { fields: ["url"] },
+            background: { fields: ["url"] },
             friendships_receive: {
               fields: ["status"],
               populate: { follow_sender: { fields: ["nickname"] } },
@@ -107,17 +108,19 @@ module.exports = (plugin) => {
         }
       );
 
-      const modifiedUser = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        nickname: user.nickname,
-        body: user.body,
-        photo: user.photo ? user.photo : null,
-        background: user.background ? user.background : null,
+      const modifiedMe = {
+        id: me.id,
+        email: me.email,
+        username: me.username,
+        nickname: me.nickname,
+        phone: me.phone,
+        body: me.body,
+        photo: me.photo ? me.photo : null,
+        background: me.background ? me.background : null,
+        private: me.private,
       };
 
-      return ctx.send(modifiedUser);
+      return ctx.send(modifiedMe);
     } catch (e) {
       return ctx.notFound("The user cannot be found");
     }
@@ -130,11 +133,45 @@ module.exports = (plugin) => {
     if (!ctx.state.user || ctx.state.user.id !== +userId) {
       return ctx.unauthorized("Authentication token is missing or invalid");
     }
+
     const { photo, background } = ctx.request.files;
 
     const parsedData = JSON.parse(ctx.request.body.data);
 
     try {
+      if (parsedData.nickname || parsedData.phone) {
+        const me = await strapi.entityService.findOne(
+          "plugin::users-permissions.user",
+          userId
+        );
+
+        const existingUserWithNickname = await strapi.entityService.findMany(
+          "plugin::users-permissions.user",
+          {
+            filters: {
+              nickname: { $eq: parsedData.nickname, $not: me.nickname },
+            },
+          }
+        );
+
+        if ((existingUserWithNickname as any).length > 0) {
+          return ctx.badRequest("Already nickname exists", {
+            field: "nickname",
+          });
+        }
+
+        const existingUserWithPhone = await strapi.entityService.findMany(
+          "plugin::users-permissions.user",
+          { filters: { phone: { $eq: parsedData.phone, $not: me.phone } } }
+        );
+        if ((existingUserWithPhone as any).length > 0) {
+          return ctx.badRequest({
+            field: "phone",
+            message: "Already phone exists",
+          });
+        }
+      }
+
       const updatedUser = await strapi.entityService.update(
         "plugin::users-permissions.user",
         userId,
@@ -223,6 +260,36 @@ module.exports = (plugin) => {
     }
   };
 
+  // user 검색
+  plugin.controllers.user.searchUsers = async (ctx) => {
+    const { searchTerm } = ctx.query;
+
+    try {
+      const users = await strapi.db
+        .query("plugin::users-permissions.user")
+        .findMany({
+          populate: {
+            photo: true,
+          },
+          where: {
+            nickname: {
+              $containsi: searchTerm,
+            },
+          },
+        });
+
+      const usersData = users.map((user) => ({
+        id: user.id,
+        photo: user.photo && user.photo.formats.thumbnail.url,
+        nickname: user.nickname,
+      }));
+
+      return ctx.send(usersData);
+    } catch (e) {
+      return ctx.badRequest("Fail to search users");
+    }
+  };
+
   // nickname 중복 체크 route
   plugin.routes["content-api"].routes.push({
     method: "GET",
@@ -242,5 +309,16 @@ module.exports = (plugin) => {
       prefix: "",
     },
   });
+
+  // user 검색 route
+  plugin.routes["content-api"].routes.push({
+    method: "GET",
+    path: "/search-users",
+    handler: "user.searchUsers",
+    config: {
+      prefix: "",
+    },
+  });
+
   return plugin;
 };

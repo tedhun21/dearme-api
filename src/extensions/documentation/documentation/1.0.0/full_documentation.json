@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-02-01T01:57:28.926Z"
+    "x-generation-date": "2024-02-05T12:33:37.423Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -762,6 +762,9 @@
                                                                   "FRIEND",
                                                                   "PRIVATE"
                                                                 ]
+                                                              },
+                                                              "priority": {
+                                                                "type": "integer"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -4250,6 +4253,9 @@
                                         "PRIVATE"
                                       ]
                                     },
+                                    "priority": {
+                                      "type": "integer"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -6765,6 +6771,9 @@
                                         "FRIEND",
                                         "PRIVATE"
                                       ]
+                                    },
+                                    "priority": {
+                                      "type": "integer"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -9315,6 +9324,9 @@
                                         "PRIVATE"
                                       ]
                                     },
+                                    "priority": {
+                                      "type": "integer"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -11800,6 +11812,9 @@
                                         "PRIVATE"
                                       ]
                                     },
+                                    "priority": {
+                                      "type": "integer"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -13921,6 +13936,9 @@
                                                                   "FRIEND",
                                                                   "PRIVATE"
                                                                 ]
+                                                              },
+                                                              "priority": {
+                                                                "type": "integer"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -16358,6 +16376,9 @@
                   "FRIEND",
                   "PRIVATE"
                 ]
+              },
+              "priority": {
+                "type": "integer"
               }
             }
           }
@@ -17777,6 +17798,9 @@
                                         "PRIVATE"
                                       ]
                                     },
+                                    "priority": {
+                                      "type": "integer"
+                                    },
                                     "createdAt": {
                                       "type": "string",
                                       "format": "date-time"
@@ -18726,6 +18750,9 @@
               "FRIEND",
               "PRIVATE"
             ]
+          },
+          "priority": {
+            "type": "integer"
           },
           "createdAt": {
             "type": "string",

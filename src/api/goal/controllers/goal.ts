@@ -141,5 +141,72 @@ export default factories.createCoreController(
         return ctx.badRequest("Fail to delete the goal");
       }
     },
+
+    // 목표 검색
+    async search(ctx) {
+      interface Goal {
+        body: string;
+        postsCount: number;
+        postsData?: any[];
+      }
+
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
+      const { searchTerm, posts } = ctx.query;
+
+      try {
+        const whereCondition =
+          posts === "true" ? { $eq: searchTerm } : { $containsi: searchTerm };
+
+        const goals = await strapi.db.query("api::goal.goal").findMany({
+          populate: {
+            posts: {
+              populate: {
+                photo: true,
+              },
+              where: {
+                public: { $eq: true },
+              },
+            },
+          },
+          where: {
+            body: whereCondition,
+          },
+        });
+
+        const searchedGoals: Goal[] = goals.reduce((result, goal) => {
+          const existingGoal = result.find((g) => g.body === goal.body);
+          if (existingGoal) {
+            existingGoal.postsCount += goal.posts.length;
+            if (posts === "true")
+              existingGoal.postsData = goal.posts.map((post) => ({
+                postId: post.id,
+                photo: post.photo,
+              }));
+          } else {
+            const newGoal: Goal = {
+              body: goal.body,
+              postsCount: goal.posts.length,
+            };
+
+            if (posts === "true")
+              newGoal.postsData = goal.posts.map((post) => ({
+                postId: post.id,
+                photo: post.photo,
+              }));
+            result.push(newGoal);
+          }
+          return result;
+        }, []);
+
+        let responseData = { searchedGoals };
+
+        return ctx.send(responseData);
+      } catch (e) {
+        return ctx.badRequest("Fail to search goals");
+      }
+    },
   })
 );
