@@ -10,5 +10,10 @@ export default {
       path: "/posts/:postId",
       handler: "post.findByPostId",
     },
+    {
+      method: "GET",
+      path: "/posts/:postId/likeship",
+      handler: "post.likeShip",
+    },
   ],
 };

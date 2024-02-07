@@ -116,12 +116,12 @@ export default factories.createCoreController(
               },
             },
             likes: {
-              fields: ["nickname"],
-              populate: {
-                photo: {
-                  fields: ["url"],
-                },
-              },
+              fields: ["id"],
+              // populate: {
+              //   photo: {
+              //     fields: ["url"],
+              //   },
+              // },
             },
             goal: { fields: ["body"] },
           },
@@ -139,11 +139,10 @@ export default factories.createCoreController(
           user: post.user,
           goal: post.goal,
           comments: post.comments,
-          likes: post.likes,
+          likes: (post.likes as any).length,
         }));
 
         return ctx.send({
-          message: "Successfully find posts",
           results: modifiedPosts,
           pagination: posts.pagination,
         });
@@ -472,6 +471,130 @@ export default factories.createCoreController(
       } catch (e) {
         return ctx.badRequest("Fail to find the post");
       }
+    },
+    async likeShip(ctx) {
+      const { postId } = ctx.params;
+
+      if (!ctx.state.user) {
+        return ctx.badRequest("Bad");
+      }
+      const { id: userId } = ctx.state.user;
+
+      try {
+        const post = await strapi.entityService.findOne(
+          "api::post.post",
+          postId,
+          {
+            populate: {
+              likes: {
+                populate: {
+                  friendships_receive: {
+                    populate: {
+                      follow_sender: { fields: ["id", "nickname"] },
+                      follow_receiver: { fields: ["id", "nickname"] },
+                    },
+                  },
+                  friendships_send: {
+                    populate: {
+                      follow_sender: { fields: ["id", "nickname"] },
+                      follow_receiver: { fields: ["id", "nickname"] },
+                    },
+                  },
+                },
+              },
+            },
+          }
+        );
+        // console.log(post.likes[0].friendships_send);
+        const modifiedLikeUsers = (post.likes as any).map((likeUser) => {
+          // 사용자와의 관계를 저장할 객체
+          const relationship = {
+            id: likeUser.id,
+            nickname: likeUser.nickname,
+            status: "UNKNOWN", // 기본적으로 상태를 알 수 없는 상태로 설정
+            block: null,
+            blocked: null,
+          };
+
+          // likeUser와의 관계를 찾아서 상태를 설정
+          likeUser.friendships_receive.forEach((friendship) => {
+            if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "FRIEND"
+            ) {
+              relationship.status = "FRIEND";
+            } else if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "PENDING"
+            ) {
+              relationship.status = "PENDING";
+            } else if (
+              friendship.follow_sender.id === userId ||
+              (friendship.follow_receiver.id === userId &&
+                // friendship.block.id === userId &&
+                friendship.status === "BLOCK_ONE")
+            ) {
+              console.log("hi");
+              relationship.status = "BLOCK_ONE";
+              relationship.block = userId;
+              relationship.blocked = likeUser.id;
+            } else if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "BLOCK_BOTH"
+            ) {
+              relationship.status = "BLOCK_BOTH";
+              relationship.block = userId;
+              relationship.blocked = likeUser.id;
+            }
+          });
+
+          likeUser.friendships_send.forEach((friendship) => {
+            if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "FRIEND"
+            ) {
+              relationship.status = "FRIEND";
+            } else if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "PENDING"
+            ) {
+              relationship.status = "PENDING";
+            }
+          });
+
+          likeUser.friendships_send.map((friendship) => {
+            if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "FRIEND"
+            ) {
+              relationship.status = "FRIEND";
+            } else if (
+              (friendship.follow_sender.id === userId ||
+                friendship.follow_receiver.id === userId) &&
+              friendship.status === "PENDING"
+            ) {
+              relationship.status = "PENDING";
+            }
+          });
+
+          // 추가적인 상태에 대한 처리
+          if (relationship.status === "UNKNOWN") {
+            // 예를 들어 PENDING이나 BLOCKED 상태 등을 추가적으로 처리할 수 있음
+            // relationship.status = "PENDING";
+            // relationship.status = "BLOCKED";
+          }
+
+          return relationship;
+        });
+
+        console.log(modifiedLikeUsers);
+      } catch (e) {}
     },
   })
 );

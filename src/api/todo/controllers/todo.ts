@@ -69,19 +69,32 @@ export default factories.createCoreController(
       }
 
       const { id: userId } = ctx.state.user;
+      const { date } = ctx.request.body;
 
       try {
+        const todos = await strapi.entityService.findMany("api::todo.todo", {
+          filters: { date, user: { id: userId } },
+        });
+
+        // todos 배열로부터 우선순위를 추출하여 새로운 배열을 생성
+        const priorities = (todos as any).map((todo) => todo.priority);
+
+        // 배열에서 최대값을 구함
+        const maxPriority = Math.max(...priorities);
+        console.log(maxPriority);
+
         const newTodo = await strapi.entityService.create("api::todo.todo", {
           data: {
             ...ctx.request.body,
             user: userId,
+            priority: maxPriority + 1,
           },
         });
 
-        return ctx.send({
-          message: "Successfully create a todo",
-          todoId: newTodo.id,
-        });
+        // return ctx.send({
+        //   message: "Successfully create a todo",
+        //   todoId: newTodo.id,
+        // });
       } catch (e) {
         return ctx.badRequest("Fail to create a todo");
       }
@@ -136,7 +149,7 @@ export default factories.createCoreController(
         const user = await strapi.entityService.findOne(
           "plugin::users-permissions.user",
           userId,
-          { populate: { todos: { fields: ["id"] } } }
+          { populate: { todos: { fields: ["id", "priority"] } } }
         );
 
         const todo = await strapi.entityService.findOne(
@@ -154,12 +167,95 @@ export default factories.createCoreController(
           todoId
         );
 
+        // 삭제된 할 일의 우선순위
+        const deletedPriority = deletedTodo.priority;
+
+        // 삭제된 우선순위보다 큰 우선순위를 가진 할 일들의 우선순위를 1씩 감소
+        await Promise.all(
+          (user.todos as any)
+            .filter((todo) => todo.priority > deletedPriority)
+            .map(async (todo) => {
+              await strapi.entityService.update("api::todo.todo", todo.id, {
+                data: { priority: todo.priority - 1 } as any,
+              });
+            })
+        );
+
         return ctx.send({
           message: "Successfully delete a todo",
           todoId: deletedTodo.id,
         });
       } catch (e) {
         return ctx.badRequest("Fail to delete a todo.");
+      }
+    },
+
+    // todo 순서 업데이트
+    async updatePriority(ctx) {
+      const {
+        data: { source, destination },
+      } = ctx.request.body;
+      const { date } = ctx.params;
+
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
+      const { id: userId } = ctx.state.user;
+      // 투데이 todo
+      try {
+        const todos = await strapi.entityService.findMany("api::todo.todo", {
+          filters: {
+            date,
+            user: { id: userId },
+          },
+        });
+
+        const sourceTodos = (todos as any).filter(
+          (todo) => todo.priority === source
+        );
+        const destinationTodos = (todos as any).filter(
+          (todo) => todo.priority === destination
+        );
+
+        await Promise.all(
+          sourceTodos.map(async (todo) => {
+            await strapi.entityService.update("api::todo.todo", todo.id, {
+              data: { priority: destination } as any,
+            });
+          })
+        );
+
+        if (destination > source) {
+          await Promise.all(
+            (todos as any)
+              .filter(
+                (todo) => todo.priority > source && todo.priority <= destination
+              )
+              .map(async (todo) => {
+                await strapi.entityService.update("api::todo.todo", todo.id, {
+                  data: { priority: todo.priority - 1 } as any,
+                });
+              })
+          );
+        } else {
+          await Promise.all(
+            (todos as any)
+              .filter(
+                (todo) => todo.priority >= destination && todo.priority < source
+              )
+              .map(async (todo) => {
+                await strapi.entityService.update("api::todo.todo", todo.id, {
+                  data: { priority: todo.priority + 1 } as any,
+                });
+              })
+          );
+        }
+
+        return ctx.send({ message: "Update for priority completed" });
+      } catch (error) {
+        console.error("Error updating priorities:", error);
+        return ctx.badRequest("Failed to update priorities");
       }
     },
   })

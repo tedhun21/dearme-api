@@ -51,7 +51,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.notFound("The friendship cannot be found");
+          return ctx.send("The friendship cannot be found");
         }
 
         let modifiedFriendship;
