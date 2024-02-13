@@ -75,26 +75,31 @@ export default factories.createCoreController(
         const todos = await strapi.entityService.findMany("api::todo.todo", {
           filters: { date, user: { id: userId } },
         });
-
         // todos 배열로부터 우선순위를 추출하여 새로운 배열을 생성
         const priorities = (todos as any).map((todo) => todo.priority);
-
         // 배열에서 최대값을 구함
         const maxPriority = Math.max(...priorities);
-        console.log(maxPriority);
 
         const newTodo = await strapi.entityService.create("api::todo.todo", {
           data: {
             ...ctx.request.body,
             user: userId,
-            priority: maxPriority + 1,
+            priority: todos.length !== 0 ? maxPriority + 1 : 0,
           },
+          populate: { user: { fields: ["id", "nickname"] } },
         });
 
-        // return ctx.send({
-        //   message: "Successfully create a todo",
-        //   todoId: newTodo.id,
-        // });
+        const modifiedNewTodo = {
+          id: newTodo.id,
+          date: newTodo.date,
+          body: newTodo.body,
+          done: newTodo.done,
+          public: newTodo.public,
+          user: newTodo.user,
+          priority: newTodo.priority,
+        };
+
+        return ctx.send(modifiedNewTodo);
       } catch (e) {
         return ctx.badRequest("Fail to create a todo");
       }
@@ -125,11 +130,20 @@ export default factories.createCoreController(
         const updatedTodo = await strapi.entityService.update(
           "api::todo.todo",
           todoId,
-          { data: { ...ctx.request.body } }
+          {
+            data: { ...ctx.request.body },
+            populate: { user: { fields: ["id", "nickname"] } },
+          }
         );
 
         return ctx.send({
-          todoId: updatedTodo.id,
+          id: updatedTodo.id,
+          date: updatedTodo.date,
+          body: updatedTodo.body,
+          done: updatedTodo.done,
+          public: updatedTodo.public,
+          user: updatedTodo.user,
+          priority: updatedTodo.priority,
         });
       } catch (e) {
         return ctx.badRequest("Fail to update a user");
@@ -152,15 +166,15 @@ export default factories.createCoreController(
           { populate: { todos: { fields: ["id", "priority"] } } }
         );
 
-        const todo = await strapi.entityService.findOne(
-          "api::todo.todo",
-          todoId,
-          { populate: { user: { fields: ["id"] } } }
-        );
+        // const todo = await strapi.entityService.findOne(
+        //   "api::todo.todo",
+        //   todoId,
+        //   { populate: { user: { fields: ["id"] } } }
+        // );
 
-        if (!todo || (todo.user as any).id !== user.id) {
-          return ctx.forbidden("No permission to delete this todo");
-        }
+        // if (!todo || (todo.user as any).id !== user.id) {
+        //   return ctx.forbidden("No permission to delete this todo");
+        // }
 
         const deletedTodo = await strapi.entityService.delete(
           "api::todo.todo",
@@ -182,7 +196,6 @@ export default factories.createCoreController(
         );
 
         return ctx.send({
-          message: "Successfully delete a todo",
           todoId: deletedTodo.id,
         });
       } catch (e) {

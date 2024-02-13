@@ -1154,7 +1154,8 @@ export interface ApiTodoTodo extends Schema.CollectionType {
     >;
     date: Attribute.Date;
     done: Attribute.Boolean & Attribute.DefaultTo<false>;
-    public: Attribute.Enumeration<['ALL', 'FRIEND', 'PRIVATE']>;
+    public: Attribute.Enumeration<['ALL', 'FRIEND', 'PRIVATE']> &
+      Attribute.DefaultTo<'ALL'>;
     priority: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

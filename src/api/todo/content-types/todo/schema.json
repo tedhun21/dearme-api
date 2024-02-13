@@ -34,7 +34,8 @@
         "ALL",
         "FRIEND",
         "PRIVATE"
-      ]
+      ],
+      "default": "ALL"
     },
     "priority": {
       "type": "integer"

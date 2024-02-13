@@ -35,10 +35,16 @@ export default factories.createCoreController(
           filters,
         });
 
-        return ctx.send({
-          message: "Successfully find goals",
-          goals,
-        });
+        const modifiedGoals = (goals as any).map((goal) => ({
+          id: goal.id,
+          title: goal.title,
+          body: goal.body,
+          startDate: goal.startDate,
+          endDate: goal.endDate,
+          createdAt: goal.createdAt,
+        }));
+
+        return ctx.send(modifiedGoals);
       } catch (e) {
         return ctx.badRequest("Fail to find goals");
       }
@@ -60,10 +66,7 @@ export default factories.createCoreController(
           },
         });
 
-        return ctx.send({
-          message: "Successfully create a goal",
-          goalId: newGoal.id,
-        });
+        return ctx.send(newGoal);
       } catch (e) {
         return ctx.badRequest("Fail to create a goal");
       }
