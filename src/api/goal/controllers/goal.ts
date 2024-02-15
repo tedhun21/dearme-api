@@ -42,6 +42,7 @@ export default factories.createCoreController(
           startDate: goal.startDate,
           endDate: goal.endDate,
           createdAt: goal.createdAt,
+          isPublic: goal.public,
         }));
 
         return ctx.send(modifiedGoals);
@@ -101,10 +102,17 @@ export default factories.createCoreController(
           { data: { ...ctx.request.body } }
         );
 
-        return ctx.send({
-          message: "Successfully update the goal",
-          goalId: updatedGoal.id,
-        });
+        const modifiedUpdatedGoal = {
+          id: updatedGoal.id,
+          title: updatedGoal.title,
+          body: updatedGoal.body,
+          startDate: updatedGoal.startDate,
+          endDate: updatedGoal.endDate,
+          createdAt: updatedGoal.createdAt,
+          isPublic: updatedGoal.isPublic,
+        };
+
+        return ctx.send(modifiedUpdatedGoal);
       } catch (e) {
         return ctx.badRequest("Fail to update the goal");
       }
@@ -137,7 +145,6 @@ export default factories.createCoreController(
           ctx.params.id
         );
         return ctx.send({
-          message: "Successfully delete the goal",
           goalId: deletedGoal.id,
         });
       } catch (e) {

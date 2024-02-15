@@ -145,7 +145,16 @@ export default factories.createCoreController(
             sort: { id: "desc" },
             page,
             pageSize: size,
-            populate: { user: { fields: ["nickname"] } },
+            populate: {
+              user: {
+                fields: ["nickname"],
+                populate: {
+                  photo: {
+                    fields: ["url"],
+                  },
+                },
+              },
+            },
             filters: { post: { id: postId } },
           }
         );

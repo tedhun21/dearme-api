@@ -35,6 +35,10 @@
       "relation": "oneToMany",
       "target": "api::post.post",
       "mappedBy": "goal"
+    },
+    "isPublic": {
+      "type": "boolean",
+      "default": true
     }
   }
 }

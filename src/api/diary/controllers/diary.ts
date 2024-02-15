@@ -48,7 +48,7 @@ export default factories.createCoreController(
         }
 
         // 일기 조회
-        const diaries = await strapi.entityService.findPage(
+        const diaries = await strapi.entityService.findMany(
           "api::diary.diary",
           {
             filters,
@@ -57,14 +57,11 @@ export default factories.createCoreController(
           }
         );
 
-        if (diaries.results.length === 0) {
+        if (diaries.length === 0) {
           return ctx.notFound(`No diary found for ${date}`);
         }
 
-        return ctx.send({
-          results: diaries.results,
-          pagination: diaries.pagination,
-        });
+        return ctx.send(diaries);
       } catch (e) {
         return ctx.notFound("The diaries cannot be found");
       }
@@ -96,6 +93,13 @@ export default factories.createCoreController(
       const { id: userId } = ctx.state.user;
       const { date } = ctx.query;
 
+      console.log("ctx.request.body:", ctx.request.body);
+      console.log("ctx.request.files:", ctx.request.files);
+
+      const parsedData = JSON.parse(ctx.request.body.data);
+
+      console.log("parsedData:", parsedData);
+
       try {
         // 같은 날짜에 일기가 기존에 있는지
         const diary = await strapi.entityService.findMany("api::diary.diary", {
@@ -107,13 +111,19 @@ export default factories.createCoreController(
           const parsedData = JSON.parse(ctx.request.body.data);
 
           // 사진 파일 업로드
-          const { file } = ctx.request.files;
+          const { photos, todayPickImage } = ctx.request.files;
+
+          let uploadFiles = {
+            ...(photos && { photos: photos }),
+            ...(todayPickImage && { todayPickImage: todayPickImage }),
+          };
 
           let data = {
             data: { date, user: userId, ...parsedData },
-            files: file ? { photos: file } : null,
+            files: uploadFiles ? uploadFiles : null,
           };
 
+          console.log(ctx.request.files);
           const newDiary = await strapi.entityService.create(
             "api::diary.diary",
             data

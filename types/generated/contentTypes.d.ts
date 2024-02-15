@@ -1007,6 +1007,7 @@ export interface ApiGoalGoal extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     posts: Attribute.Relation<'api::goal.goal', 'oneToMany', 'api::post.post'>;
+    isPublic: Attribute.Boolean & Attribute.DefaultTo<true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

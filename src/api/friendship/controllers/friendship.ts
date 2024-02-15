@@ -186,15 +186,17 @@ export default factories.createCoreController(
     // (block -> friend)
     async update(ctx) {
       const { id: userId } = ctx.state.user;
+      // status: 요청 종류
       const { friendId, status } = ctx.query;
 
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
 
-      if (!ctx.query) {
+      if (!ctx.query.friendId) {
         return ctx.badRequest("friendId, status are required");
       }
+
       try {
         // 친분 유무
         const friendship = await strapi.entityService.findMany(
@@ -224,12 +226,31 @@ export default factories.createCoreController(
             },
           }
         );
+        console.log(friendship);
 
-        if (friendship.length === 0) {
-          return ctx.notFound("No friendship exists");
+        // 친분 x -> 친구 요청 (request)
+        if (friendship.length === 0 && status === "request") {
+          try {
+            const newFriendship = await strapi.entityService.create(
+              "api::friendship.friendship",
+              {
+                data: {
+                  status: "PENDING",
+                  follow_receiver: +friendId,
+                  follow_sender: userId,
+                },
+              }
+            );
+            return ctx.send({
+              message: `Successfully create a friendship between ${userId} and ${friendId}`,
+              friendshipId: [userId, friendId],
+            });
+          } catch (e) {
+            return ctx.badRequest("Fail to send the follow request");
+          }
         }
 
-        // pending -> friend
+        // pending -> friend (confirm)
         // 상대방이 팔로우 요청을 보냈다면 수락 하는 단계 (맞팔)
         if (
           friendship[0].status === "PENDING" &&
@@ -241,25 +262,24 @@ export default factories.createCoreController(
             const updatedFriendship = await strapi.entityService.update(
               "api::friendship.friendship",
               friendship[0].id,
-              { data: { ...friendship[0], status: "FRIEND" } }
+              { data: { status: "FRIEND" } } as any
             );
-
-            return ctx.send({
-              message: `${
-                (updatedFriendship.follow_receiver as any).id
-              } accept the follow request from ${
-                (updatedFriendship.follow_sender as any).id
-              }.`,
-              friendshipId: updatedFriendship.id,
-            });
+            console.log(updatedFriendship);
+            if (updatedFriendship) {
+              console.log("Executing return statement");
+              return ctx.send({
+                message: `Successfully accept the follow request from ${friendId}`,
+                friendshipId: [userId, friendId],
+              });
+            }
           } catch (e) {
             return ctx.badRequest("Fail to accept the follow request");
           }
+        }
 
-          // friend -> block
-          // 친구 중 상태에서 한명이 block할때
-        } else if (
-          friendship[0].status === "FRIEND" ||
+        // 친구 중 상태에서 한명이 block할때
+        else if (
+          (friendship[0].status === "FRIEND" && status === "block") ||
           (friendship[0].status === "BLOCK_ONE" && status === "block")
         ) {
           try {
@@ -281,19 +301,17 @@ export default factories.createCoreController(
 
             return ctx.send({
               status: 200,
-              message: `${(updatedFriendship.block as any).id} block ${
-                (updatedFriendship.blocked as any).id
-              }.`,
+              message: "Successfully block the user",
             });
           } catch (e) {
             return ctx.badRequest("Fail to block the friendship.");
           }
 
-          // block -> friend
+          // block -> friend (unblock)
           // block 해제
         } else if (
-          friendship[0].status === "BLOCK_ONE" ||
-          (friendship[0].status === "BLOCK_BOTH" && status === "friend")
+          (friendship[0].status === "BLOCK_ONE" && status === "unblock") ||
+          (friendship[0].status === "BLOCK_BOTH" && status === "unblock")
         ) {
           try {
             const updatedFriendship = await strapi.entityService.update(
@@ -319,7 +337,7 @@ export default factories.createCoreController(
 
             return ctx.send({
               status: 200,
-              message: `${updatedFriendship.block} unblock ${updatedFriendship.blocked}`,
+              message: `unblocked! `,
             });
           } catch (e) {
             return ctx.badRequest("Fail to unblock the friendship.");

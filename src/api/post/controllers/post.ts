@@ -45,7 +45,6 @@ export default factories.createCoreController(
       }
     },
 
-    // 추가!!
     // READ: 전체 / 친구 공개 게시물 조회 (query: ?isPublic=false)
     // 1. 그냥 최신순으로
     // 2. query public을 넣었을 경우
@@ -504,6 +503,7 @@ export default factories.createCoreController(
 
       const likes = post.likes;
       const likeIds = (likes as any).map((likeUser) => likeUser.id);
+      console.log(likeIds);
 
       const friendships = await strapi.entityService.findMany(
         "api::friendship.friendship",
@@ -532,6 +532,7 @@ export default factories.createCoreController(
           },
         }
       );
+      console.log(friendships);
 
       const modifiedFriendships =
         Array.isArray(likes) &&
@@ -540,8 +541,12 @@ export default factories.createCoreController(
             Array.isArray(friendships) &&
             friendships.find(
               (f: any) =>
-                (f.follow_sender && f.follow_sender.id === like.id) ||
-                (f.follow_receiver && f.follow_receiver.id === like.id)
+                (like.id !== userId &&
+                  f.follow_sender &&
+                  f.follow_sender.id === like.id) ||
+                (like.id !== userId &&
+                  f.follow_receiver &&
+                  f.follow_receiver.id === like.id)
             );
 
           if (friendship) {
@@ -585,6 +590,7 @@ export default factories.createCoreController(
           }
         });
 
+      // console.log(modifiedFriendships);
       return ctx.send({
         message: "Successfully find the likes and friendship",
         results: modifiedFriendships,

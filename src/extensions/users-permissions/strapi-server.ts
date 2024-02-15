@@ -260,6 +260,37 @@ module.exports = (plugin) => {
     }
   };
 
+  // Email로 사용자 조회
+  plugin.controllers.user.findByEmail = async (ctx) => {
+    const { email } = ctx.query;
+
+    if (!email) {
+      return ctx.badRequest("email is missing");
+    }
+
+    try {
+      const user = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        {
+          filters: { email },
+          fields: ["email", "phone"],
+        }
+      );
+
+      if (!user) {
+        return ctx.notFound("User not found");
+      }
+
+      // return ctx.send(user[0]);
+      return ctx.send({
+        email: user[0].email,
+        phone: user[0].phone,
+      });
+    } catch (error) {
+      return ctx.badRequest("Fail to find user");
+    }
+  };
+
   // user 검색
   plugin.controllers.user.searchUsers = async (ctx) => {
     const { searchTerm } = ctx.query;
@@ -305,6 +336,16 @@ module.exports = (plugin) => {
     method: "GET",
     path: "/check-email",
     handler: "user.checkEmail",
+    config: {
+      prefix: "",
+    },
+  });
+
+  // Email 사용자 조회 route
+  plugin.routes["content-api"].routes.push({
+    method: "GET",
+    path: "/find-by-email",
+    handler: "user.findByEmail",
     config: {
       prefix: "",
     },

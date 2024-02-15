@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-02-12T13:22:43.307Z"
+    "x-generation-date": "2024-02-15T04:25:44.131Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -883,6 +883,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "isPublic": {
+                                                                "type": "boolean"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -4091,6 +4094,9 @@
                                                     }
                                                   }
                                                 },
+                                                "isPublic": {
+                                                  "type": "boolean"
+                                                },
                                                 "createdAt": {
                                                   "type": "string",
                                                   "format": "date-time"
@@ -6610,6 +6616,9 @@
                                                     }
                                                   }
                                                 },
+                                                "isPublic": {
+                                                  "type": "boolean"
+                                                },
                                                 "createdAt": {
                                                   "type": "string",
                                                   "format": "date-time"
@@ -7894,6 +7903,9 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "isPublic": {
+                "type": "boolean"
               }
             }
           }
@@ -9162,6 +9174,9 @@
                                                     }
                                                   }
                                                 },
+                                                "isPublic": {
+                                                  "type": "boolean"
+                                                },
                                                 "createdAt": {
                                                   "type": "string",
                                                   "format": "date-time"
@@ -10281,6 +10296,9 @@
                 }
               }
             }
+          },
+          "isPublic": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -11649,6 +11667,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "isPublic": {
+                                                  "type": "boolean"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
@@ -14057,6 +14078,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "isPublic": {
+                                                                "type": "boolean"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -17635,6 +17659,9 @@
                                                       }
                                                     }
                                                   }
+                                                },
+                                                "isPublic": {
+                                                  "type": "boolean"
                                                 },
                                                 "createdAt": {
                                                   "type": "string",
