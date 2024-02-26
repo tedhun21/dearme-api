@@ -15,5 +15,10 @@ module.exports = {
       path: "/friendships/request",
       handler: "friendship.findRequest",
     },
+    {
+      method: "GET",
+      path: "/friendships/friendandblock",
+      handler: "friendship.findFriendAndBlock",
+    },
   ],
 };

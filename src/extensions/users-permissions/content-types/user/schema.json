@@ -176,6 +176,9 @@
     },
     "body": {
       "type": "text"
+    },
+    "friendCount": {
+      "type": "integer"
     }
   }
 }

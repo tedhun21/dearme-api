@@ -21,11 +21,12 @@ module.exports = {
       handler: "diary.create",
     },
     // 일기 수정
-    { method: "PUT", path: "/diaries", handler: "diary.update" },
+    { method: "PUT", path: "/diaries/:diaryId", handler: "diary.update" },
+
     // 일기 삭제
     {
       method: "DELETE",
-      path: "/diaries",
+      path: "/diaries/:diaryId",
       handler: "diary.delete",
     },
   ],

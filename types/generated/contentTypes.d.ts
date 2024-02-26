@@ -821,6 +821,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     >;
     background: Attribute.Media;
     body: Attribute.Text;
+    friendCount: Attribute.Integer;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -901,7 +902,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     photos: Attribute.Media;
     startSleep: Attribute.Time;
     endSleep: Attribute.Time;
-    weather: Attribute.String;
+    weatherId: Attribute.String;
     remember: Attribute.Boolean;
     user: Attribute.Relation<
       'api::diary.diary',
@@ -913,7 +914,15 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     >;
     body: Attribute.Text;
     date: Attribute.Date;
-    mood: Attribute.Enumeration<['HAPPY', 'GOOD', 'SOSO', 'BAD', 'SAD']>;
+    mood: Attribute.Enumeration<
+      ['JOYFUL', 'HAPPY', 'NEUTRAL', 'UNHAPPY', 'SAD']
+    >;
+    todayPickTitle: Attribute.String;
+    todayPickContributors: Attribute.String;
+    todayPickDate: Attribute.String;
+    todayPickImage: Attribute.Media;
+    todayPickId: Attribute.String;
+    weather: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1091,7 +1100,7 @@ export interface ApiPostPost extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     goal: Attribute.Relation<'api::post.post', 'manyToOne', 'api::goal.goal'>;
-    commentSettings: Attribute.Enumeration<['PUBLIC', 'FRIENDS', 'OFF']>;
+    commentSettings: Attribute.Enumeration<['ALL', 'FRIENDS', 'OFF']>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

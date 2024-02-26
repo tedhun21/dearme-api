@@ -42,7 +42,7 @@ export default factories.createCoreController(
           startDate: goal.startDate,
           endDate: goal.endDate,
           createdAt: goal.createdAt,
-          isPublic: goal.public,
+          isPublic: goal.isPublic,
         }));
 
         return ctx.send(modifiedGoals);
@@ -155,7 +155,7 @@ export default factories.createCoreController(
     // 목표 검색
     async search(ctx) {
       interface Goal {
-        body: string;
+        title: string;
         postsCount: number;
         postsData?: any[];
       }
@@ -182,12 +182,12 @@ export default factories.createCoreController(
             },
           },
           where: {
-            body: whereCondition,
+            title: whereCondition,
           },
         });
 
         const searchedGoals: Goal[] = goals.reduce((result, goal) => {
-          const existingGoal = result.find((g) => g.body === goal.body);
+          const existingGoal = result.find((g) => g.title === goal.title);
           if (existingGoal) {
             existingGoal.postsCount += goal.posts.length;
             if (posts === "true")
@@ -197,7 +197,7 @@ export default factories.createCoreController(
               }));
           } else {
             const newGoal: Goal = {
-              body: goal.body,
+              title: goal.title,
               postsCount: goal.posts.length,
             };
 

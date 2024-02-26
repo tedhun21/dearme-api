@@ -55,12 +55,14 @@ export default factories.createCoreController(
       // 필터링 조건
       let filters = {};
 
-      // 1. 최신순 (public === true)
+      // 1. post 중 public이 true인 것만 (public === true)
+      // jwt 필요 없음
       if (isPublic === "true") {
         filters = { public: { $eq: true } };
       }
 
       // 2. 친구꺼 (public === true || public === false)
+      // jwt 필수
       if (ctx.state.user && friend === true) {
         const { id: userId } = ctx.state.user;
         const friendsList = await getFriendsList(userId);
@@ -70,11 +72,13 @@ export default factories.createCoreController(
       }
 
       // 3. 한 유저의 모든 포스트
+      // jwt 필요 없음
       if (userId) {
         filters = { user: { id: userId } };
       }
 
-      // 4. 나의 모든 포스트 (jwt)
+      // 4. 나의 모든 포스트
+      // jwt 필요
       if (ctx.state.user && friend === false) {
         const { id: userId } = ctx.state.user;
         filters = {
@@ -124,13 +128,12 @@ export default factories.createCoreController(
                 },
               },
             },
-            goal: { fields: ["body"] },
+            goal: { fields: ["title"] },
           },
           page,
           pageSize: size,
         });
 
-        // FIXME 친구 상태 boolean -> 댓글 설정??
         const modifiedPosts = posts.results.map((post) => ({
           id: post.id,
           photo: post.photo,
@@ -147,7 +150,6 @@ export default factories.createCoreController(
         // console.log(modifiedPosts);
 
         return ctx.send({
-          message: "Successfully find posts",
           results: modifiedPosts,
           pagination: posts.pagination,
         });

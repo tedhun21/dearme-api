@@ -108,6 +108,25 @@ module.exports = (plugin) => {
         }
       );
 
+      // 친구 카운트
+      const [entries, count] = await strapi.db
+        .query("api::friendship.friendship")
+        .findWithCount({
+          where: {
+            $or: [
+              {
+                $and: [{ follow_sender: me.id }, { status: "FRIEND" }],
+              },
+              {
+                $and: [{ follow_receiver: me.id }, { status: "FRIEND" }],
+              },
+              {
+                $and: [{ $not: { block: me.id } }, { status: "BLOCK_ONE" }],
+              },
+            ],
+          },
+        });
+
       const modifiedMe = {
         id: me.id,
         email: me.email,
@@ -118,6 +137,7 @@ module.exports = (plugin) => {
         photo: me.photo ? me.photo : null,
         background: me.background ? me.background : null,
         private: me.private,
+        friendCount: count && count,
       };
 
       return ctx.send(modifiedMe);

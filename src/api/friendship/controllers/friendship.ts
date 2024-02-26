@@ -10,9 +10,6 @@ export default factories.createCoreController(
     // 친구 관계 확인
     // jwt & 상대방 user id
     async find(ctx) {
-      const { id: userId } = ctx.state.user;
-      const { friendId } = ctx.query;
-
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
@@ -20,6 +17,8 @@ export default factories.createCoreController(
       if (!ctx.query) {
         return ctx.badRequest("friendId is required");
       }
+      const { id: userId } = ctx.state.user;
+      const { friendId } = ctx.query;
 
       try {
         const friendship = await strapi.entityService.findMany(
@@ -185,10 +184,6 @@ export default factories.createCoreController(
     // (friend -> block)
     // (block -> friend)
     async update(ctx) {
-      const { id: userId } = ctx.state.user;
-      // status: 요청 종류
-      const { friendId, status } = ctx.query;
-
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
@@ -196,6 +191,9 @@ export default factories.createCoreController(
       if (!ctx.query.friendId) {
         return ctx.badRequest("friendId, status are required");
       }
+
+      const { friendId, status } = ctx.query;
+      const { id: userId } = ctx.state.user;
 
       try {
         // 친분 유무
@@ -226,7 +224,6 @@ export default factories.createCoreController(
             },
           }
         );
-        console.log(friendship);
 
         // 친분 x -> 친구 요청 (request)
         if (friendship.length === 0 && status === "request") {
@@ -241,16 +238,18 @@ export default factories.createCoreController(
                 },
               }
             );
+
             return ctx.send({
               message: `Successfully create a friendship between ${userId} and ${friendId}`,
-              friendshipId: [userId, friendId],
+              friendshipId: newFriendship.id,
+              relation: [+userId, +friendId],
             });
           } catch (e) {
             return ctx.badRequest("Fail to send the follow request");
           }
         }
 
-        // pending -> friend (confirm)
+        // pending -> friend (accept)
         // 상대방이 팔로우 요청을 보냈다면 수락 하는 단계 (맞팔)
         if (
           friendship[0].status === "PENDING" &&
@@ -262,14 +261,30 @@ export default factories.createCoreController(
             const updatedFriendship = await strapi.entityService.update(
               "api::friendship.friendship",
               friendship[0].id,
-              { data: { status: "FRIEND" } } as any
+              {
+                data: { status: "FRIEND" } as any,
+                populate: {
+                  follow_sender: {
+                    fields: ["id", "username", "nickname"],
+                    populate: { photo: { fields: ["id", "url"] } },
+                  },
+                },
+              }
             );
-            console.log(updatedFriendship);
+
             if (updatedFriendship) {
-              console.log("Executing return statement");
+              const modifiedFriend = {
+                id: (updatedFriendship.follow_sender as any).id,
+                username: (updatedFriendship.follow_sender as any).username,
+                nickname: (updatedFriendship.follow_sender as any).nickname,
+                photo: (updatedFriendship.follow_sender as any).photo,
+              };
+
               return ctx.send({
-                message: `Successfully accept the follow request from ${friendId}`,
-                friendshipId: [userId, friendId],
+                message: `Successfully accept the follow request from ${modifiedFriend.nickname}`,
+                friendshipId: updatedFriendship.id,
+                relation: [+userId, +friendId],
+                newFriend: modifiedFriend,
               });
             }
           } catch (e) {
@@ -277,10 +292,16 @@ export default factories.createCoreController(
           }
         }
 
-        // 친구 중 상태에서 한명이 block할때
-        else if (
-          (friendship[0].status === "FRIEND" && status === "block") ||
-          (friendship[0].status === "BLOCK_ONE" && status === "block")
+        // 유저가 block할때
+        if (
+          (friendship[0].status === "FRIEND" &&
+            status === "block" &&
+            friendship[0].block.length === 0 &&
+            friendship[0].blocked.length === 0) ||
+          (friendship[0].status === "BLOCK_ONE" &&
+            status === "block" &&
+            friendship[0].block.length === 1 &&
+            friendship[0].blocked.length === 1)
         ) {
           try {
             const updatedFriendship = await strapi.entityService.update(
@@ -290,28 +311,41 @@ export default factories.createCoreController(
                 data: {
                   ...friendship[0],
                   status:
-                    friendship[0].block.length === 0
+                    friendship[0].status === "FRIEND"
                       ? "BLOCK_ONE"
                       : "BLOCK_BOTH",
                   block: { connect: [userId] },
                   blocked: { connect: [+friendId] },
                 },
+                populate: { blocked: { fields: ["id", "nickname"] } },
               }
             );
-
-            return ctx.send({
-              status: 200,
-              message: "Successfully block the user",
-            });
+            if (updatedFriendship) {
+              return ctx.send({
+                message: `Successfully block ${
+                  (updatedFriendship.blocked as any)[0].nickname
+                }`,
+                blockId: (updatedFriendship.blocked as any)[0].id,
+              });
+            }
           } catch (e) {
             return ctx.badRequest("Fail to block the friendship.");
           }
 
           // block -> friend (unblock)
           // block 해제
-        } else if (
-          (friendship[0].status === "BLOCK_ONE" && status === "unblock") ||
-          (friendship[0].status === "BLOCK_BOTH" && status === "unblock")
+        }
+
+        // 유저가 unblock할때
+        if (
+          (friendship[0].status === "BLOCK_ONE" &&
+            status === "unblock" &&
+            friendship[0].block.length === 1 &&
+            friendship[0].blocked.length === 1) ||
+          (friendship[0].status === "BLOCK_BOTH" &&
+            status === "unblock" &&
+            friendship[0].block.length === 2 &&
+            friendship[0].blocked.length === 2)
         ) {
           try {
             const updatedFriendship = await strapi.entityService.update(
@@ -336,8 +370,8 @@ export default factories.createCoreController(
             );
 
             return ctx.send({
-              status: 200,
-              message: `unblocked! `,
+              message: `unblocked!`,
+              friendshipId: updatedFriendship.id,
             });
           } catch (e) {
             return ctx.badRequest("Fail to unblock the friendship.");
@@ -408,7 +442,7 @@ export default factories.createCoreController(
 
     // 유저의 친구 찾기
     async findFriend(ctx) {
-      const { q, page, size } = ctx.query;
+      const { page, size } = ctx.query;
 
       if (!ctx.state.user) {
         return ctx.unauthorized("Authentication token is missing or invalid");
@@ -424,37 +458,13 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { status: "FRIEND" },
-                    {
-                      follow_receiver: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  $and: [{ follow_sender: userId }, { status: "FRIEND" }],
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { status: "FRIEND" },
-                    {
-                      follow_sender: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  $and: [{ follow_receiver: userId }, { status: "FRIEND" }],
                 },
                 {
-                  $and: [
-                    { $not: { block: userId } },
-                    { status: "BLOCK_ONE" },
-                    {
-                      block: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  $and: [{ $not: { block: userId } }, { status: "BLOCK_ONE" }],
                 },
               ],
             },
@@ -499,7 +509,7 @@ export default factories.createCoreController(
         }));
 
         return ctx.send({
-          users: modifiedFriends,
+          results: modifiedFriends,
           pagination: friends.pagination,
         });
       } catch (e) {
@@ -555,6 +565,165 @@ export default factories.createCoreController(
         });
       } catch (e) {
         return ctx.badRequest("Fail to find request");
+      }
+    },
+
+    // 유저의 친구 + block 찾기(searchParam)
+    async findFriendAndBlock(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
+      const { id: userId } = ctx.state.user;
+      const { q, page, size } = ctx.query;
+
+      // 무한 스크롤, 친구 & block 관계인 사람 검색
+      // 1. 친구 + block 검색
+      // 2. 친구 정보 + friendship 보내기 (friend인지, block한 상태인지만 표시)
+
+      try {
+        const friendships = await strapi.entityService.findPage(
+          "api::friendship.friendship",
+          {
+            filters: {
+              $or: [
+                {
+                  $and: [
+                    { follow_sender: userId },
+                    { status: "FRIEND" },
+                    {
+                      follow_receiver: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
+                },
+                {
+                  $and: [
+                    { follow_receiver: userId },
+                    { status: "FRIEND" },
+                    {
+                      follow_sender: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
+                },
+                {
+                  $and: [
+                    { block: { id: userId } },
+                    { status: "BLOCK_ONE" },
+                    {
+                      blocked: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
+                },
+                {
+                  $and: [
+                    { block: { id: userId } },
+                    { status: "BLOCK_BOTH" },
+                    {
+                      blocked: {
+                        nickname: { $contains: q !== undefined ? q : "" },
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+            page,
+            pageSize: size,
+            populate: {
+              follow_sender: {
+                fields: ["id", "username", "nickname"],
+                populate: { photo: { fields: ["id", "url"] } },
+              },
+              follow_receiver: {
+                fields: ["id", "username", "nickname"],
+                populate: { photo: { fields: ["id", "url"] } },
+              },
+              blocked: {
+                fields: ["id", "username", "nickname"],
+                populate: { photo: { fields: ["id", "url"] } },
+              },
+            },
+          }
+        );
+
+        const friendAndBlock = (friendships.results as any).map(
+          (friendship: any) => {
+            if (friendship.status === "FRIEND") {
+              if (friendship.follow_sender.id !== userId) {
+                const friend = friendship.follow_sender;
+                return {
+                  id: friend?.id,
+                  username: friend?.username,
+                  nickname: friend?.nickname,
+                  photo: friend.photo
+                    ? {
+                        id: friend?.photo?.id ?? null,
+                        url: friend?.photo?.url ?? null,
+                      }
+                    : null,
+                  status: "FRIEND",
+                };
+              } else if (friendship.follow_receiver.id !== userId) {
+                const friend = friendship.follow_receiver;
+                return {
+                  id: friend?.id,
+                  username: friend?.username,
+                  nickname: friend?.nickname,
+                  photo: friend.photo
+                    ? {
+                        id: friend?.photo.id ?? null,
+                        url: friend?.photo.url ?? null,
+                      }
+                    : null,
+                  status: "FRIEND",
+                };
+              }
+            } else if (friendship.status === "BLOCK_ONE") {
+              const filter = friendship.blocked.filter(
+                (blocked) => blocked.id !== userId
+              );
+              const blocked = filter[0];
+
+              return {
+                id: blocked.id,
+                username: blocked.username,
+                nickname: blocked.nickname,
+                photo: blocked?.photo
+                  ? { id: blocked?.photo?.id, url: blocked?.photo?.url }
+                  : null,
+                status: "BLOCK",
+              };
+            } else if (friendship.status === "BLOCK_BOTH") {
+              const filter = friendship.blocked.filter(
+                (blocked) => blocked.id !== userId
+              );
+              const blocked = filter[0];
+
+              return {
+                id: blocked.id,
+                username: blocked.username,
+                nickname: blocked.nickname,
+                photo: blocked?.photo
+                  ? { id: blocked?.photo?.id, url: blocked?.photo?.url }
+                  : null,
+                status: "BLOCK",
+              };
+            }
+          }
+        );
+
+        return ctx.send({
+          results: friendAndBlock,
+          pagination: friendships.pagination,
+        });
+      } catch (e) {
+        return ctx.badRequest("Fail to find friends and blockeds");
       }
     },
   })

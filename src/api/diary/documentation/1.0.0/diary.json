@@ -249,7 +249,9 @@
           }
         }
       }
-    },
+    }
+  },
+  "/diaries/{diaryId}": {
     "put": {
       "responses": {
         "200": {
@@ -316,8 +318,19 @@
       "tags": [
         "Diary"
       ],
-      "parameters": [],
-      "operationId": "put/diaries",
+      "parameters": [
+        {
+          "name": "diaryId",
+          "in": "path",
+          "description": "",
+          "deprecated": false,
+          "required": true,
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "operationId": "put/diaries/{diaryId}",
       "requestBody": {
         "required": true,
         "content": {
@@ -396,8 +409,19 @@
       "tags": [
         "Diary"
       ],
-      "parameters": [],
-      "operationId": "delete/diaries"
+      "parameters": [
+        {
+          "name": "diaryId",
+          "in": "path",
+          "description": "",
+          "deprecated": false,
+          "required": true,
+          "schema": {
+            "type": "number"
+          }
+        }
+      ],
+      "operationId": "delete/diaries/{diaryId}"
     }
   }
 }

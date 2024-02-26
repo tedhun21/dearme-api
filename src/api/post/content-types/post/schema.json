@@ -56,7 +56,7 @@
     "commentSettings": {
       "type": "enumeration",
       "enum": [
-        "PUBLIC",
+        "ALL",
         "FRIENDS",
         "OFF"
       ]

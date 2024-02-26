@@ -35,7 +35,7 @@
     "endSleep": {
       "type": "time"
     },
-    "weather": {
+    "weatherId": {
       "type": "string"
     },
     "remember": {
@@ -66,12 +66,38 @@
     "mood": {
       "type": "enumeration",
       "enum": [
+        "JOYFUL",
         "HAPPY",
-        "GOOD",
-        "SOSO",
-        "BAD",
+        "NEUTRAL",
+        "UNHAPPY",
         "SAD"
       ]
+    },
+    "todayPickTitle": {
+      "type": "string"
+    },
+    "todayPickContributors": {
+      "type": "string"
+    },
+    "todayPickDate": {
+      "type": "string"
+    },
+    "todayPickImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "todayPickId": {
+      "type": "string"
+    },
+    "weather": {
+      "type": "string"
     }
   }
 }
