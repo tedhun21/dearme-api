@@ -59,7 +59,7 @@ export default ({ env }) => {
         host: env("DATABASE_HOST", "localhost"),
         port: env.int("DATABASE_PORT", 5432),
         database: env("DATABASE_NAME", "dearme"),
-        user: env("DATABASE_USERNAME", "songjihun"),
+        user: env("DATABASE_USERNAME", "root"),
         password: env("DATABASE_PASSWORD", ""),
         ssl: env.bool("DATABASE_SSL", false) && {
           key: env("DATABASE_SSL_KEY", undefined),
