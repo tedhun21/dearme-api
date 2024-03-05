@@ -58,7 +58,7 @@ export default factories.createCoreController(
 
         return ctx.send(modifiedTodos);
       } catch (e) {
-        return ctx.badRequest("Fail to find todos.");
+        return ctx.badRequest("Fail to find todos");
       }
     },
 

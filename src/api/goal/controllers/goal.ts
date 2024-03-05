@@ -8,7 +8,7 @@ export default factories.createCoreController(
   "api::goal.goal",
   ({ strapi }: { strapi: Strapi }) => ({
     // 목표 조회 (특정 목표 id)
-    // query로 그 날짜 사이에 있는 애만 보여주기
+    // query로 그 날짜 사이에 있는 목표만 보여주기
     async find(ctx) {
       const { date } = ctx.query;
       const { userId } = ctx.query;

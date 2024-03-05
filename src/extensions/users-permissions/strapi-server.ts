@@ -158,38 +158,43 @@ module.exports = (plugin) => {
 
     const parsedData = JSON.parse(ctx.request.body.data);
 
+    console.log(parsedData.private);
+    if (parsedData.nickname.length < 2) {
+      return ctx.badRequest("nickname has to be more than 1 character", {
+        field: "nickname",
+      });
+    }
+
     try {
-      if (parsedData.nickname || parsedData.phone) {
-        const me = await strapi.entityService.findOne(
-          "plugin::users-permissions.user",
-          userId
-        );
+      const me = await strapi.entityService.findOne(
+        "plugin::users-permissions.user",
+        userId
+      );
 
-        const existingUserWithNickname = await strapi.entityService.findMany(
-          "plugin::users-permissions.user",
-          {
-            filters: {
-              nickname: { $eq: parsedData.nickname, $not: me.nickname },
-            },
-          }
-        );
-
-        if ((existingUserWithNickname as any).length > 0) {
-          return ctx.badRequest("Already nickname exists", {
-            field: "nickname",
-          });
+      const existingUserWithNickname = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        {
+          filters: {
+            nickname: { $eq: parsedData.nickname, $not: me.nickname },
+          },
         }
+      );
 
-        const existingUserWithPhone = await strapi.entityService.findMany(
-          "plugin::users-permissions.user",
-          { filters: { phone: { $eq: parsedData.phone, $not: me.phone } } }
-        );
-        if ((existingUserWithPhone as any).length > 0) {
-          return ctx.badRequest({
-            field: "phone",
-            message: "Already phone exists",
-          });
-        }
+      if ((existingUserWithNickname as any).length > 0) {
+        return ctx.badRequest("Already nickname exists", {
+          field: "nickname",
+        });
+      }
+
+      const existingUserWithPhone = await strapi.entityService.findMany(
+        "plugin::users-permissions.user",
+        { filters: { phone: { $eq: parsedData.phone, $not: me.phone } } }
+      );
+
+      if ((existingUserWithPhone as any).length > 0) {
+        return ctx.badRequest("Already phone exists", {
+          field: "phone",
+        });
       }
 
       const updatedUser = await strapi.entityService.update(
