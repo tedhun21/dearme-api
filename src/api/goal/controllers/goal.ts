@@ -26,6 +26,8 @@ export default factories.createCoreController(
       } else {
         filters = {
           user: { id: userId },
+          startDate: { $lte: date },
+          endDate: { $gte: date },
         };
       }
 

@@ -63,7 +63,7 @@ export default factories.createCoreController(
 
       // 2. 친구꺼 (public === true || public === false)
       // jwt 필수
-      if (ctx.state.user && friend === true) {
+      else if (ctx.state.user && friend === "true") {
         const { id: userId } = ctx.state.user;
         const friendsList = await getFriendsList(userId);
         filters = {
@@ -73,13 +73,13 @@ export default factories.createCoreController(
 
       // 3. 한 유저의 모든 포스트
       // jwt 필요 없음
-      if (userId) {
+      else if (userId) {
         filters = { user: { id: userId } };
       }
 
       // 4. 나의 모든 포스트
       // jwt 필요
-      if (ctx.state.user && friend === false) {
+      else if (ctx.state.user && friend === "false") {
         const { id: userId } = ctx.state.user;
         filters = {
           user: { id: userId },

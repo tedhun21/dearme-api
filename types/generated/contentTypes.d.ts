@@ -788,7 +788,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       }>;
     address: Attribute.String;
     phone: Attribute.String;
-    private: Attribute.Boolean;
+    private: Attribute.Boolean & Attribute.DefaultTo<false>;
     comments: Attribute.Relation<
       'plugin::users-permissions.user',
       'oneToMany',
@@ -897,12 +897,11 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     draftAndPublish: true;
   };
   attributes: {
-    title: Attribute.String;
+    title: Attribute.String & Attribute.Required;
     feelings: Attribute.Text;
     photos: Attribute.Media;
     startSleep: Attribute.Time;
     endSleep: Attribute.Time;
-    weatherId: Attribute.String;
     remember: Attribute.Boolean;
     user: Attribute.Relation<
       'api::diary.diary',
@@ -912,17 +911,18 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     companions: Attribute.Enumeration<
       ['FAMILY', 'FRIEND', 'LOVER', 'ACQUAINTANCE', 'ALONE']
     >;
-    body: Attribute.Text;
-    date: Attribute.Date;
+    body: Attribute.Text & Attribute.Required;
+    date: Attribute.Date & Attribute.Required;
     mood: Attribute.Enumeration<
       ['JOYFUL', 'HAPPY', 'NEUTRAL', 'UNHAPPY', 'SAD']
     >;
-    todayPickTitle: Attribute.String;
-    todayPickContributors: Attribute.String;
-    todayPickDate: Attribute.String;
-    todayPickImage: Attribute.Media;
-    todayPickId: Attribute.String;
     weather: Attribute.String;
+    weatherId: Attribute.Integer;
+    today_picks: Attribute.Relation<
+      'api::diary.diary',
+      'oneToMany',
+      'api::today-pick.today-pick'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1144,6 +1144,45 @@ export interface ApiQuoteQuote extends Schema.CollectionType {
   };
 }
 
+export interface ApiTodayPickTodayPick extends Schema.CollectionType {
+  collectionName: 'today_picks';
+  info: {
+    singularName: 'today-pick';
+    pluralName: 'today-picks';
+    displayName: 'todayPick';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    date: Attribute.Date;
+    contributors: Attribute.String;
+    title: Attribute.String;
+    image: Attribute.Media;
+    diary: Attribute.Relation<
+      'api::today-pick.today-pick',
+      'manyToOne',
+      'api::diary.diary'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::today-pick.today-pick',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::today-pick.today-pick',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiTodoTodo extends Schema.CollectionType {
   collectionName: 'todos';
   info: {
@@ -1202,6 +1241,7 @@ declare module '@strapi/types' {
       'api::notice.notice': ApiNoticeNotice;
       'api::post.post': ApiPostPost;
       'api::quote.quote': ApiQuoteQuote;
+      'api::today-pick.today-pick': ApiTodayPickTodayPick;
       'api::todo.todo': ApiTodoTodo;
     }
   }

@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "today_picks",
+  "info": {
+    "singularName": "today-pick",
+    "pluralName": "today-picks",
+    "displayName": "todayPick",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "date": {
+      "type": "date"
+    },
+    "contributors": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "diary": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::diary.diary",
+      "inversedBy": "today_picks"
+    }
+  }
+}

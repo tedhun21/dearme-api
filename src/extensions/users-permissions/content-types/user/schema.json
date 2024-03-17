@@ -125,7 +125,9 @@
       "required": false
     },
     "private": {
-      "type": "boolean"
+      "type": "boolean",
+      "default": false,
+      "required": false
     },
     "comments": {
       "type": "relation",

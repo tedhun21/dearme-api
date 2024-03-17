@@ -99,7 +99,10 @@ export default factories.createCoreController(
             "api::diary.diary",
             {
               filters,
-              populate: { photos: { fields: ["id", "url"] } },
+              populate: {
+                photos: { fields: ["id", "url"] },
+                today_picks: { populate: { image: { fields: ["id", "url"] } } },
+              },
               page,
               pageSize: size,
             }
@@ -141,44 +144,38 @@ export default factories.createCoreController(
 
       const { id: userId } = ctx.state.user;
       const { date } = ctx.query;
-
       const parsedData = JSON.parse(ctx.request.body.data);
+      const { photos } = ctx.request.files;
+
+      // 같은 날짜에 일기가 기존에 있는지
+      const diary = await strapi.entityService.findMany("api::diary.diary", {
+        filters: { date: { $eq: date }, user: userId },
+      });
+
+      if ((diary as any)?.length > 0) {
+        return ctx.badRequest("A diary already exists for this date");
+      }
 
       try {
-        // 같은 날짜에 일기가 기존에 있는지
-        const diary = await strapi.entityService.findMany("api::diary.diary", {
-          filters: { date: { $eq: date }, user: userId },
+        let data = {
+          data: {
+            date,
+            user: { id: userId },
+            remember: false,
+            ...parsedData,
+          },
+          files: photos ? { photos } : null,
+        };
+
+        const newDiary = await strapi.entityService.create(
+          "api::diary.diary",
+          data
+        );
+
+        return ctx.send({
+          message: "Successfully create a diary",
+          diaryId: newDiary.id,
         });
-
-        if (diary.length === 0) {
-          // 일기 데이터 추출 (Strapi가 자동으로 파싱한 데이터 사용)
-          const parsedData = JSON.parse(ctx.request.body.data);
-
-          // 사진 파일 업로드
-          const { photos, todayPickImage } = ctx.request.files;
-
-          let uploadFiles = {
-            ...(photos && { photos: photos }),
-            ...(todayPickImage && { todayPickImage: todayPickImage }),
-          };
-
-          let data = {
-            data: { date, user: userId, ...parsedData },
-            files: uploadFiles ? uploadFiles : null,
-          };
-
-          const newDiary = await strapi.entityService.create(
-            "api::diary.diary",
-            data
-          );
-
-          return ctx.send({
-            message: "Successfully create a diary",
-            diaryId: newDiary.id,
-          });
-        } else {
-          return ctx.badRequest("A diary already exists for this date");
-        }
       } catch (e) {
         return ctx.badRequest("Fail to create a diary.");
       }
@@ -194,63 +191,45 @@ export default factories.createCoreController(
         return ctx.badRequest("No data or query parameters available");
       }
 
-      const { remember }: { remember?: boolean } = ctx.query;
-
       const { id: userId } = ctx.state.user;
       const { diaryId } = ctx.request.params;
-      const { file } = ctx.request.files;
+      const { photos } = ctx.request.files;
       const parsedData = JSON.parse(ctx.request.body.data);
 
-      if (remember) {
-        try {
-          const diary = await strapi.entityService.findOne(
-            "api::diary.diary",
-            diaryId,
-            { populate: { user: { fields: ["id", "nickname"] } } }
-          );
+      const { remember }: { remember?: boolean } = ctx.query;
 
-          if ((diary.user as any).id !== userId) {
-            return ctx.unauthorized("No permission to update this diary");
-          }
+      try {
+        const diary = await strapi.entityService.findOne(
+          "api::diary.diary",
+          diaryId,
+          { populate: { user: { fields: ["id", "nickname"] } } }
+        );
 
-          const updatedDiary = await strapi.entityService.update(
-            "api::diary.diary",
-            diary.id,
-            { data: { remember } } as any
-          );
-
-          return ctx.send({ remember: updatedDiary.remember });
-        } catch (e) {}
-      } else {
-        try {
-          const diary = await strapi.entityService.findOne(
-            "api::diary.diary",
-            diaryId,
-            { populate: { user: { fields: ["id", "nickname"] } } }
-          );
-
-          if ((diary.user as any).id !== userId) {
-            return ctx.unauthorized("No permission to update this diary");
-          }
-
-          let data = {
-            data: {
-              user: userId,
-              ...parsedData,
-            },
-            files: file ? { photos: file } : null,
-          };
-
-          const updatedDiary = await strapi.entityService.update(
-            "api::diary.diary",
-            diary.id,
-            data
-          );
-
-          return ctx.send(updatedDiary);
-        } catch (e) {
-          return ctx.badRequest("Fail to update the diary");
+        if ((diary.user as any).id !== userId) {
+          return ctx.unauthorized("No permission to update this diary");
         }
+
+        let data;
+        if (remember) {
+          data = { data: { remember } };
+        }
+        data = {
+          data: { user: { id: userId }, ...parsedData },
+          files: photos ? { photos } : null,
+        };
+
+        const updatedDiary = await strapi.entityService.update(
+          "api::diary.diary",
+          diary.id,
+          data
+        );
+
+        return ctx.send({
+          messsage: "Successfully update the diary",
+          diaryId: updatedDiary,
+        });
+      } catch (e) {
+        return ctx.badRequest("Fail to update the diary");
       }
     },
 

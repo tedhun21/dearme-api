@@ -50,7 +50,7 @@ export default factories.createCoreController(
         );
 
         if (friendship.length === 0) {
-          return ctx.send("The friendship cannot be found");
+          return ctx.send({ status: "NOTHING" });
         }
 
         let modifiedFriendship;
@@ -246,6 +246,40 @@ export default factories.createCoreController(
             });
           } catch (e) {
             return ctx.badRequest("Fail to send the follow request");
+          }
+        }
+
+        // 요청 취소 (cancel)
+        if (
+          friendship[0].status === "PENDING" &&
+          status === "requestCancel" &&
+          friendship[0].follow_sender.id === userId &&
+          friendship[0].follow_receiver.id === +friendId
+        ) {
+          console.log("hi");
+          try {
+            const deleteFriendship = await strapi.entityService.delete(
+              "api::friendship.friendship",
+              friendship[0].id,
+              {
+                populate: {
+                  follow_receiver: { fields: ["id"] },
+                  follow_sender: { fields: ["id"] },
+                },
+              }
+            );
+
+            console.log(deleteFriendship);
+
+            return ctx.send({
+              message: `receiver: ${
+                (deleteFriendship.follow_receiver as any).id
+              } and sender: ${
+                (deleteFriendship.follow_sender as any).id
+              }'s friendship has been deleted`,
+            });
+          } catch (e) {
+            return ctx.badRequest("Fail to follow cancel");
           }
         }
 
@@ -458,13 +492,22 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [{ follow_sender: userId }, { status: "FRIEND" }],
+                  $and: [
+                    { follow_sender: { id: userId } },
+                    { status: "FRIEND" },
+                  ],
                 },
                 {
-                  $and: [{ follow_receiver: userId }, { status: "FRIEND" }],
+                  $and: [
+                    { follow_receiver: { id: userId } },
+                    { status: "FRIEND" },
+                  ],
                 },
                 {
-                  $and: [{ $not: { block: userId } }, { status: "BLOCK_ONE" }],
+                  $and: [
+                    { $not: { block: { id: userId } } },
+                    { status: "BLOCK_ONE" },
+                  ],
                 },
               ],
             },
@@ -506,6 +549,7 @@ export default factories.createCoreController(
           username: friend.username,
           nickname: friend.nickname,
           photo: friend.photo,
+          status: "FRIEND",
         }));
 
         return ctx.send({
@@ -557,6 +601,7 @@ export default factories.createCoreController(
           username: user.username,
           nickname: user.nickname,
           photo: user.photo,
+          status: "PENDING",
         }));
 
         return ctx.send({

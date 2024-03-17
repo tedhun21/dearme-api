@@ -13,7 +13,8 @@
   "pluginOptions": {},
   "attributes": {
     "title": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "feelings": {
       "type": "text"
@@ -35,9 +36,6 @@
     "endSleep": {
       "type": "time"
     },
-    "weatherId": {
-      "type": "string"
-    },
     "remember": {
       "type": "boolean"
     },
@@ -58,10 +56,12 @@
       ]
     },
     "body": {
-      "type": "text"
+      "type": "text",
+      "required": true
     },
     "date": {
-      "type": "date"
+      "type": "date",
+      "required": true
     },
     "mood": {
       "type": "enumeration",
@@ -73,31 +73,17 @@
         "SAD"
       ]
     },
-    "todayPickTitle": {
-      "type": "string"
-    },
-    "todayPickContributors": {
-      "type": "string"
-    },
-    "todayPickDate": {
-      "type": "string"
-    },
-    "todayPickImage": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "todayPickId": {
-      "type": "string"
-    },
     "weather": {
       "type": "string"
+    },
+    "weatherId": {
+      "type": "integer"
+    },
+    "today_picks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::today-pick.today-pick",
+      "mappedBy": "diary"
     }
   }
 }
