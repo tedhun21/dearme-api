@@ -49,26 +49,14 @@ export default factories.createCoreController(
           const remembers = await strapi.entityService.findMany(
             "api::diary.diary",
             {
+              sort: { date: "asc" },
               filters,
               populate: { photos: { fields: ["url"] } },
               fields: ["id", "mood", "date", "title", "weatherId", "weather"],
-              sort: { date: "asc" },
             }
           );
 
-          const modifiedRemembers =
-            Array.isArray(remembers) &&
-            remembers.map((remember) => ({
-              ...remember,
-              date: (remember as any).date,
-              photos: (remember as any).photos[0].url,
-            }));
-
-          if ((remembers as any).length === 0) {
-            return ctx.notFound(`No diary found for ${date}`);
-          }
-
-          return ctx.send(modifiedRemembers);
+          return ctx.send(remembers);
         } else if (date.length === 7) {
           // 월별 조회 ("YYYY-MM")
           const startDate = new Date(date + "-01");
@@ -82,10 +70,9 @@ export default factories.createCoreController(
           const diaries = await strapi.entityService.findMany(
             "api::diary.diary",
             {
+              sort: { date: "asc" },
               filters,
               populate: { photos: { fields: ["id", "url"] } },
-              page,
-              pageSize: size,
             }
           );
 
@@ -226,7 +213,8 @@ export default factories.createCoreController(
 
         return ctx.send({
           messsage: "Successfully update the diary",
-          diaryId: updatedDiary,
+          diaryId: updatedDiary.id,
+          remember: updatedDiary.remember,
         });
       } catch (e) {
         return ctx.badRequest("Fail to update the diary");
@@ -271,6 +259,43 @@ export default factories.createCoreController(
         });
       } catch (e) {
         return ctx.badRequest("Fail to delete the diary");
+      }
+    },
+
+    // 일기 검색 (월별 다이어리)
+    async search(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+
+      const { searchTerm, date } = ctx.query;
+
+      try {
+        const startDate = new Date(date + "-01");
+        const endDate = new Date(
+          new Date(date).setMonth(startDate.getMonth() + 1)
+        );
+
+        const diaries = await strapi.db.query("api::diary.diary").findMany({
+          filters: {
+            $and: [
+              {
+                $or: [
+                  { title: { $containsi: searchTerm } },
+                  { body: { $containsi: searchTerm } },
+                ],
+              },
+              { date: { $gte: startDate, $lt: endDate } },
+            ],
+          },
+        });
+
+        const modifiedDiaries =
+          Array.isArray(diaries) && diaries.map((diary) => diary.id);
+
+        return ctx.send(modifiedDiaries);
+      } catch (e) {
+        return ctx.badRequest("Fail to search the diary");
       }
     },
   })

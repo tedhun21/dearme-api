@@ -29,5 +29,12 @@ module.exports = {
       path: "/diaries/:diaryId",
       handler: "diary.delete",
     },
+
+    // 일기 검색
+    {
+      method: "GET",
+      path: "/search-diaries",
+      handler: "diary.search",
+    },
   ],
 };

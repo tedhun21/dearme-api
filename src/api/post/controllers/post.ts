@@ -147,7 +147,6 @@ export default factories.createCoreController(
           comments: Array.isArray(post.comments) && post.comments.length,
           likes: post.likes,
         }));
-        // console.log(modifiedPosts);
 
         return ctx.send({
           results: modifiedPosts,
@@ -184,7 +183,6 @@ export default factories.createCoreController(
             },
           }
         );
-        // console.log(friendship);
 
         // 유저의 친구 리스트
         const friendsList =
@@ -405,11 +403,7 @@ export default factories.createCoreController(
       }
     },
 
-    // !!FIXME
     async findByPostId(ctx) {
-      if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid");
-      }
       const { postId } = ctx.params;
       console.log(postId);
       try {
@@ -433,19 +427,7 @@ export default factories.createCoreController(
               },
               // 댓글 > 유저 프로필 사진 & ID, 댓글, 시간
 
-              comments: {
-                sort: { createdAt: "desc" },
-                populate: {
-                  user: {
-                    fields: ["nickname"],
-                    populate: {
-                      photo: {
-                        fields: ["url"],
-                      },
-                    },
-                  },
-                },
-              },
+              comments: true,
               likes: {
                 fields: ["nickname"],
                 populate: {
@@ -454,11 +436,10 @@ export default factories.createCoreController(
                   },
                 },
               },
-              goal: { fields: ["body"] },
+              goal: { fields: ["title"] },
             },
           }
         );
-        console.log(post);
 
         const modifiedPosts = {
           id: post.id,
@@ -469,7 +450,7 @@ export default factories.createCoreController(
           commentSettings: post.commentSettings,
           user: post.user,
           goal: post.goal,
-          comments: post.comments,
+          comments: Array.isArray(post.comments) && post.comments.length,
           likes: post.likes,
         };
         console.log(modifiedPosts);
@@ -482,12 +463,10 @@ export default factories.createCoreController(
       }
     },
 
-    // 추가!!
     // 좋아요 유저 목록 & 관계 (photo, nickname, friendship)
     async likeShip(ctx) {
       const { postId } = ctx.params;
-
-      const { id: userId } = ctx.state.user;
+      const { all } = ctx.query;
 
       // 일단 포스트 하나 불러와서 likes 가져오기 첫번째
       const post = await strapi.entityService.findOne(
@@ -504,8 +483,24 @@ export default factories.createCoreController(
       );
 
       const likes = post.likes;
+
+      if (all) {
+        const modifiedLikes =
+          Array.isArray(likes) &&
+          likes.map((like) => ({
+            likeId: like.id,
+            userPhoto: like.photo?.url,
+            nickname: like.nickname,
+            status: "public",
+          }));
+        return ctx.send({
+          message: "Successfully find the likes and friendship",
+          results: modifiedLikes,
+        });
+      }
       const likeIds = (likes as any).map((likeUser) => likeUser.id);
-      console.log(likeIds);
+
+      const { id: userId } = ctx.state.user;
 
       const friendships = await strapi.entityService.findMany(
         "api::friendship.friendship",
@@ -534,7 +529,6 @@ export default factories.createCoreController(
           },
         }
       );
-      console.log(friendships);
 
       const modifiedFriendships =
         Array.isArray(likes) &&
@@ -565,7 +559,7 @@ export default factories.createCoreController(
               case "BLOCK_ONE":
               case "BLOCK_BOTH":
                 return {
-                  ...likeItem,
+                  likeItem,
                   status:
                     friendship.block?.[0]?.id === userId
                       ? "blocked user"

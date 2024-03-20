@@ -1088,7 +1088,7 @@ export interface ApiPostPost extends Schema.CollectionType {
       'api::comment.comment'
     >;
     public: Attribute.Boolean;
-    photo: Attribute.Media;
+    photo: Attribute.Media & Attribute.Required;
     user: Attribute.Relation<
       'api::post.post',
       'manyToOne',

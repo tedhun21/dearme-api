@@ -223,7 +223,7 @@ module.exports = (plugin) => {
       );
 
       return ctx.send({
-        message: "Successfully update the user",
+        message: "Successfully update this user",
         userId: updatedUser.id,
       });
     } catch (e) {

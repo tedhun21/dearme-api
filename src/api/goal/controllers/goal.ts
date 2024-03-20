@@ -156,16 +156,6 @@ export default factories.createCoreController(
 
     // 목표 검색
     async search(ctx) {
-      interface Goal {
-        title: string;
-        postsCount: number;
-        postsData?: any[];
-      }
-
-      if (!ctx.state.user) {
-        return ctx.unauthorized("Authentication token is missing or invalid");
-      }
-
       const { searchTerm, posts } = ctx.query;
 
       try {
@@ -175,38 +165,44 @@ export default factories.createCoreController(
         const goals = await strapi.db.query("api::goal.goal").findMany({
           populate: {
             posts: {
-              populate: {
-                photo: true,
-              },
+              populate: { photo: true },
               where: {
                 public: { $eq: true },
               },
             },
           },
           where: {
+            isPublic: { $eq: true },
             title: whereCondition,
           },
         });
 
-        const searchedGoals: Goal[] = goals.reduce((result, goal) => {
-          const existingGoal = result.find((g) => g.title === goal.title);
+        // 게시물 > 0 이상 목표
+        const filteredGoals = goals.filter(
+          (goal) => goal.posts && goal.posts.length > 0
+        );
+        console.log(filteredGoals);
+
+        const searchedGoals = filteredGoals.reduce((result, goal) => {
+          const existingGoal = result.find((g: any) => g.title === goal.title);
           if (existingGoal) {
             existingGoal.postsCount += goal.posts.length;
             if (posts === "true")
-              existingGoal.postsData = goal.posts.map((post) => ({
+              existingGoal.postsData = goal.posts.map((post: any) => ({
                 postId: post.id,
-                photo: post.photo,
+                photo: post.photo.formats.thumbnail.url,
               }));
           } else {
-            const newGoal: Goal = {
+            const newGoal: any = {
+              id: goal.id,
               title: goal.title,
               postsCount: goal.posts.length,
             };
 
             if (posts === "true")
-              newGoal.postsData = goal.posts.map((post) => ({
+              newGoal.postsData = goal.posts.map((post: any) => ({
                 postId: post.id,
-                photo: post.photo,
+                photo: post.photo.formats.thumbnail.url,
               }));
             result.push(newGoal);
           }
@@ -214,7 +210,6 @@ export default factories.createCoreController(
         }, []);
 
         let responseData = { searchedGoals };
-
         return ctx.send(responseData);
       } catch (e) {
         return ctx.badRequest("Fail to search goals");

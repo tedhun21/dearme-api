@@ -43,7 +43,7 @@ export default factories.createCoreController(
             populate: {
               follow_receiver: { fields: ["nickname"] },
               follow_sender: { fields: ["nickname"] },
-              block: { fields: ["nickname"] },
+              block: { fields: ["id", "nickname"] },
               blocked: { fields: ["nickname"] },
             },
           }
@@ -256,7 +256,6 @@ export default factories.createCoreController(
           friendship[0].follow_sender.id === userId &&
           friendship[0].follow_receiver.id === +friendId
         ) {
-          console.log("hi");
           try {
             const deleteFriendship = await strapi.entityService.delete(
               "api::friendship.friendship",
@@ -268,8 +267,6 @@ export default factories.createCoreController(
                 },
               }
             );
-
-            console.log(deleteFriendship);
 
             return ctx.send({
               message: `receiver: ${
