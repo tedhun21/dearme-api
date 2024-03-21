@@ -405,7 +405,7 @@ export default factories.createCoreController(
 
     async findByPostId(ctx) {
       const { postId } = ctx.params;
-      console.log(postId);
+
       try {
         const post = await strapi.entityService.findOne(
           "api::post.post",
@@ -453,7 +453,7 @@ export default factories.createCoreController(
           comments: Array.isArray(post.comments) && post.comments.length,
           likes: post.likes,
         };
-        console.log(modifiedPosts);
+
         return ctx.send({
           message: "Successfully find the post",
           results: modifiedPosts,
@@ -586,7 +586,6 @@ export default factories.createCoreController(
           }
         });
 
-      // console.log(modifiedFriendships);
       return ctx.send({
         message: "Successfully find the likes and friendship",
         results: modifiedFriendships,

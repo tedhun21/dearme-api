@@ -181,7 +181,6 @@ export default factories.createCoreController(
         const filteredGoals = goals.filter(
           (goal) => goal.posts && goal.posts.length > 0
         );
-        console.log(filteredGoals);
 
         const searchedGoals = filteredGoals.reduce((result, goal) => {
           const existingGoal = result.find((g: any) => g.title === goal.title);

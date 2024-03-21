@@ -52,7 +52,6 @@ export default factories.createCoreController(
               sort: { date: "asc" },
               filters,
               populate: { photos: { fields: ["url"] } },
-              fields: ["id", "mood", "date", "title", "weatherId", "weather"],
             }
           );
 
@@ -198,12 +197,13 @@ export default factories.createCoreController(
 
         let data;
         if (remember) {
-          data = { data: { remember } };
+          data = { data: { remember: !diary.remember } };
+        } else {
+          data = {
+            data: { user: { id: userId }, ...parsedData },
+            files: photos ? { photos } : null,
+          };
         }
-        data = {
-          data: { user: { id: userId }, ...parsedData },
-          files: photos ? { photos } : null,
-        };
 
         const updatedDiary = await strapi.entityService.update(
           "api::diary.diary",
