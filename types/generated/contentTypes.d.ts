@@ -1016,7 +1016,7 @@ export interface ApiGoalGoal extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     posts: Attribute.Relation<'api::goal.goal', 'oneToMany', 'api::post.post'>;
-    isPublic: Attribute.Boolean & Attribute.DefaultTo<true>;
+    private: Attribute.Boolean & Attribute.DefaultTo<false>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -1087,7 +1087,9 @@ export interface ApiPostPost extends Schema.CollectionType {
       'oneToMany',
       'api::comment.comment'
     >;
-    public: Attribute.Boolean;
+    private: Attribute.Boolean &
+      Attribute.Required &
+      Attribute.DefaultTo<false>;
     photo: Attribute.Media & Attribute.Required;
     user: Attribute.Relation<
       'api::post.post',

@@ -94,9 +94,9 @@ export default factories.createCoreController(
             }
           );
 
-          if (diaries.length === 0) {
-            return ctx.notFound(`No diary found for ${date}`);
-          }
+          // if (diaries.length === 0) {
+          //   return ctx.notFound(`No diary found for ${date}`);
+          // }
 
           return ctx.send(diaries[0]);
         }

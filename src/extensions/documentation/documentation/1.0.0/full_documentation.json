@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-03-21T11:12:10.381Z"
+    "x-generation-date": "2024-03-22T11:54:17.758Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -884,7 +884,7 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "isPublic": {
+                                                              "private": {
                                                                 "type": "boolean"
                                                               },
                                                               "createdAt": {
@@ -2473,7 +2473,7 @@
                           }
                         }
                       },
-                      "public": {
+                      "private": {
                         "type": "boolean"
                       },
                       "photo": {
@@ -4115,7 +4115,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -4357,7 +4357,7 @@
                                                     }
                                                   }
                                                 },
-                                                "isPublic": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "createdAt": {
@@ -6671,7 +6671,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -7144,7 +7144,7 @@
                                                     }
                                                   }
                                                 },
-                                                "isPublic": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "createdAt": {
@@ -8671,7 +8671,7 @@
                   "example": "string or id"
                 }
               },
-              "isPublic": {
+              "private": {
                 "type": "boolean"
               }
             }
@@ -9468,7 +9468,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -9941,7 +9941,7 @@
                                                     }
                                                   }
                                                 },
-                                                "isPublic": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "createdAt": {
@@ -11303,7 +11303,7 @@
               }
             }
           },
-          "isPublic": {
+          "private": {
             "type": "boolean"
           },
           "createdAt": {
@@ -12201,7 +12201,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -12674,7 +12674,7 @@
                                                     }
                                                   }
                                                 },
-                                                "isPublic": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "createdAt": {
@@ -14119,6 +14119,7 @@
         "properties": {
           "data": {
             "required": [
+              "private",
               "photo"
             ],
             "type": "object",
@@ -14140,7 +14141,7 @@
                   "example": "string or id"
                 }
               },
-              "public": {
+              "private": {
                 "type": "boolean"
               },
               "photo": {
@@ -14251,6 +14252,7 @@
       "Post": {
         "type": "object",
         "required": [
+          "private",
           "photo"
         ],
         "properties": {
@@ -14309,7 +14311,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -15330,7 +15332,7 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "isPublic": {
+                                                              "private": {
                                                                 "type": "boolean"
                                                               },
                                                               "createdAt": {
@@ -16802,7 +16804,7 @@
               }
             }
           },
-          "public": {
+          "private": {
             "type": "boolean"
           },
           "photo": {
@@ -19227,7 +19229,7 @@
                                                     }
                                                   }
                                                 },
-                                                "public": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "photo": {
@@ -19469,7 +19471,7 @@
                                                                 }
                                                               }
                                                             },
-                                                            "isPublic": {
+                                                            "private": {
                                                               "type": "boolean"
                                                             },
                                                             "createdAt": {
@@ -21532,7 +21534,7 @@
                                         }
                                       }
                                     },
-                                    "public": {
+                                    "private": {
                                       "type": "boolean"
                                     },
                                     "photo": {
@@ -22005,7 +22007,7 @@
                                                     }
                                                   }
                                                 },
-                                                "isPublic": {
+                                                "private": {
                                                   "type": "boolean"
                                                 },
                                                 "createdAt": {

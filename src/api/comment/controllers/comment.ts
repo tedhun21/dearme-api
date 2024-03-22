@@ -66,7 +66,7 @@ export default factories.createCoreController(
         // 2. post PUBLIC이면 관계가 어떤 것이든 상관 x
         if (
           ((post.user as any).id === userId && friendship.length === 0) ||
-          post.commentSettings === "PUBLIC"
+          post.commentSettings === "ALL"
         ) {
           data = {
             data: { user: userId, post: postId, body },

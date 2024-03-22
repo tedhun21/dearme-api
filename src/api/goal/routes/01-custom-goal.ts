@@ -2,7 +2,7 @@ export default {
   routes: [
     {
       method: "GET",
-      path: "/search-goals",
+      path: "/goals/search-goals",
       handler: "goal.search",
     },
   ],

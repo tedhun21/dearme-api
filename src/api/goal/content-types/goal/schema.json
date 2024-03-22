@@ -36,9 +36,9 @@
       "target": "api::post.post",
       "mappedBy": "goal"
     },
-    "isPublic": {
+    "private": {
       "type": "boolean",
-      "default": true
+      "default": false
     }
   }
 }

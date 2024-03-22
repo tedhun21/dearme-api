@@ -14,7 +14,7 @@ export default factories.createCoreController(
       }
 
       const { id: userId } = ctx.state.user;
-      const { goalId, body, isPublic, commentSettings } = JSON.parse(
+      const { goalId, body, isPrivate, commentSettings } = JSON.parse(
         ctx.request.body.data
       );
       const { file } = ctx.request.files;
@@ -25,7 +25,7 @@ export default factories.createCoreController(
             user: userId,
             goal: { connect: [goalId] },
             body,
-            public: isPublic,
+            private: isPrivate,
             commentSettings,
           },
           files: file ? { photo: file } : null,
@@ -45,23 +45,22 @@ export default factories.createCoreController(
       }
     },
 
-    // READ: 전체 / 친구 공개 게시물 조회 (query: ?isPublic=false)
+    // READ: 전체 / 친구 공개 게시물 조회 (query: ?isPrivate=false)
     // 1. 그냥 최신순으로
     // 2. query public을 넣었을 경우
-    // 3. 유저와 관련된 친구가 가지고 있는 post들만 가져오기 (여긴 친구가 public을 하든 안 하든 보이기)
+    // 3. 유저와 관련된 친구가 가지고 있는 post들만 가져오기
     async find(ctx) {
-      const { page, size, userId, public: isPublic, friend } = ctx.query;
+      const { page, size, userId, isPrivate, friend } = ctx.query;
 
-      // 필터링 조건
       let filters = {};
 
-      // 1. post 중 public이 true인 것만 (public === true)
+      // 1. post 중 public이 true인 것만 (private === false)
       // jwt 필요 없음
-      if (isPublic === "true") {
-        filters = { public: { $eq: true } };
+      if (isPrivate === "false") {
+        filters = { private: { $eq: false } };
       }
 
-      // 2. 친구꺼 (public === true || public === false)
+      // 2. 친구꺼
       // jwt 필수
       else if (ctx.state.user && friend === "true") {
         const { id: userId } = ctx.state.user;
@@ -139,7 +138,7 @@ export default factories.createCoreController(
           photo: post.photo,
           body: post.body,
           createdAt: post.createdAt,
-          public: post.public,
+          private: post.private,
           commentSettings: post.commentSettings,
           user: post.user,
           goal: post.goal,
@@ -227,7 +226,7 @@ export default factories.createCoreController(
         }
 
         if (userId === (existingPost.user as any).id) {
-          const { goal, body, isPublic, commentSettings } = JSON.parse(
+          const { goal, body, isPrivate, commentSettings } = JSON.parse(
             ctx.request.body.data
           );
           const { file } = ctx.request.files;
@@ -237,7 +236,7 @@ export default factories.createCoreController(
               body,
               user: userId,
               goal,
-              public: isPublic,
+              private: isPrivate,
               commentSettings,
             },
             files: file ? { photo: file } : null,
@@ -446,7 +445,7 @@ export default factories.createCoreController(
           photo: post.photo,
           body: post.body,
           createdAt: post.createdAt,
-          public: post.public,
+          private: post.private,
           commentSettings: post.commentSettings,
           user: post.user,
           goal: post.goal,
@@ -590,6 +589,27 @@ export default factories.createCoreController(
         message: "Successfully find the likes and friendship",
         results: modifiedFriendships,
       });
+    },
+
+    // 포스트가 가지고 있는 골의 title에 완전 똑같은 포스트들만 찾기
+    async findOnGoal(ctx) {
+      const { searchTerm } = ctx.query;
+
+      const posts = await strapi.entityService.findMany("api::post.post", {
+        filters: {
+          sort: { createdAt: "desc" },
+          goal: { title: { $eq: searchTerm } },
+          private: false,
+        },
+        populate: { photo: { fields: ["id", "url"] } },
+      });
+
+      const modifiedPosts = (posts as any).map((post: any) => ({
+        id: post.id,
+        photo: post.photo,
+      }));
+
+      return ctx.send(modifiedPosts);
     },
   })
 );

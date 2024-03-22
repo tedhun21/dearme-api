@@ -44,7 +44,7 @@ export default factories.createCoreController(
           startDate: goal.startDate,
           endDate: goal.endDate,
           createdAt: goal.createdAt,
-          isPublic: goal.isPublic,
+          private: goal.private,
         }));
 
         return ctx.send(modifiedGoals);
@@ -111,7 +111,7 @@ export default factories.createCoreController(
           startDate: updatedGoal.startDate,
           endDate: updatedGoal.endDate,
           createdAt: updatedGoal.createdAt,
-          isPublic: updatedGoal.isPublic,
+          private: updatedGoal.private,
         };
 
         return ctx.send(modifiedUpdatedGoal);
@@ -156,60 +156,46 @@ export default factories.createCoreController(
 
     // 목표 검색
     async search(ctx) {
-      const { searchTerm, posts } = ctx.query;
+      const { searchTerm } = ctx.query;
 
       try {
-        const whereCondition =
-          posts === "true" ? { $eq: searchTerm } : { $containsi: searchTerm };
-
-        const goals = await strapi.db.query("api::goal.goal").findMany({
-          populate: {
-            posts: {
-              populate: { photo: true },
-              where: {
-                public: { $eq: true },
-              },
-            },
-          },
-          where: {
-            isPublic: { $eq: true },
-            title: whereCondition,
+        const goals = await strapi.entityService.findMany("api::goal.goal", {
+          filters: {
+            title: { $containsi: searchTerm },
+            private: false,
           },
         });
 
-        // 게시물 > 0 이상 목표
-        const filteredGoals = goals.filter(
-          (goal) => goal.posts && goal.posts.length > 0
-        );
+        // 중복 제거
+        const uniqueTitles = new Set();
+        const uniqueGoals = [];
 
-        const searchedGoals = filteredGoals.reduce((result, goal) => {
-          const existingGoal = result.find((g: any) => g.title === goal.title);
-          if (existingGoal) {
-            existingGoal.postsCount += goal.posts.length;
-            if (posts === "true")
-              existingGoal.postsData = goal.posts.map((post: any) => ({
-                postId: post.id,
-                photo: post.photo.formats.thumbnail.url,
-              }));
-          } else {
-            const newGoal: any = {
-              id: goal.id,
-              title: goal.title,
-              postsCount: goal.posts.length,
-            };
-
-            if (posts === "true")
-              newGoal.postsData = goal.posts.map((post: any) => ({
-                postId: post.id,
-                photo: post.photo.formats.thumbnail.url,
-              }));
-            result.push(newGoal);
+        for (const goal of goals as any) {
+          // 배열에 있으면 안 넣고 없으면 넣기
+          if (!uniqueTitles.has(goal.title)) {
+            uniqueTitles.add(goal.title);
+            uniqueGoals.push(goal);
           }
-          return result;
-        }, []);
+        }
 
-        let responseData = { searchedGoals };
-        return ctx.send(responseData);
+        const modifiedGoalsPromises = uniqueGoals.map(async (goal) => {
+          const posts = await strapi.entityService.findPage("api::post.post", {
+            filters: {
+              goal: { title: { $eq: goal.title } },
+              private: false,
+            },
+          });
+
+          return {
+            id: goal.id,
+            title: goal.title,
+            postsCount: posts.pagination.total,
+          };
+        });
+
+        const modifiedGoals = await Promise.all(modifiedGoalsPromises);
+
+        return ctx.send(modifiedGoals);
       } catch (e) {
         return ctx.badRequest("Fail to search goals");
       }

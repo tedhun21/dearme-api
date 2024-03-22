@@ -260,6 +260,7 @@ module.exports = (plugin) => {
   // nickname 중복 체크
   plugin.controllers.user.checkNickname = async (ctx) => {
     const { nickname } = ctx.query;
+    console.log(nickname);
 
     try {
       const existingUserWithNickname = await strapi.entityService.findMany(
