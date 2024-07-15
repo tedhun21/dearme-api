@@ -7,21 +7,21 @@ module.exports = (plugin) => {
       // 닉네임 중복 체크
       const existingUserWithNickname = await strapi.entityService.findMany(
         "plugin::users-permissions.user",
-        { filters: { nickname } }
+        { filters: { nickname: { $eqi: nickname } } }
       );
 
       if ((existingUserWithNickname as any).length > 0) {
-        return ctx.conflict("The username already exists.");
+        return ctx.badRequest("The username already exists.");
       }
 
       // email 중복체크
       const existingUserWithEmail = await strapi.entityService.findMany(
         "plugin::users-permissions.user",
-        { filters: { email } }
+        { filters: { email: { $eqi: email } } }
       );
 
       if ((existingUserWithEmail as any).length > 0) {
-        return ctx.conflict("The email already exists.");
+        return ctx.badRequest("The email already exists.");
       }
 
       const newMember = await strapi.entityService.create(
@@ -260,12 +260,11 @@ module.exports = (plugin) => {
   // nickname 중복 체크
   plugin.controllers.user.checkNickname = async (ctx) => {
     const { nickname } = ctx.query;
-    console.log(nickname);
 
     try {
       const existingUserWithNickname = await strapi.entityService.findMany(
         "plugin::users-permissions.user",
-        { filters: { nickname } }
+        { filters: { nickname: { $eqi: nickname } } }
       );
       if ((existingUserWithNickname as any).length > 0) {
         return ctx.send({ duplicate: true });
@@ -283,7 +282,7 @@ module.exports = (plugin) => {
     try {
       const existingUserWithEmail = await strapi.entityService.findMany(
         "plugin::users-permissions.user",
-        { filters: { email } }
+        { filters: { email: { $eqi: email } } }
       );
       if ((existingUserWithEmail as any).length > 0) {
         return ctx.send({ duplicate: true });

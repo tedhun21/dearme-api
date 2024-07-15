@@ -14,6 +14,11 @@ export default factories.createCoreController(
 
       const parsedData = JSON.parse(ctx.request.body.data);
 
+      // 날짜 형식 검증(YYYY-MM-DD)
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(parsedData.date)) {
+        return ctx.badRequest("Invalid format. Please use YYYY-MM-DD.");
+      }
+
       const { image } = ctx.request.files;
 
       let data = {

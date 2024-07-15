@@ -37,17 +37,17 @@ export default factories.createCoreController(
           filters,
         });
 
-        const modifiedGoals = (goals as any).map((goal) => ({
-          id: goal.id,
-          title: goal.title,
-          body: goal.body,
-          startDate: goal.startDate,
-          endDate: goal.endDate,
-          createdAt: goal.createdAt,
-          private: goal.private,
-        }));
+        // const modifiedGoals = (goals as any).map((goal) => ({
+        //   id: goal.id,
+        //   title: goal.title,
+        //   body: goal.body,
+        //   startDate: goal.startDate,
+        //   endDate: goal.endDate,
+        //   createdAt: goal.createdAt,
+        //   private: goal.private,
+        // }));
 
-        return ctx.send(modifiedGoals);
+        return ctx.send(goals);
       } catch (e) {
         return ctx.badRequest("Fail to find goals");
       }

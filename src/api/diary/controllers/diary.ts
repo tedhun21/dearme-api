@@ -34,6 +34,7 @@ export default factories.createCoreController(
       try {
         let filters;
 
+        // diary 중 remember만
         if (date.length === 7 && remember) {
           const startDate = new Date(date + "-01");
           const endDate = new Date(
@@ -55,8 +56,13 @@ export default factories.createCoreController(
             }
           );
 
-          return ctx.send(remembers);
-        } else if (date.length === 7) {
+          const modifiedRemembers = (remembers as any).map((remember) => ({
+            ...remember,
+            feelings: JSON.parse(remember.feelings),
+          }));
+
+          return ctx.send(modifiedRemembers);
+        } else if (date.length === 7 && !remember) {
           // 월별 조회 ("YYYY-MM")
           const startDate = new Date(date + "-01");
           const endDate = new Date(
@@ -145,10 +151,11 @@ export default factories.createCoreController(
       try {
         let data = {
           data: {
+            ...parsedData,
             date,
+            feelings: JSON.stringify(parsedData.feelings),
             user: { id: userId },
             remember: false,
-            ...parsedData,
           },
           files: photos ? { photos } : null,
         };
@@ -200,7 +207,11 @@ export default factories.createCoreController(
           data = { data: { remember: !diary.remember } };
         } else {
           data = {
-            data: { user: { id: userId }, ...parsedData },
+            data: {
+              user: { id: userId },
+              ...parsedData,
+              feelings: JSON.stringify(parsedData.feelings),
+            },
             files: photos ? { photos } : null,
           };
         }

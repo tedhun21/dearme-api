@@ -898,7 +898,6 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String & Attribute.Required;
-    feelings: Attribute.Text;
     photos: Attribute.Media;
     startSleep: Attribute.Time;
     endSleep: Attribute.Time;
@@ -914,7 +913,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
     body: Attribute.Text & Attribute.Required;
     date: Attribute.Date & Attribute.Required;
     mood: Attribute.Enumeration<
-      ['JOYFUL', 'HAPPY', 'NEUTRAL', 'UNHAPPY', 'SAD']
+      ['JOYFUL', 'HAPPINESS', 'NEUTRAL', 'UNHAPPY', 'SADNESS']
     >;
     weather: Attribute.String;
     weatherId: Attribute.Integer;
@@ -923,6 +922,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       'oneToMany',
       'api::today-pick.today-pick'
     >;
+    feelings: Attribute.String;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

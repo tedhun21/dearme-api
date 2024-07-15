@@ -16,9 +16,6 @@
       "type": "string",
       "required": true
     },
-    "feelings": {
-      "type": "text"
-    },
     "photos": {
       "type": "media",
       "multiple": true,
@@ -67,10 +64,10 @@
       "type": "enumeration",
       "enum": [
         "JOYFUL",
-        "HAPPY",
+        "HAPPINESS",
         "NEUTRAL",
         "UNHAPPY",
-        "SAD"
+        "SADNESS"
       ]
     },
     "weather": {
@@ -84,6 +81,9 @@
       "relation": "oneToMany",
       "target": "api::today-pick.today-pick",
       "mappedBy": "diary"
+    },
+    "feelings": {
+      "type": "string"
     }
   }
 }

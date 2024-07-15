@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-03-22T11:54:17.758Z"
+    "x-generation-date": "2024-07-15T12:18:06.464Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -957,9 +957,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "feelings": {
-                                                                "type": "string"
-                                                              },
                                                               "photos": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -1384,10 +1381,10 @@
                                                                 "type": "string",
                                                                 "enum": [
                                                                   "JOYFUL",
-                                                                  "HAPPY",
+                                                                  "HAPPINESS",
                                                                   "NEUTRAL",
                                                                   "UNHAPPY",
-                                                                  "SAD"
+                                                                  "SADNESS"
                                                                 ]
                                                               },
                                                               "weather": {
@@ -1628,6 +1625,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "feelings": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -2850,9 +2850,6 @@
               "title": {
                 "type": "string"
               },
-              "feelings": {
-                "type": "string"
-              },
               "photos": {
                 "type": "array",
                 "items": {
@@ -2912,10 +2909,10 @@
                 "type": "string",
                 "enum": [
                   "JOYFUL",
-                  "HAPPY",
+                  "HAPPINESS",
                   "NEUTRAL",
                   "UNHAPPY",
-                  "SAD"
+                  "SADNESS"
                 ]
               },
               "weather": {
@@ -2937,6 +2934,9 @@
                   ],
                   "example": "string or id"
                 }
+              },
+              "feelings": {
+                "type": "string"
               }
             }
           }
@@ -2997,9 +2997,6 @@
         ],
         "properties": {
           "title": {
-            "type": "string"
-          },
-          "feelings": {
             "type": "string"
           },
           "photos": {
@@ -4615,9 +4612,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "feelings": {
-                                      "type": "string"
-                                    },
                                     "photos": {
                                       "type": "object",
                                       "properties": {
@@ -4811,10 +4805,10 @@
                                       "type": "string",
                                       "enum": [
                                         "JOYFUL",
-                                        "HAPPY",
+                                        "HAPPINESS",
                                         "NEUTRAL",
                                         "UNHAPPY",
-                                        "SAD"
+                                        "SADNESS"
                                       ]
                                     },
                                     "weather": {
@@ -5055,6 +5049,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "feelings": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -5720,10 +5717,10 @@
             "type": "string",
             "enum": [
               "JOYFUL",
-              "HAPPY",
+              "HAPPINESS",
               "NEUTRAL",
               "UNHAPPY",
-              "SAD"
+              "SADNESS"
             ]
           },
           "weather": {
@@ -5751,6 +5748,9 @@
                 }
               }
             }
+          },
+          "feelings": {
+            "type": "string"
           },
           "createdAt": {
             "type": "string",
@@ -7402,9 +7402,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "feelings": {
-                                      "type": "string"
-                                    },
                                     "photos": {
                                       "type": "object",
                                       "properties": {
@@ -7598,10 +7595,10 @@
                                       "type": "string",
                                       "enum": [
                                         "JOYFUL",
-                                        "HAPPY",
+                                        "HAPPINESS",
                                         "NEUTRAL",
                                         "UNHAPPY",
-                                        "SAD"
+                                        "SADNESS"
                                       ]
                                     },
                                     "weather": {
@@ -7842,6 +7839,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "feelings": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -10199,9 +10199,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "feelings": {
-                                      "type": "string"
-                                    },
                                     "photos": {
                                       "type": "object",
                                       "properties": {
@@ -10395,10 +10392,10 @@
                                       "type": "string",
                                       "enum": [
                                         "JOYFUL",
-                                        "HAPPY",
+                                        "HAPPINESS",
                                         "NEUTRAL",
                                         "UNHAPPY",
-                                        "SAD"
+                                        "SADNESS"
                                       ]
                                     },
                                     "weather": {
@@ -10639,6 +10636,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "feelings": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -12932,9 +12932,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "feelings": {
-                                      "type": "string"
-                                    },
                                     "photos": {
                                       "type": "object",
                                       "properties": {
@@ -13128,10 +13125,10 @@
                                       "type": "string",
                                       "enum": [
                                         "JOYFUL",
-                                        "HAPPY",
+                                        "HAPPINESS",
                                         "NEUTRAL",
                                         "UNHAPPY",
-                                        "SAD"
+                                        "SADNESS"
                                       ]
                                     },
                                     "weather": {
@@ -13372,6 +13369,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "feelings": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -15405,9 +15405,6 @@
                                                               "title": {
                                                                 "type": "string"
                                                               },
-                                                              "feelings": {
-                                                                "type": "string"
-                                                              },
                                                               "photos": {
                                                                 "type": "object",
                                                                 "properties": {
@@ -15601,10 +15598,10 @@
                                                                 "type": "string",
                                                                 "enum": [
                                                                   "JOYFUL",
-                                                                  "HAPPY",
+                                                                  "HAPPINESS",
                                                                   "NEUTRAL",
                                                                   "UNHAPPY",
-                                                                  "SAD"
+                                                                  "SADNESS"
                                                                 ]
                                                               },
                                                               "weather": {
@@ -15845,6 +15842,9 @@
                                                                     }
                                                                   }
                                                                 }
+                                                              },
+                                                              "feelings": {
+                                                                "type": "string"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -18596,9 +18596,6 @@
                       "title": {
                         "type": "string"
                       },
-                      "feelings": {
-                        "type": "string"
-                      },
                       "photos": {
                         "type": "object",
                         "properties": {
@@ -20343,10 +20340,10 @@
                         "type": "string",
                         "enum": [
                           "JOYFUL",
-                          "HAPPY",
+                          "HAPPINESS",
                           "NEUTRAL",
                           "UNHAPPY",
-                          "SAD"
+                          "SADNESS"
                         ]
                       },
                       "weather": {
@@ -20587,6 +20584,9 @@
                             }
                           }
                         }
+                      },
+                      "feelings": {
+                        "type": "string"
                       },
                       "createdAt": {
                         "type": "string",
@@ -22265,9 +22265,6 @@
                                     "title": {
                                       "type": "string"
                                     },
-                                    "feelings": {
-                                      "type": "string"
-                                    },
                                     "photos": {
                                       "type": "object",
                                       "properties": {
@@ -22461,10 +22458,10 @@
                                       "type": "string",
                                       "enum": [
                                         "JOYFUL",
-                                        "HAPPY",
+                                        "HAPPINESS",
                                         "NEUTRAL",
                                         "UNHAPPY",
-                                        "SAD"
+                                        "SADNESS"
                                       ]
                                     },
                                     "weather": {
@@ -22705,6 +22702,9 @@
                                           }
                                         }
                                       }
+                                    },
+                                    "feelings": {
+                                      "type": "string"
                                     },
                                     "createdAt": {
                                       "type": "string",
