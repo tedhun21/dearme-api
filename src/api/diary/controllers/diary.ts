@@ -309,5 +309,66 @@ export default factories.createCoreController(
         return ctx.badRequest("Fail to search the diary");
       }
     },
+
+    // 태그 개수
+    async getTag(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+      const { id: userId } = ctx.state.user;
+      const { date } = ctx.query;
+
+      let filters;
+
+      // 날짜 필터 적용
+      if (date) {
+        // 날짜 형식 검증 (YYYY 또는 YYYY-MM 또는 YYYY-MM-DD)
+        if (!/^\d{4}(-\d{2})?(-\d{2})?$/.test(date)) {
+          return ctx.badRequest(
+            "Invalid date format. Use YYYY, YYYY-MM, or YYYY-MM-DD."
+          );
+        }
+
+        if (date.length === 4) {
+          // YYYY 형식
+          const startDate = new Date(`${date}-01-01`);
+          const endDate = new Date(
+            new Date(`${date}-01-01`).setFullYear(startDate.getFullYear() + 1)
+          );
+
+          filters = { user: userId, date: { $gte: startDate, $lt: endDate } };
+        } else if (date.length === 7) {
+          // YYYY-MM 형식
+          const startDate = new Date(`${date}-01`);
+          const endDate = new Date(startDate);
+          endDate.setMonth(startDate.getMonth() + 1);
+
+          filters = { user: userId, date: { $gte: startDate, $lt: endDate } };
+        }
+      }
+
+      try {
+        const diaries = await strapi.entityService.findMany(
+          "api::diary.diary",
+          { filters, fields: ["companions"] }
+        );
+
+        const tagCounts = {};
+
+        (diaries as any).forEach((diary) => {
+          if (diary.companions) {
+            if (tagCounts[diary.companions]) {
+              tagCounts[diary.companions] += 1;
+            } else {
+              tagCounts[diary.companions] = 1;
+            }
+          }
+        });
+
+        return ctx.send(tagCounts);
+      } catch (e) {
+        return ctx.badRequest("Failed to get tags.");
+      }
+    },
   })
 );

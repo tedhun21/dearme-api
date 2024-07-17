@@ -899,8 +899,6 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   attributes: {
     title: Attribute.String & Attribute.Required;
     photos: Attribute.Media;
-    startSleep: Attribute.Time;
-    endSleep: Attribute.Time;
     remember: Attribute.Boolean;
     user: Attribute.Relation<
       'api::diary.diary',
@@ -923,6 +921,8 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
       'api::today-pick.today-pick'
     >;
     feelings: Attribute.String;
+    startSleep: Attribute.DateTime;
+    endSleep: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

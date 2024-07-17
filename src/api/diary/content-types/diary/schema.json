@@ -27,12 +27,6 @@
         "audios"
       ]
     },
-    "startSleep": {
-      "type": "time"
-    },
-    "endSleep": {
-      "type": "time"
-    },
     "remember": {
       "type": "boolean"
     },
@@ -84,6 +78,12 @@
     },
     "feelings": {
       "type": "string"
+    },
+    "startSleep": {
+      "type": "datetime"
+    },
+    "endSleep": {
+      "type": "datetime"
     }
   }
 }

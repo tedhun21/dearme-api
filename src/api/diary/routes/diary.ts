@@ -36,5 +36,8 @@ module.exports = {
       path: "/search-diaries",
       handler: "diary.search",
     },
+
+    // 태그 검색
+    { method: "GET", path: "/diaries/tags", handler: "diary.getTag" },
   ],
 };

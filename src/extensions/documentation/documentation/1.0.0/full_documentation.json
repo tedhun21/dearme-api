@@ -14,7 +14,7 @@
       "name": "Apache 2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
-    "x-generation-date": "2024-07-15T12:18:06.464Z"
+    "x-generation-date": "2024-07-17T10:09:55.818Z"
   },
   "x-strapi-config": {
     "path": "/documentation",
@@ -1330,16 +1330,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "startSleep": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "12:54.000"
-                                                              },
-                                                              "endSleep": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "12:54.000"
-                                                              },
                                                               "remember": {
                                                                 "type": "boolean"
                                                               },
@@ -1628,6 +1618,14 @@
                                                               },
                                                               "feelings": {
                                                                 "type": "string"
+                                                              },
+                                                              "startSleep": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "endSleep": {
+                                                                "type": "string",
+                                                                "format": "date-time"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -2864,16 +2862,6 @@
                   "example": "string or id"
                 }
               },
-              "startSleep": {
-                "type": "string",
-                "format": "time",
-                "example": "12:54.000"
-              },
-              "endSleep": {
-                "type": "string",
-                "format": "time",
-                "example": "12:54.000"
-              },
               "remember": {
                 "type": "boolean"
               },
@@ -2937,6 +2925,14 @@
               },
               "feelings": {
                 "type": "string"
+              },
+              "startSleep": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "endSleep": {
+                "type": "string",
+                "format": "date-time"
               }
             }
           }
@@ -3623,16 +3619,6 @@
                 }
               }
             }
-          },
-          "startSleep": {
-            "type": "string",
-            "format": "time",
-            "example": "12:54.000"
-          },
-          "endSleep": {
-            "type": "string",
-            "format": "time",
-            "example": "12:54.000"
           },
           "remember": {
             "type": "boolean"
@@ -4754,16 +4740,6 @@
                                         }
                                       }
                                     },
-                                    "startSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
-                                    "endSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
                                     "remember": {
                                       "type": "boolean"
                                     },
@@ -5052,6 +5028,14 @@
                                     },
                                     "feelings": {
                                       "type": "string"
+                                    },
+                                    "startSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "endSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -5751,6 +5735,14 @@
           },
           "feelings": {
             "type": "string"
+          },
+          "startSleep": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endSleep": {
+            "type": "string",
+            "format": "date-time"
           },
           "createdAt": {
             "type": "string",
@@ -7544,16 +7536,6 @@
                                         }
                                       }
                                     },
-                                    "startSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
-                                    "endSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
                                     "remember": {
                                       "type": "boolean"
                                     },
@@ -7842,6 +7824,14 @@
                                     },
                                     "feelings": {
                                       "type": "string"
+                                    },
+                                    "startSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "endSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -10341,16 +10331,6 @@
                                         }
                                       }
                                     },
-                                    "startSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
-                                    "endSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
                                     "remember": {
                                       "type": "boolean"
                                     },
@@ -10639,6 +10619,14 @@
                                     },
                                     "feelings": {
                                       "type": "string"
+                                    },
+                                    "startSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "endSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -13074,16 +13062,6 @@
                                         }
                                       }
                                     },
-                                    "startSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
-                                    "endSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
                                     "remember": {
                                       "type": "boolean"
                                     },
@@ -13372,6 +13350,14 @@
                                     },
                                     "feelings": {
                                       "type": "string"
+                                    },
+                                    "startSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "endSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -15547,16 +15533,6 @@
                                                                   }
                                                                 }
                                                               },
-                                                              "startSleep": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "12:54.000"
-                                                              },
-                                                              "endSleep": {
-                                                                "type": "string",
-                                                                "format": "time",
-                                                                "example": "12:54.000"
-                                                              },
                                                               "remember": {
                                                                 "type": "boolean"
                                                               },
@@ -15845,6 +15821,14 @@
                                                               },
                                                               "feelings": {
                                                                 "type": "string"
+                                                              },
+                                                              "startSleep": {
+                                                                "type": "string",
+                                                                "format": "date-time"
+                                                              },
+                                                              "endSleep": {
+                                                                "type": "string",
+                                                                "format": "date-time"
                                                               },
                                                               "createdAt": {
                                                                 "type": "string",
@@ -18738,16 +18722,6 @@
                           }
                         }
                       },
-                      "startSleep": {
-                        "type": "string",
-                        "format": "time",
-                        "example": "12:54.000"
-                      },
-                      "endSleep": {
-                        "type": "string",
-                        "format": "time",
-                        "example": "12:54.000"
-                      },
                       "remember": {
                         "type": "boolean"
                       },
@@ -20588,6 +20562,14 @@
                       "feelings": {
                         "type": "string"
                       },
+                      "startSleep": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "endSleep": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
                       "createdAt": {
                         "type": "string",
                         "format": "date-time"
@@ -22407,16 +22389,6 @@
                                         }
                                       }
                                     },
-                                    "startSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
-                                    "endSleep": {
-                                      "type": "string",
-                                      "format": "time",
-                                      "example": "12:54.000"
-                                    },
                                     "remember": {
                                       "type": "boolean"
                                     },
@@ -22705,6 +22677,14 @@
                                     },
                                     "feelings": {
                                       "type": "string"
+                                    },
+                                    "startSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
+                                    },
+                                    "endSleep": {
+                                      "type": "string",
+                                      "format": "date-time"
                                     },
                                     "createdAt": {
                                       "type": "string",
@@ -24644,6 +24624,77 @@
         ],
         "parameters": [],
         "operationId": "get/search-diaries"
+      }
+    },
+    "/diaries/tags": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Diary"
+        ],
+        "parameters": [],
+        "operationId": "get/diaries/tags"
       }
     },
     "/friendships": {
