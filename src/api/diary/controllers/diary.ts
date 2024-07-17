@@ -316,11 +316,12 @@ export default factories.createCoreController(
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
       const { id: userId } = ctx.state.user;
-      const { date } = ctx.query;
+      const { date, tag } = ctx.query;
 
-      let filters;
+      let filters = { user: userId };
 
       // 날짜 필터 적용
+      // 날짜 형식 검증 및 필터 설정
       if (date) {
         // 날짜 형식 검증 (YYYY 또는 YYYY-MM 또는 YYYY-MM-DD)
         if (!/^\d{4}(-\d{2})?(-\d{2})?$/.test(date)) {
@@ -332,36 +333,89 @@ export default factories.createCoreController(
         if (date.length === 4) {
           // YYYY 형식
           const startDate = new Date(`${date}-01-01`);
-          const endDate = new Date(
-            new Date(`${date}-01-01`).setFullYear(startDate.getFullYear() + 1)
-          );
+          const endDate = new Date(startDate);
+          endDate.setFullYear(startDate.getFullYear() + 1);
 
-          filters = { user: userId, date: { $gte: startDate, $lt: endDate } };
+          (filters as any).date = { $gte: startDate, $lt: endDate };
         } else if (date.length === 7) {
           // YYYY-MM 형식
           const startDate = new Date(`${date}-01`);
           const endDate = new Date(startDate);
           endDate.setMonth(startDate.getMonth() + 1);
 
-          filters = { user: userId, date: { $gte: startDate, $lt: endDate } };
+          (filters as any).date = { $gte: startDate, $lt: endDate };
+        } else if (date.length === 10) {
+          // YYYY-MM-DD 형식
+          const startDate = new Date(date);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 1);
+
+          (filters as any).date = { $gte: startDate, $lt: endDate };
         }
+      }
+
+      // 필드 설정
+      let fields = [];
+      if (tag === "ALL") {
+        fields = ["companions", "mood", "feelings", "date"];
+      } else if (tag === "WITH") {
+        fields = ["companions"];
+      } else if (tag === "MOOD") {
+        fields = ["mood"];
+      } else if (tag === "FEELINGS") {
+        fields = ["feelings"];
       }
 
       try {
         const diaries = await strapi.entityService.findMany(
           "api::diary.diary",
-          { filters, fields: ["companions"] }
+          { filters, fields }
         );
 
+        // 태그 빈도수 계산
         const tagCounts = {};
-
         (diaries as any).forEach((diary) => {
-          if (diary.companions) {
-            if (tagCounts[diary.companions]) {
-              tagCounts[diary.companions] += 1;
-            } else {
-              tagCounts[diary.companions] = 1;
+          if (tag === "ALL") {
+            if (diary.companions) {
+              diary.companions.split(",").forEach((companion) => {
+                if (tagCounts[companion]) {
+                  tagCounts[companion] += 1;
+                } else {
+                  tagCounts[companion] = 1;
+                }
+              });
             }
+            if (diary.mood) {
+              if (tagCounts[diary.mood]) {
+                tagCounts[diary.mood] += 1;
+              } else {
+                tagCounts[diary.mood] = 1;
+              }
+            }
+          } else if (tag === "WITH" && diary.companions) {
+            diary.companions.split(",").forEach((companion) => {
+              if (tagCounts[companion]) {
+                tagCounts[companion] += 1;
+              } else {
+                tagCounts[companion] = 1;
+              }
+            });
+          } else if (tag === "MOOD" && diary.mood) {
+            if (tagCounts[diary.mood]) {
+              tagCounts[diary.mood] += 1;
+            } else {
+              tagCounts[diary.mood] = 1;
+            }
+          } else if (tag === "FEELINGS" && diary.feelings) {
+            const parsedFeelings = JSON.parse(diary.feelings);
+
+            parsedFeelings.forEach((feeling) => {
+              if (tagCounts[feeling]) {
+                tagCounts[feeling] += 1;
+              } else {
+                tagCounts[feeling] = 1;
+              }
+            });
           }
         });
 
