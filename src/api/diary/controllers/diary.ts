@@ -372,54 +372,86 @@ export default factories.createCoreController(
           { filters, fields }
         );
 
-        // 태그 빈도수 계산
-        const tagCounts = {};
+        // 태그 빈도수 배열로 초기화
+        const tagCountsArray = [];
+
         (diaries as any).forEach((diary) => {
           if (tag === "ALL") {
+            // 처리 'companions', 'mood', 'feelings'의 모든 태그를 배열로 저장
             if (diary.companions) {
               diary.companions.split(",").forEach((companion) => {
-                if (tagCounts[companion]) {
-                  tagCounts[companion] += 1;
+                const existingTag = tagCountsArray.find(
+                  (item) => item.tag === companion
+                );
+                if (existingTag) {
+                  existingTag.count += 1;
                 } else {
-                  tagCounts[companion] = 1;
+                  tagCountsArray.push({ tag: companion, count: 1 });
                 }
               });
             }
             if (diary.mood) {
-              if (tagCounts[diary.mood]) {
-                tagCounts[diary.mood] += 1;
+              const existingTag = tagCountsArray.find(
+                (item) => item.tag === diary.mood
+              );
+              if (existingTag) {
+                existingTag.count += 1;
               } else {
-                tagCounts[diary.mood] = 1;
+                tagCountsArray.push({ tag: diary.mood, count: 1 });
               }
+            }
+            if (diary.feelings) {
+              const parsedFeelings = JSON.parse(diary.feelings);
+              parsedFeelings.forEach((feeling) => {
+                const existingTag = tagCountsArray.find(
+                  (item) => item.tag === feeling
+                );
+                if (existingTag) {
+                  existingTag.count += 1;
+                } else {
+                  tagCountsArray.push({ tag: feeling, count: 1 });
+                }
+              });
             }
           } else if (tag === "WITH" && diary.companions) {
             diary.companions.split(",").forEach((companion) => {
-              if (tagCounts[companion]) {
-                tagCounts[companion] += 1;
+              const existingTag = tagCountsArray.find(
+                (item) => item.tag === companion
+              );
+              if (existingTag) {
+                existingTag.count += 1;
               } else {
-                tagCounts[companion] = 1;
+                tagCountsArray.push({ tag: companion, count: 1 });
               }
             });
           } else if (tag === "MOOD" && diary.mood) {
-            if (tagCounts[diary.mood]) {
-              tagCounts[diary.mood] += 1;
+            const existingTag = tagCountsArray.find(
+              (item) => item.tag === diary.mood
+            );
+            if (existingTag) {
+              existingTag.count += 1;
             } else {
-              tagCounts[diary.mood] = 1;
+              tagCountsArray.push({ tag: diary.mood, count: 1 });
             }
           } else if (tag === "FEELINGS" && diary.feelings) {
             const parsedFeelings = JSON.parse(diary.feelings);
-
             parsedFeelings.forEach((feeling) => {
-              if (tagCounts[feeling]) {
-                tagCounts[feeling] += 1;
+              const existingTag = tagCountsArray.find(
+                (item) => item.tag === feeling
+              );
+              if (existingTag) {
+                existingTag.count += 1;
               } else {
-                tagCounts[feeling] = 1;
+                tagCountsArray.push({ tag: feeling, count: 1 });
               }
             });
           }
         });
 
-        return ctx.send(tagCounts);
+        // 빈도수에 따라 태그 정렬
+        tagCountsArray.sort((a, b) => b.count - a.count);
+
+        return ctx.send(tagCountsArray);
       } catch (e) {
         return ctx.badRequest("Failed to get tags.");
       }
