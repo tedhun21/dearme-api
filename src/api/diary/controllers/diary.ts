@@ -316,7 +316,7 @@ export default factories.createCoreController(
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
       const { id: userId } = ctx.state.user;
-      const { date, tag, page, size } = ctx.query;
+      const { date, tag } = ctx.query;
 
       let filters = { user: userId };
 
@@ -505,48 +505,20 @@ export default factories.createCoreController(
           { filters }
         );
 
-        console.log(diaries);
+        // 모든 startSleep과 endSleep 수집
+        const startSleeps = diaries.map((diary) => ({
+          date: diary.date,
+          startSleep: diary.startSleep,
+        }));
+        const endSleeps = diaries.map((diary) => ({
+          date: diary.date,
+          endSleep: diary.endSleep,
+        }));
 
-        // Extract startSleep and endSleep into separate arrays
-        const startSleeps = (diaries as any).map((diary) => diary.startSleep);
-        const endSleeps = (diaries as any).map((diary) => diary.endSleep);
-
-        // Convert each time to minutes from the start of the day, adjusting for times past midnight
-        const referenceDate = new Date("1970-01-01T00:00:00Z");
-        const minutesInDay = 24 * 60;
-
-        const startTimesInMinutes = startSleeps.map((start) => {
-          const date = new Date(start);
-          let minutes = date.getUTCHours() * 60 + date.getUTCMinutes();
-          if (date < referenceDate) {
-            minutes += minutesInDay; // adjust for past midnight times
-          }
-          return minutes;
+        return ctx.send({
+          startSleeps,
+          endSleeps,
         });
-
-        // Use reduce to sum these minute values
-        const totalMinutes = startTimesInMinutes.reduce(
-          (accumulator, currentValue) => accumulator + currentValue,
-          0
-        );
-
-        // Calculate the average minutes
-        const averageMinutes = totalMinutes / startSleeps.length;
-
-        // Adjust the average minutes back within a 24-hour period
-        const adjustedAverageMinutes = averageMinutes % minutesInDay;
-
-        // Convert the average minutes back to a time format
-        const hours = Math.floor(adjustedAverageMinutes / 60);
-        const minutes = Math.floor(adjustedAverageMinutes % 60);
-
-        const formattedTime = `${String(hours).padStart(2, "0")}:${String(
-          minutes
-        ).padStart(2, "0")}`;
-
-        console.log("Average Time:", formattedTime);
-
-        return ctx.send({ startSleeps, endSleeps });
       } catch (e) {
         return ctx.badRequest("Failed to get sleep data.");
       }
