@@ -316,14 +316,12 @@ export default factories.createCoreController(
         return ctx.unauthorized("Authentication token is missing or invalid");
       }
       const { id: userId } = ctx.state.user;
-      const { date, tag } = ctx.query;
+      const { date, tag, page, size } = ctx.query;
 
       let filters = { user: userId };
 
       // 날짜 필터 적용
-      // 날짜 형식 검증 및 필터 설정
       if (date) {
-        // 날짜 형식 검증 (YYYY 또는 YYYY-MM 또는 YYYY-MM-DD)
         if (!/^\d{4}(-\d{2})?(-\d{2})?$/.test(date)) {
           return ctx.badRequest(
             "Invalid date format. Use YYYY, YYYY-MM, or YYYY-MM-DD."
@@ -331,25 +329,19 @@ export default factories.createCoreController(
         }
 
         if (date.length === 4) {
-          // YYYY 형식
           const startDate = new Date(`${date}-01-01`);
           const endDate = new Date(startDate);
           endDate.setFullYear(startDate.getFullYear() + 1);
-
           (filters as any).date = { $gte: startDate, $lt: endDate };
         } else if (date.length === 7) {
-          // YYYY-MM 형식
           const startDate = new Date(`${date}-01`);
           const endDate = new Date(startDate);
           endDate.setMonth(startDate.getMonth() + 1);
-
           (filters as any).date = { $gte: startDate, $lt: endDate };
         } else if (date.length === 10) {
-          // YYYY-MM-DD 형식
           const startDate = new Date(date);
           const endDate = new Date(startDate);
           endDate.setDate(startDate.getDate() + 1);
-
           (filters as any).date = { $gte: startDate, $lt: endDate };
         }
       }
@@ -367,7 +359,7 @@ export default factories.createCoreController(
       }
 
       try {
-        const diaries = await strapi.entityService.findMany(
+        const diaries = await strapi.entityService.findPage(
           "api::diary.diary",
           { filters, fields }
         );
@@ -375,9 +367,8 @@ export default factories.createCoreController(
         // 태그 빈도수 배열로 초기화
         const tagCountsArray = [];
 
-        (diaries as any).forEach((diary) => {
+        (diaries.results as any).forEach((diary) => {
           if (tag === "ALL") {
-            // 처리 'companions', 'mood', 'feelings'의 모든 태그를 배열로 저장
             if (diary.companions) {
               diary.companions.split(",").forEach((companion) => {
                 const existingTag = tagCountsArray.find(
@@ -451,9 +442,113 @@ export default factories.createCoreController(
         // 빈도수에 따라 태그 정렬
         tagCountsArray.sort((a, b) => b.count - a.count);
 
-        return ctx.send(tagCountsArray);
+        // 태그에 순위 추가
+        tagCountsArray.forEach((item, index) => {
+          item.rank = index + 1;
+        });
+
+        // const totalTags = tagCountsArray.length;
+        // const totalPages = Math.ceil(totalTags / size);
+        // const currentPage = Math.max(1, Math.min(page, totalPages));
+        // const start = (currentPage - 1) * size;
+        // const end = start + size;
+        // const paginatedTags = tagCountsArray.slice(start, end);
+
+        return ctx.send(
+          // totalTags,
+          // totalPages,
+          // currentPage,
+          // tags: paginatedTags,
+          tagCountsArray
+        );
       } catch (e) {
         return ctx.badRequest("Failed to get tags.");
+      }
+    },
+    async getSleep(ctx) {
+      if (!ctx.state.user) {
+        return ctx.unauthorized("Authentication token is missing or invalid");
+      }
+      const { id: userId } = ctx.state.user;
+      const { date } = ctx.query;
+
+      let filters = { user: userId };
+
+      if (date) {
+        if (!/^\d{4}(-\d{2})?(-\d{2})?$/.test(date)) {
+          return ctx.badRequest(
+            "Invalid date format. Use YYYY, YYYY-MM, or YYYY-MM-DD."
+          );
+        }
+
+        if (date.length === 4) {
+          const startDate = new Date(`${date}-01-01`);
+          const endDate = new Date(startDate);
+          endDate.setFullYear(startDate.getFullYear() + 1);
+          (filters as any).date = { $gte: startDate, $lt: endDate };
+        } else if (date.length === 7) {
+          const startDate = new Date(`${date}-01`);
+          const endDate = new Date(startDate);
+          endDate.setMonth(startDate.getMonth() + 1);
+          (filters as any).date = { $gte: startDate, $lt: endDate };
+        } else if (date.length === 10) {
+          const startDate = new Date(date);
+          const endDate = new Date(startDate);
+          endDate.setDate(startDate.getDate() + 1);
+          (filters as any).date = { $gte: startDate, $lt: endDate };
+        }
+      }
+
+      try {
+        const diaries = await strapi.entityService.findMany(
+          "api::diary.diary",
+          { filters }
+        );
+
+        console.log(diaries);
+
+        // Extract startSleep and endSleep into separate arrays
+        const startSleeps = (diaries as any).map((diary) => diary.startSleep);
+        const endSleeps = (diaries as any).map((diary) => diary.endSleep);
+
+        // Convert each time to minutes from the start of the day, adjusting for times past midnight
+        const referenceDate = new Date("1970-01-01T00:00:00Z");
+        const minutesInDay = 24 * 60;
+
+        const startTimesInMinutes = startSleeps.map((start) => {
+          const date = new Date(start);
+          let minutes = date.getUTCHours() * 60 + date.getUTCMinutes();
+          if (date < referenceDate) {
+            minutes += minutesInDay; // adjust for past midnight times
+          }
+          return minutes;
+        });
+
+        // Use reduce to sum these minute values
+        const totalMinutes = startTimesInMinutes.reduce(
+          (accumulator, currentValue) => accumulator + currentValue,
+          0
+        );
+
+        // Calculate the average minutes
+        const averageMinutes = totalMinutes / startSleeps.length;
+
+        // Adjust the average minutes back within a 24-hour period
+        const adjustedAverageMinutes = averageMinutes % minutesInDay;
+
+        // Convert the average minutes back to a time format
+        const hours = Math.floor(adjustedAverageMinutes / 60);
+        const minutes = Math.floor(adjustedAverageMinutes % 60);
+
+        const formattedTime = `${String(hours).padStart(2, "0")}:${String(
+          minutes
+        ).padStart(2, "0")}`;
+
+        console.log("Average Time:", formattedTime);
+
+        return ctx.send({ startSleeps, endSleeps });
+      } catch (e) {
+        return ctx.badRequest("Failed to get sleep data.");
       }
     },
   })

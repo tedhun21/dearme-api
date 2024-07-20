@@ -3,6 +3,7 @@
  */
 
 import { factories } from "@strapi/strapi";
+import diary from "../controllers/diary";
 
 export default factories.createCoreRouter("api::diary.diary");
 
@@ -39,5 +40,8 @@ module.exports = {
 
     // 태그 검색
     { method: "GET", path: "/diaries/tags", handler: "diary.getTag" },
+
+    // 취침시간 검색
+    { method: "GET", path: "/diaries/sleep", handler: "diary.getSleep" },
   ],
 };

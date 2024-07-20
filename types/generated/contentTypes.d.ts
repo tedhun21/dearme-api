@@ -403,9 +403,12 @@ export interface PluginUploadFile extends Schema.CollectionType {
     folderPath: Attribute.String &
       Attribute.Required &
       Attribute.Private &
-      Attribute.SetMinMax<{
-        min: 1;
-      }>;
+      Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -441,9 +444,12 @@ export interface PluginUploadFolder extends Schema.CollectionType {
   attributes: {
     name: Attribute.String &
       Attribute.Required &
-      Attribute.SetMinMax<{
-        min: 1;
-      }>;
+      Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
     pathId: Attribute.Integer & Attribute.Required & Attribute.Unique;
     parent: Attribute.Relation<
       'plugin::upload.folder',
@@ -462,9 +468,12 @@ export interface PluginUploadFolder extends Schema.CollectionType {
     >;
     path: Attribute.String &
       Attribute.Required &
-      Attribute.SetMinMax<{
-        min: 1;
-      }>;
+      Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -503,6 +512,12 @@ export interface PluginContentReleasesRelease extends Schema.CollectionType {
   attributes: {
     name: Attribute.String & Attribute.Required;
     releasedAt: Attribute.DateTime;
+    scheduledAt: Attribute.DateTime;
+    timezone: Attribute.String;
+    status: Attribute.Enumeration<
+      ['ready', 'blocked', 'failed', 'done', 'empty']
+    > &
+      Attribute.Required;
     actions: Attribute.Relation<
       'plugin::content-releases.release',
       'oneToMany',
@@ -551,11 +566,13 @@ export interface PluginContentReleasesReleaseAction
       'morphToOne'
     >;
     contentType: Attribute.String & Attribute.Required;
+    locale: Attribute.String;
     release: Attribute.Relation<
       'plugin::content-releases.release-action',
       'manyToOne',
       'plugin::content-releases.release'
     >;
+    isEntryValid: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<
@@ -595,10 +612,13 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
   attributes: {
     name: Attribute.String &
-      Attribute.SetMinMax<{
-        min: 1;
-        max: 50;
-      }>;
+      Attribute.SetMinMax<
+        {
+          min: 1;
+          max: 50;
+        },
+        number
+      >;
     code: Attribute.String & Attribute.Unique;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -779,7 +799,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'oneToOne',
       'api::notice.notice'
     >;
-    photo: Attribute.Media;
+    photo: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     nickname: Attribute.String &
       Attribute.Required &
       Attribute.Unique &
@@ -819,7 +839,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
       'manyToMany',
       'api::friendship.friendship'
     >;
-    background: Attribute.Media;
+    background: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     body: Attribute.Text;
     friendCount: Attribute.Integer;
     createdAt: Attribute.DateTime;
@@ -898,7 +918,7 @@ export interface ApiDiaryDiary extends Schema.CollectionType {
   };
   attributes: {
     title: Attribute.String & Attribute.Required;
-    photos: Attribute.Media;
+    photos: Attribute.Media<'images' | 'files' | 'videos' | 'audios', true>;
     remember: Attribute.Boolean;
     user: Attribute.Relation<
       'api::diary.diary',
@@ -1090,7 +1110,8 @@ export interface ApiPostPost extends Schema.CollectionType {
     private: Attribute.Boolean &
       Attribute.Required &
       Attribute.DefaultTo<false>;
-    photo: Attribute.Media & Attribute.Required;
+    photo: Attribute.Media<'images' | 'files' | 'videos' | 'audios'> &
+      Attribute.Required;
     user: Attribute.Relation<
       'api::post.post',
       'manyToOne',
@@ -1126,7 +1147,7 @@ export interface ApiQuoteQuote extends Schema.CollectionType {
   };
   attributes: {
     author: Attribute.String;
-    image: Attribute.Media;
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     body: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
@@ -1161,7 +1182,7 @@ export interface ApiTodayPickTodayPick extends Schema.CollectionType {
     date: Attribute.Date;
     contributors: Attribute.String;
     title: Attribute.String;
-    image: Attribute.Media;
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     diary: Attribute.Relation<
       'api::today-pick.today-pick',
       'manyToOne',

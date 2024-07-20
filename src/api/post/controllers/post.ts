@@ -163,19 +163,15 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: { id: userId } },
-                    { status: { $eq: "FRIEND" } },
-                  ],
+                  follow_sender: { id: userId },
+                  status: { $eq: "FRIEND" },
                 },
                 {
-                  $and: [
-                    { follow_receiver: { id: userId } },
-                    { status: { $eq: "FRIEND" } },
-                  ],
+                  follow_receiver: { id: userId },
+                  status: { $eq: "FRIEND" },
                 },
               ],
-            },
+            } as any,
             populate: {
               follow_receiver: true,
               follow_sender: true,
@@ -507,19 +503,15 @@ export default factories.createCoreController(
           filters: {
             $or: [
               {
-                $and: [
-                  { follow_receiver: { id: userId } },
-                  { follow_sender: { id: { $in: likeIds } } },
-                ],
+                follow_receiver: { id: userId },
+                follow_sender: { id: { $in: likeIds } },
               },
               {
-                $and: [
-                  { follow_receiver: { id: { $in: likeIds } } },
-                  { follow_sender: { id: userId } },
-                ],
+                follow_receiver: { id: { $in: likeIds } },
+                follow_sender: { id: userId },
               },
             ],
-          },
+          } as any,
           populate: {
             follow_receiver: { fields: ["id"] },
             follow_sender: { fields: ["id"] },

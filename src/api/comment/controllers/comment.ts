@@ -28,29 +28,23 @@ export default factories.createCoreController(
           { populate: { user: { fields: ["nickname"] } } }
         );
 
+        // 유저와 post 유저와의 관계
         const friendship = await strapi.entityService.findMany(
           "api::friendship.friendship",
           {
             filters: {
-              $and: [
+              $or: [
                 {
-                  $or: [
-                    {
-                      $and: [
-                        { follow_sender: userId },
-                        { follow_receiver: (post.user as any).id },
-                      ],
-                    },
-                    {
-                      $and: [
-                        { follow_receiver: userId },
-                        { follow_sender: (post.user as any).id },
-                      ],
-                    },
-                  ],
+                  follow_sender: userId,
+                  follow_receiver: (post.user as any).id,
+                },
+                {
+                  follow_receiver: userId,
+                  follow_sender: (post.user as any).id,
                 },
               ],
             },
+
             populate: {
               follow_receiver: { fields: ["nickname"] },
               follow_sender: { fields: ["nickname"] },
@@ -59,6 +53,8 @@ export default factories.createCoreController(
             },
           }
         );
+
+        console.log(friendship);
 
         let data;
 
@@ -72,7 +68,6 @@ export default factories.createCoreController(
             data: { user: userId, post: postId, body },
           };
         }
-
         // 3. post commentSettings가 FRIENDS면 friendship 관계가 FRIEND만 comment를 달 수 있다.
         else if (
           post.commentSettings === "FRIENDS" &&
@@ -86,13 +81,12 @@ export default factories.createCoreController(
               friendship: { connect: [friendship[0].id] },
             },
           };
-
-          // 3. post OFF면 관계가 무엇이든지 comment를 달 수 없다.
+          // 4. post OFF면 관계가 무엇이든지 comment를 달 수 없다.
         } else if (post.commentSettings === "OFF") {
           return ctx.badRequest(
             "The owner of the post has disabled commenting on it."
           );
-          // post comment 설정이 친구인 상태에서 친분이 없거나 친분이 PENDING 상태일때
+          // 5. post comment 설정이 친구인 상태에서 친분이 없거나 친분이 PENDING 상태일때
         } else if (
           post.commentSettings === "FRIENDS" &&
           (friendship.length === 0 || friendship[0].status === "PENDING")

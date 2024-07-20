@@ -27,16 +27,12 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { follow_receiver: +friendId },
-                  ],
+                  follow_sender: userId,
+                  follow_receiver: +friendId,
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { follow_sender: +friendId },
-                  ],
+                  follow_receiver: userId,
+                  follow_sender: +friendId,
                 },
               ],
             },
@@ -102,16 +98,12 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { follow_receiver: +friendId },
-                  ],
+                  follow_sender: userId,
+                  follow_receiver: +friendId,
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { follow_sender: +friendId },
-                  ],
+                  follow_receiver: userId,
+                  follow_sender: +friendId,
                 },
               ],
             },
@@ -203,16 +195,12 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { follow_receiver: +friendId },
-                  ],
+                  follow_sender: userId,
+                  follow_receiver: +friendId,
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { follow_sender: +friendId },
-                  ],
+                  follow_receiver: userId,
+                  follow_sender: +friendId,
                 },
               ],
             },
@@ -431,16 +419,12 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { follow_receiver: +friendId },
-                  ],
+                  follow_sender: userId,
+                  follow_receiver: +friendId,
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { follow_sender: +friendId },
-                  ],
+                  follow_receiver: userId,
+                  follow_sender: +friendId,
                 },
               ],
             },
@@ -489,26 +473,19 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: { id: userId } },
-                    { status: "FRIEND" },
-                  ],
+                  follow_sender: { id: userId },
+                  status: "FRIEND",
                 },
                 {
-                  $and: [
-                    { follow_receiver: { id: userId } },
-                    { status: "FRIEND" },
-                  ],
+                  follow_receiver: { id: userId },
+                  status: "FRIEND",
                 },
                 {
-                  $and: [
-                    { $not: { block: { id: userId } } },
-                    { status: "BLOCK_ONE" },
-                  ],
+                  status: "BLOCK_ONE",
+                  $not: { block: { id: userId } },
                 },
               ],
-            },
-
+            } as any,
             populate: {
               follow_sender: { fields: ["id"] },
               follow_receiver: { fields: ["id"] },
@@ -520,13 +497,26 @@ export default factories.createCoreController(
           }
         );
 
+        // Check if there are no friendships
+        if (friendships.results.length === 0) {
+          return ctx.send({
+            results: [],
+            pagination: {
+              page: parseInt(page, 10) || 1,
+              pageSize: parseInt(size, 10) || 10,
+              pageCount: 0,
+              total: 0,
+            },
+          });
+        }
+
         // 친구인 아이디를 배열로
         const friendArray = (friendships) => {
-          return friendships.map((friend) => {
-            if ((friend.follow_sender as any).id !== userId) {
-              return (friend.follow_sender as any).id;
+          return friendships.results.map((friend) => {
+            if (friend.follow_sender.id !== userId) {
+              return friend.follow_sender.id;
             } else {
-              return (friend.follow_receiver as any).id;
+              return friend.follow_receiver.id;
             }
           });
         };
@@ -534,12 +524,14 @@ export default factories.createCoreController(
         const friends = await strapi.entityService.findPage(
           "plugin::users-permissions.user",
           {
-            filters: { id: friendArray(friendships.results) },
+            filters: { id: { $in: friendArray(friendships.results) } },
             populate: { photo: { fields: ["id", "url"] } },
             page,
             pageSize: size,
           }
         );
+
+        console.log(friends.results);
 
         const modifiedFriends = friends.results.map((friend) => ({
           id: friend.id,
@@ -588,7 +580,7 @@ export default factories.createCoreController(
         const requestUsers = await strapi.entityService.findPage(
           "plugin::users-permissions.user",
           {
-            filters: { id: requests },
+            // filters: { id: requests },
             populate: { photo: { fields: ["id", "url"] } },
           }
         );
@@ -630,51 +622,35 @@ export default factories.createCoreController(
             filters: {
               $or: [
                 {
-                  $and: [
-                    { follow_sender: userId },
-                    { status: "FRIEND" },
-                    {
-                      follow_receiver: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  follow_sender: { id: userId },
+                  status: "FRIEND",
+                  follow_receiver: {
+                    nickname: { $contains: q || "" },
+                  },
                 },
                 {
-                  $and: [
-                    { follow_receiver: userId },
-                    { status: "FRIEND" },
-                    {
-                      follow_sender: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  follow_receiver: { id: userId },
+                  status: "FRIEND",
+                  follow_sender: {
+                    nickname: { $contains: q || "" },
+                  },
                 },
                 {
-                  $and: [
-                    { block: { id: userId } },
-                    { status: "BLOCK_ONE" },
-                    {
-                      blocked: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  block: { id: userId },
+                  status: "BLOCK_ONE",
+                  blocked: {
+                    nickname: { $contains: q || "" },
+                  },
                 },
                 {
-                  $and: [
-                    { block: { id: userId } },
-                    { status: "BLOCK_BOTH" },
-                    {
-                      blocked: {
-                        nickname: { $contains: q !== undefined ? q : "" },
-                      },
-                    },
-                  ],
+                  block: { id: userId },
+                  status: "BLOCK_BOTH",
+                  blocked: {
+                    nickname: { $contains: q || "" },
+                  },
                 },
               ],
-            },
+            } as any,
             page,
             pageSize: size,
             populate: {
@@ -694,71 +670,72 @@ export default factories.createCoreController(
           }
         );
 
-        const friendAndBlock = (friendships.results as any).map(
-          (friendship: any) => {
-            if (friendship.status === "FRIEND") {
-              if (friendship.follow_sender.id !== userId) {
-                const friend = friendship.follow_sender;
-                return {
-                  id: friend?.id,
-                  username: friend?.username,
-                  nickname: friend?.nickname,
-                  photo: friend.photo
-                    ? {
-                        id: friend?.photo?.id ?? null,
-                        url: friend?.photo?.url ?? null,
-                      }
-                    : null,
-                  status: "FRIEND",
-                };
-              } else if (friendship.follow_receiver.id !== userId) {
-                const friend = friendship.follow_receiver;
-                return {
-                  id: friend?.id,
-                  username: friend?.username,
-                  nickname: friend?.nickname,
-                  photo: friend.photo
-                    ? {
-                        id: friend?.photo.id ?? null,
-                        url: friend?.photo.url ?? null,
-                      }
-                    : null,
-                  status: "FRIEND",
-                };
-              }
-            } else if (friendship.status === "BLOCK_ONE") {
-              const filter = friendship.blocked.filter(
-                (blocked) => blocked.id !== userId
-              );
-              const blocked = filter[0];
-
+        const friendAndBlock = friendships.results.map((friendship: any) => {
+          if (friendship.status === "FRIEND") {
+            if (friendship.follow_sender.id !== userId) {
+              const friend = friendship.follow_sender;
               return {
-                id: blocked.id,
-                username: blocked.username,
-                nickname: blocked.nickname,
-                photo: blocked?.photo
-                  ? { id: blocked?.photo?.id, url: blocked?.photo?.url }
+                id: friend?.id,
+                username: friend?.username,
+                nickname: friend?.nickname,
+                photo: friend.photo
+                  ? {
+                      id: friend?.photo?.id || null,
+                      url: friend?.photo?.url || null,
+                    }
                   : null,
-                status: "BLOCK",
+                status: "FRIEND",
               };
-            } else if (friendship.status === "BLOCK_BOTH") {
-              const filter = friendship.blocked.filter(
-                (blocked) => blocked.id !== userId
-              );
-              const blocked = filter[0];
-
+            } else if (friendship.follow_receiver.id !== userId) {
+              const friend = friendship.follow_receiver;
               return {
-                id: blocked.id,
-                username: blocked.username,
-                nickname: blocked.nickname,
-                photo: blocked?.photo
-                  ? { id: blocked?.photo?.id, url: blocked?.photo?.url }
+                id: friend?.id,
+                username: friend?.username,
+                nickname: friend?.nickname,
+                photo: friend.photo
+                  ? {
+                      id: friend?.photo.id || null,
+                      url: friend?.photo.url || null,
+                    }
                   : null,
-                status: "BLOCK",
+                status: "FRIEND",
               };
             }
+          } else if (friendship.status === "BLOCK_ONE") {
+            const filter = friendship.blocked.filter(
+              (blocked: any) => blocked.id !== userId
+            );
+            const blocked = filter[0];
+
+            return {
+              id: blocked.id,
+              username: blocked.username,
+              nickname: blocked.nickname,
+              photo: blocked?.photo
+                ? { id: blocked?.photo?.id, url: blocked?.photo?.url }
+                : null,
+              status: "BLOCK",
+            };
+          } else if (friendship.status === "BLOCK_BOTH") {
+            const filter = friendship.blocked.filter(
+              (blocked) => blocked.id !== userId
+            );
+            const blocked = filter[0];
+
+            return {
+              id: blocked.id,
+              username: blocked.username,
+              nickname: blocked.nickname,
+              photo: blocked?.photo
+                ? {
+                    id: blocked?.photo?.id || null,
+                    url: blocked?.photo?.url || null,
+                  }
+                : null,
+              status: "BLOCK",
+            };
           }
-        );
+        });
 
         return ctx.send({
           results: friendAndBlock,
